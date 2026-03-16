@@ -1,0 +1,59 @@
+# MorseDecode configuration file
+# Copy to ~/.morsedecode.toml (Linux/Mac) or %APPDATA%\morsedecode\config.toml (Windows)
+# CLI flags override any value here. Use --config to point to a different file.
+
+[input]
+# Audio source. Exactly one of these should be active:
+# device = "default"   # audio device name or index (see --list-devices)
+# device = 3           # device by index
+# file = "recording.wav"
+# stdin = true         # pipe raw audio from rtl_fm, gqrx, etc.
+
+# Frequency range and bin width for FFT channel analysis
+freq_min = 400   # Hz
+freq_max = 1000  # Hz
+bin_width = 50   # Hz  (yields 12 bins: 400-450, 450-500, ... 950-1000)
+
+[audio]
+# Sample rate in Hz. 0 = auto-detect from device or file header.
+sample_rate = 0
+# FFT analysis parameters
+window_ms = 20.0   # FFT window length (controls frequency resolution: 1000/window_ms Hz/bin)
+hop_ms = 5.0       # FFT hop size (controls time resolution; smaller = better high-speed tracking)
+# Auto Gain Control
+agc_enabled = true
+agc_window_s = 2.0       # RMS averaging window
+agc_target_rms = 0.1     # normalized RMS target (0.0–1.0)
+# Signal debounce: ignore state transitions shorter than this (handles key bounce / noise)
+debounce_ms = 3.0
+
+[decoder]
+beam_width = 16          # number of hypotheses in beam search (larger = better bad-fist tolerance)
+speed_min_wpm = 5.0      # minimum CW speed to consider
+speed_max_wpm = 50.0     # maximum CW speed to consider
+# Histogram estimator robustness
+histogram_bins = 60      # bins for dit/dah/space histograms
+estimator_decay = 0.97   # exponential decay for histogram (1.0 = no decay, 0.9 = fast adapt)
+outlier_pct = 10.0       # percentile to trim when fitting histogram peaks (handles bad fists)
+# Speed reset after silence
+silence_reset_s = 5.0    # seconds of continuous silence before resetting speed estimate
+# Rewind buffer: store this many seconds of timing events for re-decode when speed updates
+rewind_buffer_s = 10.0
+# Beam branching: how wide the dit/dah ambiguity band is (1.0 = standard, >1 = more forgiving)
+ambiguity_factor = 1.5
+
+[display]
+refresh_hz = 8.0         # terminal UI refresh rate
+snr_bar_width = 5        # number of blocks in the SNR bar
+callsign_width = 9       # reserved characters for callsign column
+text_width = 60          # characters of decoded text shown per line (scrolling)
+inactive_dim = true      # dim inactive bin lines
+inactive_scroll_s = 30.0 # seconds before inactive line text has fully scrolled off
+
+[log]
+enabled = false
+path = "morsedecode.log"
+format = "text"          # "text" or "jsonl"
+# In "text" mode each line is:  TIMESTAMP  FREQ_HZ  DECODED_TEXT
+# In "jsonl" mode each line is a JSON object with timestamp, freq_hz, text, snr_db, speed_wpm
+rotate_mb = 10           # rotate log after N megabytes (0 = never)
