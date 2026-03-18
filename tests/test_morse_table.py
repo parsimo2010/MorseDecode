@@ -90,17 +90,17 @@ class TestMorseTrie:
         assert node is not None
         assert node.char == "E"
 
-    def test_navigate_to_SOS(self):
-        # SOS = ...---...
+    def test_navigate_to_SK(self):
+        # <SK> = ...-.-  (end of contact — one of the longest kept prosigns)
         node = MORSE_TREE
-        for ch in "...---...":
+        for ch in "...-.-":
             node = node.get(ch)
             assert node is not None, f"tree path broke at {ch}"
-        assert node.char == "<SOS>"
+        assert node.char == "<SK>"
 
     def test_invalid_prefix(self):
-        # No character starts with 6 identical dits except <HH>
-        assert is_valid_prefix(".......") is True   # prefix of <HH>
+        # <HH> and <SOS> are removed; long dit-runs are no longer valid prefixes
+        assert is_valid_prefix(".......") is False  # <HH> removed
         assert is_valid_prefix(".-.-.-.-") is False  # too long / invalid
 
     def test_root_has_no_char(self):

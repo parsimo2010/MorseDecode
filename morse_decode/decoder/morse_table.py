@@ -65,31 +65,24 @@ _DIGITS: dict[str, str] = {
     "-----": "0",
 }
 
-# Punctuation (ITU-R M.1677-1 and common amateur extensions)
+# Punctuation — common subset used in amateur CW / QSOs.
+# Removed: ' ! ) : ; - _ " $ @  (6–7 element sequences, never/rarely seen on air)
 _PUNCTUATION: dict[str, str] = {
     ".-.-.-": ".",
     "--..--": ",",
     "..--..": "?",
-    ".----.": "'",
-    "-.-.--": "!",
     "-..-.":  "/",
-    "-.--.":  "(",
-    "-.--.-": ")",
+    "-.--.":  "(",      # also <KN>
     ".-...":  "&",      # also <AS>
-    "---...": ":",
-    "-.-.-.": ";",
     "-...-":  "=",      # also <BT>
     ".-.-.":  "+",      # also <AR>
-    "-....-": "-",
-    "..--.-": "_",
-    ".-..-.": '"',
-    "...-..-": "$",
-    ".--.-.": "@",
 }
 
 # Prosigns  (sent without inter-letter space; displayed with angle brackets)
 # Priority: when decoding without a preceding letter gap, prefer these over
 # the punctuation synonyms above.
+# Removed: <HH> (8 elements), <SOS> (9 elements) — rarely needed for QSO;
+# <SOS> decodes naturally as S-O-S when letter spaces are present.
 _PROSIGNS: dict[str, str] = {
     ".-.-.":   "<AR>",    # end of message  (= +)
     "...-.-":  "<SK>",    # end of contact / silent key
@@ -97,9 +90,7 @@ _PROSIGNS: dict[str, str] = {
     "-.--.":   "<KN>",    # go ahead, specific station only  (= ()
     ".-...":   "<AS>",    # wait  (= &)
     "-.-.-":   "<CT>",    # start of transmission  (KA)
-    "........": "<HH>",   # error / correction
     "...-.":   "<SN>",    # understood  (VE)
-    "...---...": "<SOS>", # distress (usually sent as one run)
 }
 
 # Combined decode table: code -> char.

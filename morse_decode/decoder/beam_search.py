@@ -73,6 +73,28 @@ def _sigmoid_p_letter(duration_ms: float, threshold_ms: float, scale_ms: float) 
     return _sigmoid_p_dit(duration_ms, threshold_ms, scale_ms)
 
 
+def _two_gaussian_p2(
+    x: float, mu1: float, s1: float, mu2: float, s2: float
+) -> "float | None":
+    """
+    P(class 2 | x) from a two-Gaussian equal-prior classifier.
+
+    Computes the log-likelihood ratio log[N(x;mu2,s2) / N(x;mu1,s1)] and
+    passes it through a sigmoid.  Returns None when either sigma is <= 0
+    (caller should fall back to the heuristic sigmoid).
+
+    Class 1 = the "shorter/lower" category (dit, or element-gap).
+    Class 2 = the "longer/higher" category (dah, or letter-gap).
+    """
+    if s1 <= 0 or s2 <= 0:
+        return None
+    log_p1 = -0.5 * ((x - mu1) / s1) ** 2 - math.log(s1)
+    log_p2 = -0.5 * ((x - mu2) / s2) ** 2 - math.log(s2)
+    z = log_p2 - log_p1
+    z = max(-20.0, min(20.0, z))
+    return 1.0 / (1.0 + math.exp(-z))
+
+
 # ---------------------------------------------------------------------------
 # Hypothesis
 # ---------------------------------------------------------------------------
@@ -212,12 +234,19 @@ class BeamDecoder:
 
     def _process_mark(self, event: TimingEvent, estimate: "TimingEstimate") -> None:
         """A dit or dah arrived.  Branch softly on ambiguous durations and mark confidence."""
-        threshold_ms = estimate.dit_dah_threshold_ms
-        # Scale widens with ambiguity_factor and is proportional to dit_ms
-        scale_ms = estimate.dit_ms * 0.4 * self._ambiguity_factor
+        # Prefer the data-driven two-Gaussian classifier when cluster stats are
+        # available.  Falls back to a sigmoid centred on the histogram valley.
+        p_dah = _two_gaussian_p2(
+            event.duration_ms,
+            estimate.dit_ms, estimate.dit_sigma_ms,
+            estimate.dah_ms, estimate.dah_sigma_ms,
+        )
+        if p_dah is None:
+            threshold_ms = estimate.dit_dah_threshold_ms
+            scale_ms = estimate.dit_ms * 0.4 * self._ambiguity_factor
+            p_dah = 1.0 - _sigmoid_p_dit(event.duration_ms, threshold_ms, scale_ms)
 
-        p_dit = _sigmoid_p_dit(event.duration_ms, threshold_ms, scale_ms)
-        p_dah = 1.0 - p_dit
+        p_dit = 1.0 - p_dah
 
         # Mark confidence: probability this is a real element vs noise
         p_mark = getattr(event, "mark_confidence", 1.0)
@@ -266,62 +295,48 @@ class BeamDecoder:
 
         lw_threshold_ms = estimate.letter_word_threshold_ms
 
-        # --- Definite word gap: past 2× letter_gap — no sigmoid needed ---
-        # Per the description: once a gap exceeds this threshold it is assigned
-        # a fixed high probability of being a word boundary.  This avoids
-        # overfitting a Gaussian to sparse, variable word-gap data.
+        # --- Definite word gap: hard threshold at 2× letter_gap ---
+        # Word-gap data is sparse and variable; a fixed multiple is more robust
+        # than trying to fit a third Gaussian cluster.
         if lw_threshold_ms > 0 and event.duration_ms >= lw_threshold_ms:
             new_beam = [hyp.apply_word_space() for hyp in self._beam]
             if new_beam:
                 self._beam = new_beam
             return
 
-        # --- Scales driven by gap-cluster sigma from the space histogram ---
-        # Using dit_ms × ambiguity_factor was far too wide, causing element gaps
-        # (e.g. 60 ms at 25 WPM) to be confused for letter boundaries.
-        # The sigma of each gap distribution gives a much tighter decision zone.
-        fallback_scale = estimate.dit_ms * self._ambiguity_factor
-        el_scale_ms = (
-            estimate.element_gap_sigma_ms * self._ambiguity_factor
-            if estimate.element_gap_sigma_ms > 0
-            else fallback_scale
+        # --- Element-gap vs letter-gap classification ---
+        # Prefer the data-driven two-Gaussian model; fall back to sigmoid.
+        p_commit = _two_gaussian_p2(
+            event.duration_ms,
+            estimate.element_gap_ms, estimate.element_gap_sigma_ms,
+            estimate.letter_gap_ms, estimate.letter_gap_sigma_ms,
         )
-        lw_scale_ms = (
-            estimate.letter_gap_sigma_ms * self._ambiguity_factor
-            if estimate.letter_gap_sigma_ms > 0
-            else fallback_scale
-        )
-
-        # --- Letter vs word boundary (sigmoid, only for gaps below lw_threshold) ---
-        p_letter = _sigmoid_p_letter(event.duration_ms, lw_threshold_ms, lw_scale_ms)
-        p_word = 1.0 - p_letter
-
-        # --- Intra-char vs letter boundary ---
-        # A space shorter than ~2× dit is treated as intra-character (bad fist gap)
-        # vs proper inter-letter (3× dit in theory).
-        el_threshold_ms = estimate.element_letter_threshold_ms
-        p_commit = _sigmoid_p_dit(event.duration_ms, el_threshold_ms, el_scale_ms)
-        p_commit = 1.0 - p_commit   # longer → more likely to commit
+        if p_commit is None:
+            # Sigmoid fallback using valley threshold and sigma-based scale
+            el_threshold_ms = estimate.element_letter_threshold_ms
+            fallback_scale = estimate.dit_ms * self._ambiguity_factor
+            el_scale_ms = (
+                estimate.element_gap_sigma_ms * self._ambiguity_factor
+                if estimate.element_gap_sigma_ms > 0
+                else fallback_scale
+            )
+            p_commit = 1.0 - _sigmoid_p_dit(event.duration_ms, el_threshold_ms, el_scale_ms)
+        # p_commit ≈ 1 → likely letter-gap (commit character)
+        # p_commit ≈ 0 → likely element-gap (keep accumulating)
 
         commit_branching = 0.1 < p_commit < 0.9
-        word_branching = p_word > 0.05 and p_letter > 0.05 and p_commit > 0.7
 
         new_beam: list[Hypothesis] = []
 
         for hyp in self._beam:
             if not hyp.elements:
-                # Nothing accumulated yet — space between words, just pass through
-                if event.duration_ms > lw_threshold_ms:
-                    h = hyp.clone()
-                    if h.text and not h.text.endswith(" "):
-                        h.text += " "
-                    new_beam.append(h)
-                else:
-                    new_beam.append(hyp)
+                # Nothing accumulated — keep hypothesis unchanged
+                # (word boundaries are fully handled by the hard threshold above)
+                new_beam.append(hyp)
                 continue
 
             if commit_branching and not hyp.prosign_mode:
-                # Branch: commit char vs stay (prosign path)
+                # Branch: commit (inter-letter) vs stay (prosign / bad-fist gap)
                 # Prosign path only valid if current prefix still has children
                 if hyp.node.has_children and len(hyp.elements) < MAX_CODE_LEN:
                     h_prosign = hyp.clone()
@@ -329,30 +344,13 @@ class BeamDecoder:
                     h_prosign.score += math.log(1.0 - p_commit + 1e-9)
                     new_beam.append(h_prosign)
 
-                # Commit path
-                if word_branching:
-                    h_letter = hyp.apply_letter_space()
-                    h_letter.score += math.log(p_letter * p_commit + 1e-9)
-                    new_beam.append(h_letter)
-
-                    h_word = hyp.apply_word_space()
-                    h_word.score += math.log(p_word * p_commit + 1e-9)
-                    new_beam.append(h_word)
-                else:
-                    if p_commit >= 0.5:
-                        if p_word >= 0.5:
-                            new_beam.append(hyp.apply_word_space())
-                        else:
-                            new_beam.append(hyp.apply_letter_space())
-                    else:
-                        new_beam.append(hyp)
+                h_letter = hyp.apply_letter_space()
+                h_letter.score += math.log(p_commit + 1e-9)
+                new_beam.append(h_letter)
             else:
                 # Hard decision
                 if p_commit >= 0.5:
-                    if p_word >= 0.5:
-                        new_beam.append(hyp.apply_word_space())
-                    else:
-                        new_beam.append(hyp.apply_letter_space())
+                    new_beam.append(hyp.apply_letter_space())
                 else:
                     new_beam.append(hyp)
 
