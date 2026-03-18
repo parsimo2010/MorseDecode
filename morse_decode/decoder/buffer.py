@@ -18,9 +18,10 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class TimingEvent:
-    duration_ms: float   # duration of this mark or space in milliseconds
-    is_mark: bool        # True = signal on (dit/dah), False = signal off (space)
-    timestamp_s: float   # wall-clock time when this event ended
+    duration_ms: float        # duration of this mark or space in milliseconds
+    is_mark: bool             # True = signal on (dit/dah), False = signal off (space)
+    timestamp_s: float        # wall-clock time when this event ended
+    mark_confidence: float = 1.0  # probability [0,1] this mark is real, not noise; 1 for spaces
 
 
 class RewindBuffer:

@@ -4,56 +4,85 @@
 
 [input]
 # Audio source. Exactly one of these should be active:
-# device = "default"   # audio device name or index (see --list-devices)
+ device = "default"   # audio device name or index (see --list-devices)
 # device = 3           # device by index
 # file = "recording.wav"
 # stdin = true         # pipe raw audio from rtl_fm, gqrx, etc.
 
-# Frequency range and bin width for FFT channel analysis
-freq_min = 400   # Hz
-freq_max = 1000  # Hz
-bin_width = 50   # Hz  (yields 12 bins: 400-450, 450-500, ... 950-1000)
+# Frequency range analysed (Hz)
+freq_min = 400
+freq_max = 1000
+
+# FFT bin width in Hz. Each decoding channel covers channel_width_hz of spectrum.
+# Narrower bins = better frequency selectivity but longer FFT window.
+# 25 Hz bins require window_ms = 40 ms; 50 Hz bins require 20 ms.
+bin_width = 25
+
+# Decoding channel width in Hz. Must be a multiple of bin_width.
+# 200 Hz / 25 Hz = 8 bins per channel. A signal concentrates in 1-2 bins;
+# the remaining bins serve as the noise reference for ratio-based detection.
+channel_width_hz = 200
 
 [audio]
 # Sample rate in Hz. 0 = auto-detect from device or file header.
 sample_rate = 0
-# FFT analysis parameters
-window_ms = 20.0   # FFT window length (controls frequency resolution: 1000/window_ms Hz/bin)
-hop_ms = 5.0       # FFT hop size (controls time resolution; smaller = better high-speed tracking)
+
+# FFT window length in ms. Controls frequency resolution: resolution ≈ 1000/window_ms Hz/bin.
+# Set to match bin_width: window_ms = 1000/bin_width (e.g. 40 ms for 25 Hz bins).
+window_ms = 40.0
+
+# FFT hop size in ms. Controls time resolution. Smaller = better tracking at high WPM.
+# At 50 WPM a dit is ~24 ms; hop_ms = 5 ms gives ~5 samples per dit.
+hop_ms = 5.0
+
 # Auto Gain Control
 agc_enabled = true
-agc_window_s = 2.0       # RMS averaging window
+agc_window_s = 10.0      # RMS averaging window in seconds
 agc_target_rms = 0.1     # normalized RMS target (0.0–1.0)
-# Signal debounce: ignore state transitions shorter than this (handles key bounce / noise)
-debounce_ms = 3.0
+
+# Signal debounce: ignore state transitions shorter than this (suppresses key bounce / noise)
+debounce_ms = 2.0
+
+# Ratio-based signal detection (Schmitt trigger on 10*log10(bin1 / noise_ref))
+# bin1 = highest-energy FFT bin in the channel
+# noise_ref = mean energy of the lower half of bins (immune to Hann-window leakage)
+# ON  when ratio >= on_db  (signal is clearly present)
+# OFF when ratio <  off_db (signal has faded)
+# The gap between on_db and off_db provides hysteresis to prevent chatter.
+on_db = 24.0
+off_db = 20.0
 
 [decoder]
 beam_width = 16          # number of hypotheses in beam search (larger = better bad-fist tolerance)
 speed_min_wpm = 5.0      # minimum CW speed to consider
 speed_max_wpm = 50.0     # maximum CW speed to consider
+
 # Histogram estimator robustness
-histogram_bins = 60      # bins for dit/dah/space histograms
-estimator_decay = 0.97   # exponential decay for histogram (1.0 = no decay, 0.9 = fast adapt)
-outlier_pct = 10.0       # percentile to trim when fitting histogram peaks (handles bad fists)
+histogram_bins = 60      # bins for dit/dah/space duration histograms
+estimator_decay = 0.97   # exponential decay per event (1.0 = no decay, 0.9 = fast adapt)
+outlier_pct = 10.0       # % of extreme tail values ignored when fitting histogram peaks
+
 # Speed reset after silence
 silence_reset_s = 5.0    # seconds of continuous silence before resetting speed estimate
+
 # Rewind buffer: store this many seconds of timing events for re-decode when speed updates
 rewind_buffer_s = 10.0
+
 # Beam branching: how wide the dit/dah ambiguity band is (1.0 = standard, >1 = more forgiving)
 ambiguity_factor = 1.5
 
 [display]
 refresh_hz = 8.0         # terminal UI refresh rate
-snr_bar_width = 5        # number of blocks in the SNR bar
+snr_bar_width = 5        # blocks in the SNR bar (shows bin-ratio dB, max ~30 dB)
 callsign_width = 9       # reserved characters for callsign column
 text_width = 60          # characters of decoded text shown per line (scrolling)
-inactive_dim = true      # dim inactive bin lines
+inactive_dim = true      # dim inactive channel lines
 inactive_scroll_s = 30.0 # seconds before inactive line text has fully scrolled off
 
 [log]
 enabled = false
 path = "morsedecode.log"
 format = "text"          # "text" or "jsonl"
-# In "text" mode each line is:  TIMESTAMP  FREQ_HZ  DECODED_TEXT
-# In "jsonl" mode each line is a JSON object with timestamp, freq_hz, text, snr_db, speed_wpm
+# text format:  TIMESTAMP  FREQ_HZ  SPEED_WPM  DECODED_TEXT
+# jsonl format: {"timestamp":..., "freq_hz":..., "text":..., "snr_db":..., "speed_wpm":...}
 rotate_mb = 10           # rotate log after N megabytes (0 = never)

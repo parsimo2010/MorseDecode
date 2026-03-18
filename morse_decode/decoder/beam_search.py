@@ -211,7 +211,7 @@ class BeamDecoder:
     # ------------------------------------------------------------------
 
     def _process_mark(self, event: TimingEvent, estimate: "TimingEstimate") -> None:
-        """A dit or dah arrived.  Branch softly on ambiguous durations."""
+        """A dit or dah arrived.  Branch softly on ambiguous durations and mark confidence."""
         threshold_ms = estimate.dit_dah_threshold_ms
         # Scale widens with ambiguity_factor and is proportional to dit_ms
         scale_ms = estimate.dit_ms * 0.4 * self._ambiguity_factor
@@ -219,26 +219,36 @@ class BeamDecoder:
         p_dit = _sigmoid_p_dit(event.duration_ms, threshold_ms, scale_ms)
         p_dah = 1.0 - p_dit
 
+        # Mark confidence: probability this is a real element vs noise
+        p_mark = getattr(event, "mark_confidence", 1.0)
+        p_noise = 1.0 - p_mark
+
         branching = p_dit > 0.05 and p_dah > 0.05  # both options plausible
+        noise_branching = p_noise > 0.05             # uncertain enough to consider noise
 
         new_beam: list[Hypothesis] = []
 
         for hyp in self._beam:
+            # "This was noise — skip it" branch (only when confidence is low)
+            if noise_branching:
+                h_skip = hyp.clone()
+                h_skip.score += math.log(p_noise + 1e-9)
+                new_beam.append(h_skip)
+
             if branching:
-                # Dit branch
                 h_dit = hyp.apply_element(".")
                 if h_dit is not None:
-                    h_dit.score += math.log(p_dit + 1e-9)
+                    h_dit.score += math.log(p_dit * p_mark + 1e-9)
                     new_beam.append(h_dit)
-                # Dah branch
                 h_dah = hyp.apply_element("-")
                 if h_dah is not None:
-                    h_dah.score += math.log(p_dah + 1e-9)
+                    h_dah.score += math.log(p_dah * p_mark + 1e-9)
                     new_beam.append(h_dah)
             else:
                 element = "." if p_dit >= 0.5 else "-"
                 h = hyp.apply_element(element)
                 if h is not None:
+                    h.score += math.log(p_mark + 1e-9)
                     new_beam.append(h)
 
         if new_beam:
@@ -254,18 +264,43 @@ class BeamDecoder:
         if event.duration_ms < estimate.dit_ms * 0.5:
             return  # likely noise / key bounce; ignore
 
-        # --- Letter vs word boundary ---
         lw_threshold_ms = estimate.letter_word_threshold_ms
-        scale_ms = estimate.dit_ms * self._ambiguity_factor
 
-        p_letter = _sigmoid_p_letter(event.duration_ms, lw_threshold_ms, scale_ms)
+        # --- Definite word gap: past 2× letter_gap — no sigmoid needed ---
+        # Per the description: once a gap exceeds this threshold it is assigned
+        # a fixed high probability of being a word boundary.  This avoids
+        # overfitting a Gaussian to sparse, variable word-gap data.
+        if lw_threshold_ms > 0 and event.duration_ms >= lw_threshold_ms:
+            new_beam = [hyp.apply_word_space() for hyp in self._beam]
+            if new_beam:
+                self._beam = new_beam
+            return
+
+        # --- Scales driven by gap-cluster sigma from the space histogram ---
+        # Using dit_ms × ambiguity_factor was far too wide, causing element gaps
+        # (e.g. 60 ms at 25 WPM) to be confused for letter boundaries.
+        # The sigma of each gap distribution gives a much tighter decision zone.
+        fallback_scale = estimate.dit_ms * self._ambiguity_factor
+        el_scale_ms = (
+            estimate.element_gap_sigma_ms * self._ambiguity_factor
+            if estimate.element_gap_sigma_ms > 0
+            else fallback_scale
+        )
+        lw_scale_ms = (
+            estimate.letter_gap_sigma_ms * self._ambiguity_factor
+            if estimate.letter_gap_sigma_ms > 0
+            else fallback_scale
+        )
+
+        # --- Letter vs word boundary (sigmoid, only for gaps below lw_threshold) ---
+        p_letter = _sigmoid_p_letter(event.duration_ms, lw_threshold_ms, lw_scale_ms)
         p_word = 1.0 - p_letter
 
         # --- Intra-char vs letter boundary ---
         # A space shorter than ~2× dit is treated as intra-character (bad fist gap)
         # vs proper inter-letter (3× dit in theory).
         el_threshold_ms = estimate.element_letter_threshold_ms
-        p_commit = _sigmoid_p_dit(event.duration_ms, el_threshold_ms, scale_ms)
+        p_commit = _sigmoid_p_dit(event.duration_ms, el_threshold_ms, el_scale_ms)
         p_commit = 1.0 - p_commit   # longer → more likely to commit
 
         commit_branching = 0.1 < p_commit < 0.9
@@ -344,8 +379,10 @@ class BeamDecoder:
 
     def _prune(self) -> None:
         """Keep only the top beam_width hypotheses by score."""
+        # Always sort so beam[0] is the best hypothesis (needed for .text and
+        # for correct normalization regardless of whether we truncate).
+        self._beam.sort(key=lambda h: h.score, reverse=True)
         if len(self._beam) > self._beam_width:
-            self._beam.sort(key=lambda h: h.score, reverse=True)
             self._beam = self._beam[: self._beam_width]
         # Renormalize scores to prevent underflow
         if self._beam:

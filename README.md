@@ -13,19 +13,20 @@ signals sent with a "bad fist" (irregular timing).
 
 | Feature | Details |
 |---|---|
-| Multi-channel | Up to 12 simultaneous bins (default: 12 × 50 Hz across 400–1000 Hz) |
+| Multi-channel | Up to 12 simultaneous channels (default: 3 × 200 Hz across 400–1000 Hz) |
 | Audio input | Live device, audio file (WAV/FLAC), or stdin pipe (rtl_fm, gqrx, …) |
 | Auto gain | Exponentially-weighted RMS AGC, configurable time constant |
-| Auto threshold | Adaptive noise-floor estimation per bin, with hysteresis |
-| Auto speed | Histogram peak-finding separates dits from dahs; 5–50 WPM |
+| Ratio detection | Schmitt trigger on bin1/noise_ref energy ratio; immune to AGC-induced noise floor drift |
+| Mark confidence | Average ratio over each mark's duration → beam-search weight; marginal detections discounted |
+| Auto speed | Histogram valley detection separates dits from dahs; 5–50 WPM |
 | Auto spacing | Histogram-based inter-element / inter-letter / word-space thresholds |
-| Bad-fist tolerant | Soft (sigmoid) dit/dah decisions; wide ambiguity zone; beam width 16 |
+| Bad-fist tolerant | Soft (sigmoid) dit/dah decisions; mark-confidence noise branching; beam width 16 |
 | Beam search | Branching hypothesis search with log-probability scoring and pruning |
 | Prosigns | AR, SK, BT, KN, AS, CT, HH, SN, SOS |
 | Rewind buffer | Buffers timing events; re-decodes from buffer when speed estimate updates |
 | Speed reset | Resets estimator after configurable silence period; replays buffer |
-| Live terminal UI | 12 always-visible lines via Rich; inactive bins dim and text scrolls off |
-| File logging | Text or JSONL log with timestamp, frequency, decoded text, SNR, speed |
+| Live terminal UI | Per-channel rows via Rich; inactive channels dim and text scrolls off |
+| File logging | Text or JSONL log with timestamp, frequency, decoded text, SNR ratio, speed |
 | Config system | 3-layer: default file → --config file → CLI flags |
 | Cross-platform | Linux, Windows, macOS |
 
@@ -35,15 +36,14 @@ signals sent with a "bad fist" (irregular timing).
 
 ```
   Freq    SNR         Speed    Callsign   Decoded text
-  425 Hz  ░░░░░ --dB  -- wpm             (dim — no signal)
-  475 Hz  ▓▓▓░░ 18dB  15 wpm  W1AW       CQ CQ DE W1AW W1AW K
-  525 Hz  ░░░░░ --dB  -- wpm
-  ...
+  499 Hz  ..... --dB  -- wpm             (dim — no signal)
+  699 Hz  ##### 28dB  25 wpm  W1AW       CQ CQ DE W1AW W1AW K
+  899 Hz  ..... --dB  -- wpm
 ```
 
 Each line shows:
-- **Frequency** — bin centre in Hz
-- **SNR bar + dB** — 5-block energy indicator + numeric SNR
+- **Frequency** — channel centre in Hz
+- **SNR bar + dB** — 5-block bar + numeric ratio (dB); reflects bin1/noise_ref ratio
 - **Speed** — estimated CW speed in WPM
 - **Callsign** — last callsign detected in decoded text (matches `DE CALL` or standalone)
 - **Decoded text** — scrolling window of decoded output
@@ -61,14 +61,14 @@ morse_decode/
 │   └── normalizer.py      Exponentially-weighted RMS AGC
 ├── signal/
 │   ├── fft.py             Overlap-add STFT; per-bin energy extraction
-│   └── detector.py        Adaptive noise-floor threshold + debounce → ON/OFF events
+│   └── detector.py        Ratio-based Schmitt trigger + debounce → ON/OFF events with confidence
 ├── timing/
-│   ├── segmenter.py       Run-length encoder; silence-reset detection
-│   └── estimator.py       Log-histogram peak-finding → dit/dah/space thresholds
+│   ├── segmenter.py       ON/OFF events → TimingEvents with mark_confidence; silence reset
+│   └── estimator.py       Log-histogram valley detection → dit/dah/space thresholds
 └── decoder/
     ├── morse_table.py     Full ITU table: letters, digits, punctuation, prosigns; Morse trie
     ├── buffer.py          Time-bounded ring buffer of TimingEvents for rewind
-    └── beam_search.py     Soft-decision beam search; prosign-path branching; callsign extraction
+    └── beam_search.py     Soft-decision beam search; noise-branch on low confidence; callsign
 ```
 
 ### Signal pipeline (per audio chunk)
@@ -77,28 +77,40 @@ morse_decode/
 Audio chunk
   → AGCNormalizer          normalize RMS
   → STFTProcessor          overlap-add STFT → (n_frames × n_bins) energy array
-  [per bin]
-  → AdaptiveDetector       adaptive threshold + debounce → ON/OFF events
-  → RunLengthSegmenter     ON/OFF events → TimingEvents; silence detection
-  → TimingEstimator        histogram update → TimingEstimate (dit_ms, speed_wpm, …)
+  [per channel]
+  → GatedNoiseDetector     ratio Schmitt trigger + debounce → ON/OFF events + avg_ratio_db
+  → RunLengthSegmenter     ON/OFF events → TimingEvents with mark_confidence; silence detection
+  → TimingEstimator        histogram update → TimingEstimate (dit_ms, speed_wpm, thresholds)
   → RewindBuffer           store events for re-decode on speed update
-  → BeamDecoder            soft-decision beam search → decoded text + callsign
+  → BeamDecoder            soft-decision + noise-branch beam search → decoded text + callsign
   → BinDisplayState        feed Rich live display + file logger
 ```
 
-### Key design decisions for bad-fist tolerance
+### Key design decisions
 
-1. **Soft decisions** — P(dit) and P(dah) computed from a sigmoid centred on the
+1. **Ratio-based detection** — instead of tracking an adaptive noise floor (which fails when
+   radio AGC amplifies in-band noise during silence), detection uses
+   `10*log10(bin1 / mean(lower_half_bins))`.  A CW signal concentrates in 1–2 FFT bins;
+   the lower half of the channel's bins are pure noise, making the ratio self-normalising
+   and immune to AGC-induced level changes.
+
+2. **Schmitt trigger hysteresis** — ON threshold (24 dB) > OFF threshold (20 dB).
+   Once a mark starts, signal can fade to 20 dB before the detector goes OFF, suppressing
+   mid-element chatter.
+
+3. **Mark confidence** — the average ratio during each mark is converted to a probability
+   via a sigmoid centred on the ON threshold.  Strong signals → confidence ≈ 1.0;
+   marginal detections → confidence < 0.5.  The beam decoder branches on "this was noise"
+   for low-confidence marks, weighted by `log(1 - confidence)`.
+
+4. **Soft dit/dah decisions** — P(dit) and P(dah) computed from a sigmoid centred on the
    estimated threshold, not a hard cut.  Near-threshold timings branch the beam.
-2. **Wide ambiguity zone** — `ambiguity_factor` (default 1.5) scales the sigmoid
-   width beyond the Gaussian prediction, allowing more branching.
-3. **Robust histogram** — log-spaced bins, exponential decay, outlier trimming, and
-   Gaussian smoothing before peak-finding.  Prevents a few rogue timings from
-   skewing the speed estimate.
-4. **Signal debounce** — short ON/OFF transitions (default 3 ms) are suppressed,
-   handling key bounce and brief AGC artefacts.
-5. **Rewind and replay** — when the speed estimate updates significantly (>15%),
-   all buffered events are re-decoded with the new estimate.
+
+5. **Robust histogram** — log-spaced bins, exponential decay, outlier trimming, and Gaussian
+   smoothing before peak-finding.  Prevents a few rogue timings from skewing the speed estimate.
+
+6. **Rewind and replay** — when the speed estimate updates significantly (>15%), all buffered
+   events are re-decoded with the new estimate.
 
 ---
 
@@ -119,7 +131,7 @@ pip install -e ".[dev]"
 
 | Package | Purpose |
 |---|---|
-| `numpy` / `scipy` | FFT, histogram, signal processing |
+| `numpy` | FFT, histogram, signal processing |
 | `sounddevice` | Cross-platform live audio capture |
 | `soundfile` | Audio file decoding (WAV, FLAC, OGG) |
 | `rich` | Live multi-line terminal UI |
@@ -146,8 +158,14 @@ morsedecode --file recording.wav
 # Pipe from rtl_fm (stdin, signed 16-bit 44100 Hz mono)
 rtl_fm -f 7.040M -s 44100 -g 30 | morsedecode --stdin
 
-# Custom frequency range (600–900 Hz, 50 Hz bins → 6 channels)
-morsedecode --freq-min 600 --freq-max 900 --bin-width 50
+# Custom frequency range (625–825 Hz, single 200 Hz channel)
+morsedecode --freq-min 625 --freq-max 825
+
+# Tighten detection thresholds for a clean, strong signal
+morsedecode --on-db 30 --off-db 24
+
+# Loosen thresholds for a weak or noisy signal
+morsedecode --on-db 18 --off-db 12
 
 # Use a specific config file
 morsedecode --config ~/my-radio.toml
@@ -179,21 +197,40 @@ Key config sections:
 
 ```toml
 [input]
-freq_min = 400       # Hz
-freq_max = 1000      # Hz
-bin_width = 50       # Hz  (12 bins)
+freq_min = 400        # Hz — lower edge of frequency range
+freq_max = 1000       # Hz — upper edge
+bin_width = 25        # Hz — FFT bin width (sets frequency resolution)
+channel_width_hz = 200  # Hz — decoding channel width (must be multiple of bin_width)
+
+[audio]
+window_ms = 40.0      # FFT window (40 ms → 25 Hz bins at any sample rate)
+hop_ms = 5.0          # FFT hop (time resolution; smaller = better at high WPM)
+on_db = 24.0          # ON  threshold: 10*log10(bin1/noise_ref) in dB
+off_db = 20.0         # OFF threshold (hysteresis gap prevents chatter)
 
 [decoder]
-beam_width = 16      # larger = better bad-fist tolerance (slower)
+beam_width = 16       # larger = better bad-fist tolerance (slower)
 speed_min_wpm = 5.0
 speed_max_wpm = 50.0
-ambiguity_factor = 1.5   # widen dit/dah boundary (1.0 = standard)
+ambiguity_factor = 1.5  # widen dit/dah boundary (1.0 = standard)
 
 [log]
 enabled = false
 path = "morsedecode.log"
-format = "text"      # or "jsonl"
+format = "text"       # or "jsonl"
 ```
+
+### Detection threshold tuning
+
+The detector uses `10*log10(bin1 / mean(lower_half_bins))` as its metric.
+Typical values for the 700 Hz channel on a 20 dB SNR CW signal: **28–32 dB** during a mark,
+**2–5 dB** during silence.
+
+| Scenario | Recommended `on_db` / `off_db` |
+|---|---|
+| Strong signal, clean band | 28 / 24 |
+| Normal HF conditions | 24 / 20 (default) |
+| Weak or QRM-heavy signal | 18 / 12 |
 
 ---
 
@@ -215,7 +252,6 @@ pytest -v tests/test_beam_search.py   # Beam decoder
 - [ ] TX logging (log sent CW for QSO script replay)
 - [ ] Network audio input (UDP/TCP raw PCM)
 - [ ] Web UI for remote monitoring
-- [ ] GPU-accelerated FFT for very wide frequency ranges
 
 ---
 

@@ -1,40 +1,34 @@
 """
 Timing estimator for CW speed and spacing.
 
-Uses histogram analysis to separate dits from dahs (marks) and inter-element
-gaps from inter-letter and word gaps (spaces).
+Uses histogram analysis with valley detection to separate dits from dahs
+(marks) and inter-element gaps from inter-letter and word gaps (spaces).
 
-Robustness for bad fists
-------------------------
-The histogram uses exponential decay so recent observations gradually replace
-old ones, but the decay is slow enough that a few outlier timings don't
-immediately corrupt the estimate.  Peak-finding uses the histogram mode
-(most frequent bin) rather than the mean, which is robust to outliers and to
-the asymmetric distributions produced by inconsistent sending.
+Valley-detection approach
+--------------------------
+A histogram of mark durations is built and smoothed with a Gaussian kernel.
+Two local maxima are identified (corresponding to the dit and dah clusters).
+The valley between them becomes the dit/dah classification threshold.  This
+is more robust than assuming the global maximum is always the dit peak,
+especially for senders who use many dahs (numbers, certain letters).
 
-Speed range constraints
------------------------
-CW speed in WPM determines the standard dit duration:
-    dit_ms = 1200 / wpm
+Gap classification uses the same valley approach on the space histogram.
+The two peaks correspond to intra-character and inter-letter gaps.  Word
+gaps (infrequent and variable) are treated as any gap that exceeds
+2 × the letter gap mean.
 
-The estimator uses this to validate histogram peaks: a peak that would imply
-a speed outside [speed_min_wpm, speed_max_wpm] is rejected or clamped.
-
-Thresholds
+Robustness
 ----------
-After estimating dit_ms and dah_ms:
-  - dit/dah threshold      ≈ (dit_ms + dah_ms) / 2   (midpoint)
-  - element/letter threshold ≈ dit_ms * 2.5            (standard: 3 dit)
-  - letter/word threshold    ≈ dit_ms * 5.0            (standard: 7 dit)
-
-A small margin is applied around each threshold; combined with the beam
-search's ambiguity_factor, this handles bad-fist spacing.
+* Exponential histogram decay keeps estimates responsive to speed changes.
+* Outlier tails are trimmed before peak finding.
+* When fewer than two peaks are found, the estimator falls back to
+  assuming standard 3:1 dit:dah and 1:3:7 timing ratios.
 """
 
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 
@@ -49,29 +43,42 @@ from ..decoder.buffer import TimingEvent
 class TimingEstimate:
     """Current best estimate of CW timing parameters."""
 
-    dit_ms: float = 0.0          # estimated dit duration
-    dah_ms: float = 0.0          # estimated dah duration (ideally 3 × dit_ms)
-    speed_wpm: float = 0.0       # derived speed in WPM
-    n_samples: int = 0           # number of mark events seen so far
-    confident: bool = False      # True once enough samples collected
+    dit_ms: float = 0.0
+    dah_ms: float = 0.0
+    speed_wpm: float = 0.0
+    n_samples: int = 0
+    confident: bool = False
+
+    # Data-driven thresholds (0 = use fallback computed from dit_ms)
+    mark_threshold_ms: float = 0.0   # valley between dit and dah mark durations
+    element_gap_ms: float = 0.0      # mean inter-element gap
+    letter_gap_ms: float = 0.0       # mean inter-letter gap
+    element_gap_sigma_ms: float = 0.0   # std dev of inter-element gap distribution
+    letter_gap_sigma_ms: float = 0.0    # std dev of inter-letter gap distribution
 
     @property
     def dit_dah_threshold_ms(self) -> float:
-        """Midpoint threshold between dit and dah durations."""
+        """Threshold separating dits from dahs."""
+        if self.mark_threshold_ms > 0:
+            return self.mark_threshold_ms
         if self.dit_ms <= 0 or self.dah_ms <= 0:
             return 0.0
         return (self.dit_ms + self.dah_ms) / 2.0
 
     @property
     def element_letter_threshold_ms(self) -> float:
-        """Threshold between intra-character gap and inter-letter gap."""
+        """Threshold separating intra-character from inter-letter gaps."""
+        if self.element_gap_ms > 0 and self.letter_gap_ms > 0:
+            return (self.element_gap_ms + self.letter_gap_ms) / 2.0
         if self.dit_ms <= 0:
             return 0.0
         return self.dit_ms * 2.5
 
     @property
     def letter_word_threshold_ms(self) -> float:
-        """Threshold between inter-letter gap and inter-word gap."""
+        """Threshold separating inter-letter from inter-word gaps."""
+        if self.letter_gap_ms > 0:
+            return self.letter_gap_ms * 2.0   # ~7:3 ratio
         if self.dit_ms <= 0:
             return 0.0
         return self.dit_ms * 5.0
@@ -83,7 +90,7 @@ class TimingEstimate:
 
 class TimingEstimator:
     """
-    Online histogram-based estimator for CW timing.
+    Online histogram-based CW timing estimator using valley detection.
 
     Parameters
     ----------
@@ -92,16 +99,13 @@ class TimingEstimator:
     histogram_bins : int
         Resolution of the duration histograms.
     estimator_decay : float
-        Per-event exponential decay applied to all histogram bins (keeps
-        the histogram responsive to speed changes mid-transmission).
+        Per-event exponential decay applied to histogram bins.
     outlier_pct : float
-        Percentage of the extreme tails to ignore when finding peaks.
-        Handles wildly out-of-range timings from bad fists.
+        Percentage of extreme tail values to ignore before peak finding.
     min_samples : int
-        Minimum number of mark events before reporting a confident estimate.
+        Minimum mark events before reporting a confident estimate.
     """
 
-    # Duration range for histograms (ms)
     _HIST_MIN_MS: float = 5.0
     _HIST_MAX_MS: float = 2000.0
 
@@ -121,23 +125,16 @@ class TimingEstimator:
         self._outlier_pct = outlier_pct
         self._min_samples = min_samples
 
-        # Duration limits derived from speed range
-        self._dit_min_ms = 1200.0 / speed_max_wpm   # fastest dit
-        self._dit_max_ms = 1200.0 / speed_min_wpm   # slowest dit
-        self._dah_max_ms = self._dit_max_ms * 4.0   # slowest dah (generous)
+        self._dit_min_ms = 1200.0 / speed_max_wpm
+        self._dit_max_ms = 1200.0 / speed_min_wpm
 
-        # Log-spaced bins cover the full range; log scale better handles
-        # the wide dynamic range (5 ms to 2 s)
         log_min = math.log(self._HIST_MIN_MS)
         log_max = math.log(self._HIST_MAX_MS)
         self._bin_edges = np.exp(np.linspace(log_min, log_max, histogram_bins + 1))
-        self._bin_centers = np.sqrt(self._bin_edges[:-1] * self._bin_edges[1:])  # geometric mean
+        self._bin_centers = np.sqrt(self._bin_edges[:-1] * self._bin_edges[1:])
 
-        # Mark histogram (dits and dahs)
         self._mark_hist = np.zeros(histogram_bins, dtype=np.float64)
-        # Space histogram (gaps)
         self._space_hist = np.zeros(histogram_bins, dtype=np.float64)
-
         self._n_marks: int = 0
         self._estimate = TimingEstimate()
 
@@ -147,20 +144,19 @@ class TimingEstimator:
 
     def update(self, events: list[TimingEvent]) -> bool:
         """
-        Feed new timing events.
-
-        Returns True if the estimate changed significantly (caller may want
-        to trigger a rewind-and-replay).
+        Feed new timing events.  Returns True if speed changed significantly
+        or if the estimator just became confident for the first time (so the
+        caller can rewind and replay buffered events with a valid estimate).
         """
         old_speed = self._estimate.speed_wpm
+        old_confident = self._estimate.confident
 
         for ev in events:
             if ev.duration_ms < self._HIST_MIN_MS or ev.duration_ms > self._HIST_MAX_MS:
-                continue  # ignore extreme outliers
+                continue
             idx = int(np.searchsorted(self._bin_edges[1:], ev.duration_ms))
             idx = min(idx, self._n_bins - 1)
 
-            # Decay before adding (keeps histogram fresh)
             if ev.is_mark:
                 self._mark_hist *= self._decay
                 self._mark_hist[idx] += 1.0
@@ -171,14 +167,17 @@ class TimingEstimator:
 
         self._refit()
 
-        # Significant change: > 15% speed shift
+        # First time becoming confident: trigger a full rewind so events that
+        # were buffered during the no-estimate warmup period get decoded.
+        if not old_confident and self._estimate.confident:
+            return True
+
         new_speed = self._estimate.speed_wpm
         if old_speed > 0 and new_speed > 0:
             return abs(new_speed - old_speed) / old_speed > 0.15
         return False
 
     def reset(self) -> None:
-        """Reset after long silence / new transmission."""
         self._mark_hist[:] = 0.0
         self._space_hist[:] = 0.0
         self._n_marks = 0
@@ -189,22 +188,24 @@ class TimingEstimator:
         return self._estimate
 
     # ------------------------------------------------------------------
-    # Internal — histogram peak finding
+    # Internal — histogram fitting
     # ------------------------------------------------------------------
 
     def _refit(self) -> None:
-        """Recompute timing estimate from current histograms."""
         if self._n_marks < self._min_samples:
             return
 
-        dit_ms, dah_ms = self._fit_mark_histogram()
+        dit_ms, dah_ms, valley_ms = self._fit_mark_histogram()
         if dit_ms <= 0:
             return
 
         speed_wpm = 1200.0 / dit_ms
-        # Clamp to valid range
         speed_wpm = max(self._speed_min_wpm, min(self._speed_max_wpm, speed_wpm))
         dit_ms = 1200.0 / speed_wpm
+
+        element_gap_ms, letter_gap_ms, element_sigma, letter_sigma = (
+            self._fit_space_histogram()
+        )
 
         self._estimate = TimingEstimate(
             dit_ms=dit_ms,
@@ -212,82 +213,210 @@ class TimingEstimator:
             speed_wpm=speed_wpm,
             n_samples=self._n_marks,
             confident=self._n_marks >= self._min_samples * 2,
+            mark_threshold_ms=valley_ms,
+            element_gap_ms=element_gap_ms,
+            letter_gap_ms=letter_gap_ms,
+            element_gap_sigma_ms=element_sigma,
+            letter_gap_sigma_ms=letter_sigma,
         )
 
-    def _fit_mark_histogram(self) -> tuple[float, float]:
+    def _fit_mark_histogram(self) -> tuple[float, float, float]:
         """
-        Find two peaks in the mark histogram corresponding to dits and dahs.
+        Fit mark histogram using valley detection.
 
-        Returns (dit_ms, dah_ms).  Returns (0, 0) if the histogram is
-        insufficient or ambiguous.
+        Returns (dit_ms, dah_ms, valley_ms).  All three are 0.0 on failure.
         """
         hist = self._mark_hist.copy()
         total = hist.sum()
         if total < 1:
-            return 0.0, 0.0
+            return 0.0, 0.0, 0.0
 
-        # Trim outlier tails by zero-ing extreme bins
-        trim_count = self._outlier_pct / 100.0 * total
+        # Trim outlier tails
+        trim = self._outlier_pct / 100.0 * total
         cumsum = np.cumsum(hist)
-        lo_mask = cumsum < trim_count
-        hi_mask = cumsum > total - trim_count
-        hist[lo_mask] = 0.0
-        hist[hi_mask] = 0.0
-
+        hist[cumsum < trim] = 0.0
+        hist[cumsum > total - trim] = 0.0
         if hist.sum() < 1:
-            return 0.0, 0.0
+            return 0.0, 0.0, 0.0
 
-        # Smooth with a Gaussian kernel (width 1.5 bins) for stability
-        hist = _gaussian_smooth(hist, sigma=1.5)
+        h = _gaussian_smooth(hist, sigma=1.5)
+        peaks = _find_peaks(h)
 
-        # Find the global maximum — this is most likely the dit peak
-        # (dits outnumber dahs by ~3:1 in typical CW)
-        peak1_idx = int(np.argmax(hist))
-        peak1_ms = self._bin_centers[peak1_idx]
+        # Filter peaks: must be in valid dit or dah range
+        dit_range_lo = self._dit_min_ms
+        dit_range_hi = self._dit_max_ms
+        dah_range_hi = self._dit_max_ms * 4.0
 
-        # The expected dah duration is ~3× dit
-        expected_dah_ms = peak1_ms * 3.0
-        expected_dah_min = peak1_ms * 2.0
-        expected_dah_max = peak1_ms * 5.0
+        valid_peaks = [i for i in peaks
+                       if dit_range_lo <= self._bin_centers[i] <= dah_range_hi]
 
-        # Check that peak1 is in valid dit range
-        if not (self._dit_min_ms <= peak1_ms <= self._dit_max_ms):
-            # Maybe the histogram is dominated by dahs; try the shorter tail
-            short_mask = self._bin_centers <= self._dit_max_ms
-            if short_mask.any():
-                sub = hist.copy()
-                sub[~short_mask] = 0.0
-                if sub.sum() > 0:
-                    peak1_idx = int(np.argmax(sub))
-                    peak1_ms = self._bin_centers[peak1_idx]
-                    if not (self._dit_min_ms <= peak1_ms <= self._dit_max_ms):
-                        return 0.0, 0.0
+        if len(valid_peaks) >= 2:
+            # Sort by bin position (ascending duration)
+            valid_peaks_sorted = sorted(valid_peaks[:4], key=lambda i: self._bin_centers[i])
+            # Try each adjacent pair, pick the one with valid dit:dah ratio (2–5×)
+            p_dit, p_dah = None, None
+            for a, b in zip(valid_peaks_sorted, valid_peaks_sorted[1:]):
+                ratio = self._bin_centers[b] / self._bin_centers[a]
+                if 1.5 <= ratio <= 6.0:
+                    p_dit, p_dah = a, b
+                    break
+            if p_dit is None:
+                # Fall back to two strongest peaks
+                p_dit, p_dah = sorted(valid_peaks[:2])
+
+            dit_ms = float(self._bin_centers[p_dit])
+            dah_ms = float(self._bin_centers[p_dah])
+
+            # Validate: dit must be in range
+            if not (self._dit_min_ms <= dit_ms <= self._dit_max_ms):
+                # Maybe caller identified dah peak as first; try to fix
+                if self._dit_min_ms <= dah_ms <= self._dit_max_ms:
+                    dit_ms = dah_ms
+                    dah_ms = dit_ms * 3.0
                 else:
-                    return 0.0, 0.0
-            else:
-                return 0.0, 0.0
+                    return 0.0, 0.0, 0.0
 
-        # Find the dah peak: search in the expected range, away from the dit peak
-        mask = (self._bin_centers >= expected_dah_min) & (self._bin_centers <= expected_dah_max)
-        if mask.any() and hist[mask].sum() > 0:
-            sub = hist.copy()
-            sub[~mask] = 0.0
-            peak2_idx = int(np.argmax(sub))
-            peak2_ms = self._bin_centers[peak2_idx]
+            # Find valley between the two peaks
+            lo, hi = min(p_dit, p_dah), max(p_dit, p_dah)
+            valley_idx = lo + int(np.argmin(h[lo:hi + 1]))
+            valley_ms = float(self._bin_centers[valley_idx])
+
+            # If no genuine valley, use midpoint
+            if h[valley_idx] > 0.70 * min(h[p_dit], h[p_dah]):
+                valley_ms = (dit_ms + dah_ms) / 2.0
+
+            return dit_ms, dah_ms, valley_ms
+
+        elif len(valid_peaks) == 1:
+            # Only one peak — assume it's the dit peak
+            dit_ms = float(self._bin_centers[valid_peaks[0]])
+            if not (self._dit_min_ms <= dit_ms <= self._dit_max_ms):
+                return 0.0, 0.0, 0.0
+            return dit_ms, dit_ms * 3.0, dit_ms * 1.8
+
         else:
-            # No clear dah peak — use the theoretical 3:1 ratio
-            peak2_ms = peak1_ms * 3.0
+            return 0.0, 0.0, 0.0
 
-        return peak1_ms, peak2_ms
+    def _fit_space_histogram(self) -> tuple[float, float, float, float]:
+        """
+        Find element-gap and letter-gap peaks from the space histogram.
+
+        Returns (element_gap_ms, letter_gap_ms, element_sigma_ms, letter_sigma_ms).
+        All four are 0.0 on failure.
+
+        Short noise spikes (< 0.3 × dit) and very long silences (> 15 × dit)
+        are zeroed before peak-finding so they cannot masquerade as signal
+        peaks.  The two largest remaining peaks (by histogram count) are then
+        taken as the intra-element and inter-letter gap clusters — amplitude-
+        based selection is more robust than leftmost-based when weak noise
+        peaks remain at short durations.  A sigma is estimated for each
+        cluster from the weighted variance of histogram counts near the peak.
+        These sigmas drive the scale of the sigmoid classifiers in the beam
+        decoder, replacing the fixed dit_ms-based scale that was too wide.
+
+        Word gaps are not modelled here; the beam decoder handles them with a
+        fixed-probability step once a gap exceeds 2× letter_gap_ms.
+        """
+        hist = self._space_hist.copy()
+        dit = self._estimate.dit_ms
+        if dit > 0:
+            # Zero very short noise spikes (below 0.3 × dit) and word gaps
+            # (above 5.5 × dit).  Capping at 5.5 × dit excludes the 7 × dit
+            # word-gap cluster from the peak search so it cannot displace the
+            # true 3 × dit letter-gap peak from the top-2 selection.  Word
+            # gaps do not need to be modelled here — the beam decoder handles
+            # them with a fixed step once a gap exceeds 2 × letter_gap_ms.
+            min_gap_ms = dit * 0.3
+            max_gap_ms = dit * 5.5
+            min_gap_idx = int(np.searchsorted(self._bin_edges[1:], min_gap_ms))
+            max_gap_idx = int(np.searchsorted(self._bin_edges[1:], max_gap_ms))
+            hist[:min_gap_idx] = 0.0
+            hist[max_gap_idx:] = 0.0
+        else:
+            max_gap_ms = 500.0
+            max_gap_idx = int(np.searchsorted(self._bin_edges[1:], max_gap_ms))
+            hist[max_gap_idx:] = 0.0
+
+        total = hist.sum()
+        if total < 5:
+            return 0.0, 0.0, 0.0, 0.0
+
+        h = _gaussian_smooth(hist, sigma=1.5)
+        peaks = _find_peaks(h)
+
+        if len(peaks) < 2:
+            if len(peaks) == 1:
+                g_ms = float(self._bin_centers[peaks[0]])
+                s = _peak_sigma(h, self._bin_centers, peaks[0])
+                return g_ms, g_ms * 3.0, s, s * 2.0
+            return 0.0, 0.0, 0.0, 0.0
+
+        # _find_peaks returns peaks sorted by amplitude descending.
+        # Take the two largest peaks, then sort by bin index (ascending duration)
+        # so p1 = shorter peak (element gap) and p2 = longer peak (letter gap).
+        p1, p2 = sorted(peaks[:2])
+        g1 = float(self._bin_centers[p1])   # element gap mean
+        g2 = float(self._bin_centers[p2])   # letter gap mean
+
+        # Sanity: ratio should be 1.5–8× (standard timing is 3×, bad fist ≈ 2–4×)
+        if g1 <= 0 or not (1.5 <= g2 / g1 <= 8.0):
+            return 0.0, 0.0, 0.0, 0.0
+
+        s1 = _peak_sigma(h, self._bin_centers, p1)
+        s2 = _peak_sigma(h, self._bin_centers, p2)
+
+        return g1, g2, s1, s2
 
 
 # ---------------------------------------------------------------------------
-# Helper
+# Helpers
 # ---------------------------------------------------------------------------
+
+def _peak_sigma(h: np.ndarray, centers: np.ndarray, peak_idx: int) -> float:
+    """
+    Estimate the standard deviation of a histogram peak by weighted variance
+    over a ±5-bin window around the peak.
+
+    Returns 0.0 if insufficient weight (peak too flat or empty).
+    The caller should treat 0.0 as "not available" and fall back.
+    """
+    lo = max(0, peak_idx - 5)
+    hi = min(len(h), peak_idx + 6)
+    w = h[lo:hi]
+    c = centers[lo:hi]
+    total = float(w.sum())
+    if total < 1e-9:
+        return 0.0
+    mean = float(np.dot(w, c) / total)
+    var = float(np.dot(w, (c - mean) ** 2) / total)
+    return math.sqrt(max(var, 0.0))
+
 
 def _gaussian_smooth(arr: np.ndarray, sigma: float = 1.5) -> np.ndarray:
-    """Apply a simple Gaussian blur to a 1D array using a truncated kernel."""
     radius = max(1, int(sigma * 3))
     kernel = np.exp(-0.5 * (np.arange(-radius, radius + 1) / sigma) ** 2)
     kernel /= kernel.sum()
     return np.convolve(arr, kernel, mode="same")
+
+
+def _find_peaks(h: np.ndarray) -> list[int]:
+    """
+    Return indices of local maxima in h, sorted by value descending.
+
+    Plateaus are collapsed to their centre index.
+    """
+    n = len(h)
+    result: list[int] = []
+    i = 1
+    while i < n - 1:
+        if h[i] > h[i - 1]:
+            # Scan right across plateau
+            j = i
+            while j < n - 1 and h[j + 1] == h[j]:
+                j += 1
+            if j < n - 1 and h[j] > h[j + 1]:
+                result.append((i + j) // 2)  # centre of plateau
+            i = j + 1
+        else:
+            i += 1
+    return sorted(result, key=lambda k: h[k], reverse=True)

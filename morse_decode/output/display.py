@@ -26,9 +26,9 @@ from rich.text import Text
 if TYPE_CHECKING:
     pass
 
-# Block characters for SNR bar
-_BAR_FULL = "▓"
-_BAR_EMPTY = "░"
+# SNR bar characters (ASCII-safe)
+_BAR_FULL = "#"
+_BAR_EMPTY = "."
 
 # Style constants
 _STYLE_ACTIVE = "bright_white"
@@ -73,17 +73,17 @@ class BinDisplayState:
             self._scroll_offset = len(self.text)
             return
         chars_per_s = text_width / scroll_s
-        self._scroll_offset = min(int(elapsed * chars_per_s), len(self.text))
+        self._scroll_offset = min(int(elapsed * chars_per_s), text_width)
 
     def visible_text(self, text_width: int) -> str:
-        """Return the text slice to display (right-justified window)."""
-        # Show the last text_width characters, offset by scroll for inactive bins
+        """Return the text slice to display, scrolling oldest chars off the left when inactive."""
         full = self.text
         if not full:
             return ""
-        # Start from the end, shift left by scroll offset for inactive bins
-        end = max(0, len(full) - self._scroll_offset)
-        start = max(0, end - text_width)
+        # Viewport start shifts rightward as scroll_offset increases,
+        # so the oldest (leftmost) characters exit the left side first.
+        start = max(0, len(full) - text_width + self._scroll_offset)
+        end = min(len(full), start + text_width)
         return full[start:end]
 
 

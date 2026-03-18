@@ -39,18 +39,21 @@ class InputConfig:
     stdin: bool = False              # read raw audio from stdin
     freq_min: int = 400              # Hz
     freq_max: int = 1000             # Hz
-    bin_width: int = 50              # Hz
+    bin_width: int = 25              # Hz — FFT frequency resolution per bin
+    channel_width_hz: int = 200      # Hz — decoding channel width (must be >= bin_width)
 
 
 @dataclass
 class AudioConfig:
     sample_rate: int = 0             # 0 = auto-detect
-    window_ms: float = 20.0          # FFT window length in ms
+    window_ms: float = 40.0          # FFT window length in ms (40 ms → 25 Hz bins)
     hop_ms: float = 5.0              # FFT hop size in ms
-    agc_enabled: bool = True
-    agc_window_s: float = 2.0        # RMS averaging window
+    agc_enabled: bool = False
+    agc_window_s: float = 10.0       # RMS averaging window
     agc_target_rms: float = 0.1      # target normalized RMS
-    debounce_ms: float = 3.0         # min signal state duration (ms)
+    debounce_ms: float = 2.0         # min signal state duration (ms)
+    on_db: float = 24.0              # ON  when 10*log10(bin1/bin3) >= on_db
+    off_db: float = 20.0              # OFF when 10*log10(bin1/bin3) <  off_db
 
 
 @dataclass
