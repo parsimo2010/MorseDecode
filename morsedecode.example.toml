@@ -1,12 +1,15 @@
 # MorseDecode configuration file
-# Copy to ~/.morsedecode.toml (Linux/Mac) or %APPDATA%\morsedecode\config.toml (Windows)
+# On Windows, copy to %APPDATA%\morsedecode\config.toml.
+# On macOS and Linux, use $XDG_CONFIG_HOME/morsedecode/config.toml when set,
+# or ~/.morsedecode.toml otherwise.
 # CLI flags override this file. Use --config to point to another file.
 # Decoder settings inherit the shared core defaults unless you uncomment them.
 
 [input]
-# Audio source. Exactly one of these should be active:
-device = "default"   # audio device name or index (see --list-devices)
-# device = 3           # device by index
+# Audio source. File input takes precedence over stdin, then live device input.
+device = "default"   # use the system default or a name from --list-devices
+# If a name is ambiguous, append the host API shown in the selection error.
+# device = "Microphone (Senary Audio), MME"
 # file = "recording.wav"
 # stdin = true         # pipe raw audio from rtl_fm, gqrx, etc.
 
@@ -21,7 +24,8 @@ freq_max = 1000
 channel_width_hz = 200
 
 [audio]
-# Sample rate in Hz. 0 = auto-detect from device or file header.
+# Sample rate in Hz. 0 uses the default device rate for live input or
+# 44100 Hz for stdin. File input always uses the recording's rate.
 sample_rate = 0
 
 # Hann analysis window in ms.
@@ -35,7 +39,8 @@ sample_rate = 0
 # agc_window_s = 10.0      # RMS averaging window in seconds
 # agc_target_rms = 0.1     # normalized RMS target (0.0–1.0)
 
-# Signal debounce: ignore state transitions shorter than this (suppresses key bounce / noise)
+# Lower bound on transition debounce in ms. The core also uses the analysis
+# hop and current keying speed to decide how long a transition must persist.
 # debounce_ms = 2.0
 
 # Relative sensitivity on the historical 24/20 scale. Lower values make
@@ -60,5 +65,5 @@ enabled = false
 path = "morsedecode.log"
 format = "text"          # "text" or "jsonl"
 # text format:  TIMESTAMP  FREQ_HZ  SPEED_WPM  DECODED_TEXT
-# jsonl fields: timestamp, freq_hz, text, snr_db, speed_wpm
+# jsonl fields: timestamp, freq_hz, text, snr_db (signal contrast), speed_wpm
 rotate_mb = 10           # rotate log after N megabytes (0 = never)

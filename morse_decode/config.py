@@ -4,8 +4,8 @@ Configuration system for MorseDecode.
 Priority (highest to lowest):
   1. CLI flag overrides
   2. Config file specified via --config
-  3. Default config file (~/.morsedecode.toml or %APPDATA%/morsedecode/config.toml)
-  4. Hard-coded defaults (dataclass field defaults below)
+  3. Platform defaults file (resolved by _default_config_path)
+  4. Built-in terminal defaults and shared JavaScript decoder defaults
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ class InputConfig:
 
 @dataclass
 class AudioConfig:
-    sample_rate: int = 0             # 0 = auto-detect
+    sample_rate: int = 0             # 0 uses the live device rate or 44100 Hz for stdin
     window_ms: float | None = None
     hop_ms: float | None = None
     agc_enabled: bool | None = None

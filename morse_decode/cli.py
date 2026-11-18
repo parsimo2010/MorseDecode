@@ -7,9 +7,9 @@ Usage examples
 --------------
     morsedecode --list-devices
     morsedecode                          # default device, default settings
-    morsedecode --device 3
+    morsedecode --device "Microphone (Senary Audio), MME"
     morsedecode --file recording.wav
-    morsedecode --stdin                  # pipe from rtl_fm, gqrx, etc.
+    morsedecode --stdin --sample-rate 44100 < recording.pcm
     morsedecode --config my.toml
     morsedecode --freq-min 600 --freq-max 900 --bin-width 50
 """
@@ -155,32 +155,32 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
               help="List available audio input devices and exit.")
 # Input
 @click.option("--device", default=None, metavar="DEVICE",
-              help="Audio device name or index (default: system default).")
+              help="Live audio input name from --list-devices (default: system default).")
 @click.option("--file", "audio_file", default=None, metavar="FILE",
               help="Decode an audio file instead of live input.")
 @click.option("--stdin", is_flag=True,
-              help="Read raw PCM audio from stdin.")
+              help="Read signed 16-bit mono PCM from stdin.")
 @click.option("--freq-min", default=None, type=int, metavar="HZ",
               help="Lower frequency edge in Hz (default: 400).")
 @click.option("--freq-max", default=None, type=int, metavar="HZ",
               help="Upper frequency edge in Hz (default: 1000).")
 @click.option("--bin-width", default=None, type=int, metavar="HZ",
-              help="Maximum tone spacing in Hz (default: 12).")
+              help="Override the core's maximum spacing between search tones.")
 @click.option("--channel-width", default=None, type=int, metavar="HZ",
               help="Receiver passband width in Hz (default: 200).")
 # Audio / detection
 @click.option("--sample-rate", default=None, type=int, metavar="HZ",
-              help="Sample rate for stdin input (default: auto).")
+              help="Sample rate for live or stdin input (defaults: device rate or 44100 Hz).")
 @click.option("--on-db", default=None, type=float, metavar="DB",
-              help="Relative signal-on sensitivity (default: 24; lower is more sensitive).")
+              help="Override the core's signal-on threshold. Lower is more sensitive.")
 @click.option("--off-db", default=None, type=float, metavar="DB",
-              help="Relative signal-off sensitivity (default: 20; below --on-db).")
+              help="Override the core's signal-off threshold. Keep it below the signal-on threshold.")
 # Decoder
 @click.option("--beam-width", default=None, type=int, hidden=True)
 @click.option("--speed-min", default=None, type=float, metavar="WPM",
-              help="Minimum CW speed in WPM (default: 5).")
+              help="Override the core's minimum keying speed.")
 @click.option("--speed-max", default=None, type=float, metavar="WPM",
-              help="Maximum CW speed in WPM (default: 50).")
+              help="Override the core's maximum keying speed.")
 # Log
 @click.option("--log", "log_path", default=None, metavar="FILE",
               help="Enable file logging to FILE.")
@@ -206,7 +206,7 @@ def main(
     log_path: str | None,
     log_format: str | None,
 ) -> None:
-    """Multi-channel CW (Morse code) decoder using the shared decoder.
+    """Terminal interface for the shared CW (Morse code) decoder.
 
     Decodes simultaneous CW signals across a configurable frequency range
     from a live audio device, audio file, or stdin pipe.

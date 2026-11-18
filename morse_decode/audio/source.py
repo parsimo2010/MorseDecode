@@ -4,7 +4,7 @@ Audio source abstraction.
 Three input modes are supported:
   1. Live audio device (via sounddevice)
   2. Audio file (formats supported by libsndfile)
-  3. Raw PCM from stdin (pipe from rtl_fm, gqrx, SDR#, etc.)
+  3. Raw PCM from stdin
 
 All modes yield mono NumPy float32 chunks at the source sample rate.
 """
@@ -184,12 +184,8 @@ class StdinSource(AudioSource):
     """
     Read raw PCM audio from stdin.
 
-    Useful for piping from:
-      rtl_fm -f 7.040M -s 44100 | morsedecode --stdin
-      gqrx (network audio) | morsedecode --stdin
-
-    By default expects signed 16-bit little-endian mono at the configured
-    sample rate.  The format can be overridden via constructor parameters.
+    By default expects signed 16-bit mono in native byte order at the
+    configured rate. The constructor can override format and channel count.
     """
 
     def __init__(

@@ -1,15 +1,15 @@
 """
 Rich-based multi-line live terminal display.
 
-Layout (one row per frequency bin):
+One row per passband. The readout shows the acquired carrier frequency
+or the passband center before acquisition.
 ┌─────────┬─────────────┬────────┬───────────┬──────────────────────────────────────────────┐
-│  425 Hz │ ▓▓▓░░  18dB │ 15 wpm │ W1AW      │ CQ CQ DE W1AW W1AW K                        │
-│  475 Hz │ ░░░░░  --dB │ -- wpm │           │                                              │
+│  425 Hz │ ###..  18dB │ 15 wpm │ W1AW      │ CQ CQ DE W1AW W1AW K                        │
+│  700 Hz │ .....  --dB │ -- wpm │           │                                              │
 ...
 └─────────┴─────────────┴────────┴───────────┴──────────────────────────────────────────────┘
 
-Inactive bins are shown in dim grey.  Text that has scrolled away is replaced
-with spaces from the left over `inactive_scroll_s` seconds.
+Inactive rows can be dimmed. Their text scrolls off over the configured time.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from rich.live import Live
 from rich.table import Table
 from rich.text import Text
 
-# SNR bar characters (ASCII-safe)
+# Signal contrast bar characters (ASCII-safe)
 _BAR_FULL = "#"
 _BAR_EMPTY = "."
 
@@ -40,7 +40,7 @@ _STYLE_SPEED = "green"
 
 @dataclass
 class BinDisplayState:
-    """All display-relevant state for one frequency bin."""
+    """Display state for one receiver passband."""
     freq_hz: int
     snr_db: float = -20.0
     speed_wpm: float = 0.0
@@ -103,7 +103,7 @@ def _snr_label(snr_db: float) -> str:
 
 class Display:
     """
-    Manages the Rich Live display showing all frequency bins.
+    Manages the Rich Live display showing all receiver passbands.
     """
 
     def __init__(
