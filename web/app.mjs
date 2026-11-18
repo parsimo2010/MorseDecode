@@ -7,6 +7,10 @@ let previous = '';
 let latest = '';
 let offset = 0;
 
+function scriptURL(source) {
+  return URL.createObjectURL(new Blob([source], {type: 'text/javascript'}));
+}
+
 async function listDevices() {
   if (!navigator.mediaDevices) return;
   const selected = device.value;
@@ -60,7 +64,11 @@ field('start').onclick = async () => {
     return;
   }
   if (!navigator.mediaDevices?.getUserMedia) {
-    status.textContent = 'Open this page in Chrome on localhost or HTTPS to enable audio capture.';
+    status.textContent = 'Open the HTTPS site or use localhost to enable microphone access.';
+    return;
+  }
+  if (!window.AudioContext || !window.AudioWorkletNode) {
+    status.textContent = 'Use a current version of Chrome, Edge, Firefox, or Safari for live audio.';
     return;
   }
   const session = {};
@@ -73,12 +81,18 @@ field('start').onclick = async () => {
   status.textContent = 'Waiting for audio input permission…';
   try {
     session.context = new AudioContext();
+    await session.context.resume();
     const audio = {echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1};
     if (device.value) audio.deviceId = {exact: device.value};
     session.stream = await navigator.mediaDevices.getUserMedia({audio});
-    await session.context.resume();
-    await session.context.audioWorklet.addModule('./capture.mjs');
-    session.worker = new Worker(new URL('./worker.mjs', import.meta.url), {type: 'module'});
+    // A data URL also works when the HTML file has an opaque local origin.
+    await session.context.audioWorklet.addModule('data:text/javascript,' + encodeURIComponent(captureSource));
+    const workerURL = scriptURL(workerSource);
+    try {
+      session.worker = new Worker(workerURL);
+    } finally {
+      URL.revokeObjectURL(workerURL);
+    }
     session.worker.onerror = () => cleanup(session, 'The decoding worker failed to load.');
     session.worker.onmessage = ({data}) => {
       if (active !== session) return;
@@ -124,3 +138,17 @@ field('clear').onclick = () => {
 };
 navigator.mediaDevices?.addEventListener('devicechange', () => listDevices().catch(() => {}));
 listDevices().catch(() => {});
+
+if (location.protocol === 'https:' || location.protocol === 'http:') {
+  for (const [rel, href] of [['manifest', './manifest.webmanifest'], ['apple-touch-icon', './icons/apple.png']]) {
+    const link = document.createElement('link');
+    link.rel = rel;
+    link.href = href;
+    document.head.append(link);
+  }
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.register('./service-worker.js').catch(error => {
+      console.warn('Offline startup is unavailable.', error);
+    });
+  }
+}

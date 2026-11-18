@@ -1,4 +1,4 @@
-export const MORSE = Object.fromEntries([
+const MORSE = Object.fromEntries([
   ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter, i) =>
     ['.- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..'.split(' ')[i], letter]),
   ...'0123456789'.split('').map((digit, i) =>
@@ -57,7 +57,7 @@ function decodeWord(marks, unit) {
   return paths[marks.length].text;
 }
 
-export class CWDecoder {
+class CWDecoder {
   constructor(sampleRate, {low = 400, high = 1000, minWpm = 5, maxWpm = 50} = {}) {
     if (!(low >= 100 && high > low && high <= 3000 && high < sampleRate / 2 &&
         minWpm >= 5 && maxWpm <= 60 && minWpm < maxWpm)) {
@@ -240,3 +240,5 @@ export class CWDecoder {
     return this.snapshot();
   }
 }
+
+export {CWDecoder, MORSE};

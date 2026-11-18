@@ -1,6 +1,7 @@
 # analysis files
 *.wav
 *.png
+!web/icons/*.png
 *.txt
 
 # Byte-compiled / optimized / DLL files
