@@ -1,4 +1,4 @@
-import {CWDecoder} from './decoder.mjs';
+import {CWDecoder} from '../morse_decode/core/decoder.mjs';
 
 let decoder;
 let lastUpdate = 0;

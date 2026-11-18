@@ -3,19 +3,17 @@ Audio source abstraction.
 
 Three input modes are supported:
   1. Live audio device (via sounddevice)
-  2. Audio file (WAV, FLAC, MP3 via soundfile + optional pydub for MP3)
+  2. Audio file (formats supported by libsndfile)
   3. Raw PCM from stdin (pipe from rtl_fm, gqrx, SDR#, etc.)
 
-All modes yield numpy float32 arrays of shape (n_samples, n_channels) at a
-common sample rate.  The pipeline always down-mixes to mono before processing.
+All modes yield mono NumPy float32 chunks at the source sample rate.
 """
 
 from __future__ import annotations
 
 import queue
 import sys
-import threading
-from typing import Generator, Iterator
+from typing import Generator
 
 import numpy as np
 
@@ -102,10 +100,6 @@ class AudioSource:
         """Yield mono float32 chunks indefinitely (or until EOF for file/stdin)."""
         raise NotImplementedError
 
-    def close(self) -> None:
-        pass
-
-
 # ---------------------------------------------------------------------------
 # Live device source
 # ---------------------------------------------------------------------------
@@ -130,8 +124,6 @@ class DeviceSource(AudioSource):
         self._device = device
         self._chunk_size = max(1, int(sample_rate * chunk_ms / 1000.0))
         self._q: queue.Queue[np.ndarray] = queue.Queue(maxsize=64)
-        self._stream: sd.InputStream | None = None
-        self._stop_event = threading.Event()
 
     def stream(self) -> Generator[np.ndarray, None, None]:
         def _callback(indata: np.ndarray, _frames: int, _time, _status) -> None:
@@ -140,30 +132,20 @@ class DeviceSource(AudioSource):
             except queue.Full:
                 pass  # drop chunk if consumer is too slow
 
-        self._stream = sd.InputStream(
+        with sd.InputStream(
             device=self._device,
             channels=1,
             samplerate=self.sample_rate,
             blocksize=self._chunk_size,
             dtype="float32",
             callback=_callback,
-        )
-        self._stream.start()
-        try:
-            while not self._stop_event.is_set():
+        ):
+            while True:
                 try:
                     chunk = self._q.get(timeout=0.5)
-                    yield _to_mono(chunk)
                 except queue.Empty:
                     continue
-        finally:
-            self._stream.stop()
-            self._stream.close()
-
-    def close(self) -> None:
-        self._stop_event.set()
-        if self._stream is not None:
-            self._stream.stop()
+                yield _to_mono(chunk)
 
 
 # ---------------------------------------------------------------------------
@@ -232,11 +214,6 @@ class StdinSource(AudioSource):
             if not data:
                 break
             arr = np.frombuffer(data, dtype=self._dtype)
-            if len(arr) < chunk_samples * self._channels:
-                # Partial final chunk — pad with zeros
-                padded = np.zeros(chunk_samples * self._channels, dtype=self._dtype)
-                padded[: len(arr)] = arr
-                arr = padded
             arr = _normalize_dtype(arr)
             if self._channels > 1:
                 arr = arr.reshape(-1, self._channels)

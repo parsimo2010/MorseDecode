@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {CWDecoder, MORSE} from '../web/decoder.mjs';
+import {CWDecoder, MORSE} from '../morse_decode/core/decoder.mjs';
 
 const codes = Object.fromEntries(Object.entries(MORSE).map(([code, char]) => [char, code]));
 const messages = [

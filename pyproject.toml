@@ -5,13 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "morsedecode"
 version = "0.1.0"
-description = "Multi-channel CW (Morse code) decoder with FFT-based frequency bin analysis"
+description = "Multi-channel CW (Morse code) decoder with a shared browser and terminal core"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
     "numpy>=1.24",
-    "scipy>=1.10",
     "sounddevice>=0.4.6",
     "soundfile>=0.12",
     "rich>=13.0",
@@ -32,6 +31,9 @@ morsedecode = "morse_decode.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["morse_decode*"]
+
+[tool.setuptools.package-data]
+morse_decode = ["core/*.mjs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

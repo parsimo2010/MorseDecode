@@ -11,14 +11,14 @@ function replaceRequired(source, search, replacement) {
 }
 
 const [template, css, app, decoder, worker, capture, serviceWorker] = (await Promise.all([
-  'index.html', 'style.css', 'app.mjs', 'decoder.mjs', 'worker.mjs', 'capture.mjs', 'service-worker.js'
+  'index.html', 'style.css', 'app.mjs', '../morse_decode/core/decoder.mjs', 'worker.mjs', 'capture.mjs', 'service-worker.js'
 ].map(read))).map(asText);
 
 // The portable page starts both audio processors from inline source. The
 // decoder and worker can still use ordinary module imports in source tooling.
 const workerBundle = [
   replaceRequired(decoder, 'export {CWDecoder, MORSE};', ''),
-  replaceRequired(worker, "import {CWDecoder} from './decoder.mjs';", '')
+  replaceRequired(worker, "import {CWDecoder} from '../morse_decode/core/decoder.mjs';", '')
 ].join('\n');
 const script = [
   '"use strict";',

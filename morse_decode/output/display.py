@@ -16,15 +16,11 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.live import Live
 from rich.table import Table
 from rich.text import Text
-
-if TYPE_CHECKING:
-    pass
 
 # SNR bar characters (ASCII-safe)
 _BAR_FULL = "#"
@@ -36,7 +32,6 @@ _STYLE_INACTIVE = "dim"
 _STYLE_FREQ = "cyan"
 _STYLE_CALLSIGN = "bright_yellow bold"
 _STYLE_SPEED = "green"
-_STYLE_HEADER = "bold white on blue"
 
 
 # ---------------------------------------------------------------------------
@@ -171,7 +166,7 @@ class Display:
         )
         table.add_column("Freq", style=_STYLE_FREQ, width=7, no_wrap=True)
         table.add_column(
-            f"{'SNR':^{self._snr_bar_width + 5}}",
+            f"{'Signal':^{self._snr_bar_width + 5}}",
             width=self._snr_bar_width + 5,
             no_wrap=True,
         )

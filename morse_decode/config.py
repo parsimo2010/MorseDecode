@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import os
 import sys
-from dataclasses import dataclass, field, fields, asdict
+from dataclasses import dataclass, field, fields
 from pathlib import Path
-from typing import Any
+from typing import Any, get_args, get_type_hints
 
 # tomllib is stdlib in Python 3.11+; fall back to third-party tomli
 if sys.version_info >= (3, 11):
@@ -39,34 +39,27 @@ class InputConfig:
     stdin: bool = False              # read raw audio from stdin
     freq_min: int = 400              # Hz
     freq_max: int = 1000             # Hz
-    bin_width: int = 25              # Hz — FFT frequency resolution per bin
-    channel_width_hz: int = 200      # Hz — decoding channel width (must be >= bin_width)
+    bin_width: int | None = None
+    channel_width_hz: int = 200      # Hz — receiver passband width
 
 
 @dataclass
 class AudioConfig:
     sample_rate: int = 0             # 0 = auto-detect
-    window_ms: float = 40.0          # FFT window length in ms (40 ms → 25 Hz bins)
-    hop_ms: float = 5.0              # FFT hop size in ms
-    agc_enabled: bool = False
-    agc_window_s: float = 10.0       # RMS averaging window
-    agc_target_rms: float = 0.1      # target normalized RMS
-    debounce_ms: float = 2.0         # min signal state duration (ms)
-    on_db: float = 24.0              # ON  when 10*log10(bin1/noise_ref) >= on_db
-    off_db: float = 20.0              # OFF when 10*log10(bin1/noise_ref) <  off_db
+    window_ms: float | None = None
+    hop_ms: float | None = None
+    agc_enabled: bool | None = None
+    agc_window_s: float | None = None
+    agc_target_rms: float | None = None
+    debounce_ms: float | None = None
+    on_db: float | None = None
+    off_db: float | None = None
 
 
 @dataclass
 class DecoderConfig:
-    beam_width: int = 16             # beam search width (larger = more bad-fist tolerance)
-    speed_min_wpm: float = 5.0
-    speed_max_wpm: float = 50.0
-    histogram_bins: int = 60
-    estimator_decay: float = 0.97    # histogram exponential decay per dit/dah event
-    outlier_pct: float = 10.0        # % of extreme values to trim when fitting peaks
-    silence_reset_s: float = 5.0     # silence seconds before speed estimator resets
-    rewind_buffer_s: float = 10.0    # seconds of timing events to buffer for re-decode
-    ambiguity_factor: float = 1.5    # widens dit/dah decision boundary (>1 = more branching)
+    speed_min_wpm: float | None = None
+    speed_max_wpm: float | None = None
 
 
 @dataclass
@@ -111,19 +104,10 @@ def _default_config_path() -> Path:
     return Path.home() / ".morsedecode.toml"
 
 
-def _merge_dict(base: dict, override: dict) -> dict:
-    """Recursively merge override into base (modifies base in-place, returns it)."""
-    for key, val in override.items():
-        if isinstance(val, dict) and isinstance(base.get(key), dict):
-            _merge_dict(base[key], val)
-        else:
-            base[key] = val
-    return base
-
-
 def _apply_dict_to_dataclass(dc: Any, data: dict) -> None:
     """Apply a flat or nested dict onto a dataclass, ignoring unknown keys."""
     dc_fields = {f.name for f in fields(dc)}
+    field_types = get_type_hints(type(dc))
     for key, val in data.items():
         if key not in dc_fields:
             continue
@@ -134,15 +118,17 @@ def _apply_dict_to_dataclass(dc: Any, data: dict) -> None:
             # Coerce type to match the dataclass field default type
             try:
                 field_type = type(current)
+                if current is None:
+                    options = [option for option in get_args(field_types[key]) if option is not type(None)]
+                    if len(options) == 1:
+                        field_type = options[0]
                 if field_type is bool:
                     # bool("false") == True so handle explicitly
                     if isinstance(val, str):
                         val = val.lower() not in ("false", "0", "no", "off")
                     else:
                         val = bool(val)
-                elif current is None:
-                    val = val  # keep as-is when default is None
-                else:
+                elif field_type is not type(None):
                     val = field_type(val)
             except (ValueError, TypeError):
                 pass
@@ -172,7 +158,7 @@ def load_config(
     ----------
     config_file : path to an explicit TOML config file (--config CLI flag)
     **cli_overrides : flat keyword arguments mapping section__key to value,
-                      e.g.  input__device=3, decoder__beam_width=32
+                      e.g.  input__device=3, decoder__speed_max_wpm=45
                       Section separator is double-underscore.
     """
     cfg = Config()
@@ -210,14 +196,3 @@ def load_config(
             _apply_dict_to_dataclass(cfg, {compound_key: val})
 
     return cfg
-
-
-def compute_bin_centers(cfg: InputConfig) -> list[int]:
-    """Return list of bin center frequencies in Hz."""
-    half = cfg.bin_width // 2
-    centers = []
-    f = cfg.freq_min + half
-    while f <= cfg.freq_max - half:
-        centers.append(f)
-        f += cfg.bin_width
-    return centers
