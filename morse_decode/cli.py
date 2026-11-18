@@ -417,8 +417,8 @@ def main(
 ) -> None:
     """Multi-channel CW (Morse code) decoder with FFT frequency-bin analysis.
 
-    Decodes up to 12 simultaneous CW signals across a configurable frequency
-    range from a live audio device, audio file, or stdin pipe.
+    Decodes simultaneous CW signals across a configurable frequency range
+    from a live audio device, audio file, or stdin pipe.
     """
     if list_devs:
         click.echo(list_devices())

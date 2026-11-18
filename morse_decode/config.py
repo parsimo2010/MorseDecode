@@ -52,8 +52,8 @@ class AudioConfig:
     agc_window_s: float = 10.0       # RMS averaging window
     agc_target_rms: float = 0.1      # target normalized RMS
     debounce_ms: float = 2.0         # min signal state duration (ms)
-    on_db: float = 24.0              # ON  when 10*log10(bin1/bin3) >= on_db
-    off_db: float = 20.0              # OFF when 10*log10(bin1/bin3) <  off_db
+    on_db: float = 24.0              # ON  when 10*log10(bin1/noise_ref) >= on_db
+    off_db: float = 20.0              # OFF when 10*log10(bin1/noise_ref) <  off_db
 
 
 @dataclass

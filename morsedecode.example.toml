@@ -36,7 +36,7 @@ window_ms = 40.0
 hop_ms = 5.0
 
 # Auto Gain Control
-agc_enabled = true
+agc_enabled = true       # opt in for this example (the built-in default is false)
 agc_window_s = 10.0      # RMS averaging window in seconds
 agc_target_rms = 0.1     # normalized RMS target (0.0–1.0)
 
@@ -84,5 +84,5 @@ enabled = false
 path = "morsedecode.log"
 format = "text"          # "text" or "jsonl"
 # text format:  TIMESTAMP  FREQ_HZ  SPEED_WPM  DECODED_TEXT
-# jsonl format: {"timestamp":..., "freq_hz":..., "text":..., "snr_db":..., "speed_wpm":...}
+# jsonl fields: timestamp, freq_hz, text, snr_db, speed_wpm
 rotate_mb = 10           # rotate log after N megabytes (0 = never)

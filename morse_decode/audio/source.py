@@ -134,9 +134,7 @@ class DeviceSource(AudioSource):
         self._stop_event = threading.Event()
 
     def stream(self) -> Generator[np.ndarray, None, None]:
-        def _callback(indata: np.ndarray, frames: int, time, status) -> None:
-            if status:
-                pass  # log status flags in future
+        def _callback(indata: np.ndarray, _frames: int, _time, _status) -> None:
             try:
                 self._q.put_nowait(indata.copy())
             except queue.Full:

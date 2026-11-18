@@ -10,22 +10,9 @@ AdaptiveDetector (histogram-based)
 
 GatedNoiseDetector (ratio-based)
 ----------------------------------
-Detection is based on the ratio of the highest FFT bin to the 3rd-highest
-bin within a decoding channel.
-
-When a CW signal is present it concentrates in 1–2 bins, so
-  bin1 >> bin3 → large ratio → ON
-Broadband noise distributes relatively evenly:
-  bin1 ≈ bin3 → small ratio → OFF
-
-This is immune to AGC-induced level changes that caused the previous
-noise-floor-tracking approach to fail: the ratio is self-normalising.
-
-Schmitt trigger:
-  ON  when 10*log10(bin1 / bin3) >= on_db  (default 12 dB)
-  OFF when 10*log10(bin1 / bin3) <  off_db (default  6 dB)
-
-Debounce suppresses single-frame transients.
+The production detector compares the highest-energy FFT bin with the mean of
+the lower-energy half of the channel's bins. Hysteresis and debounce stabilize
+the transitions between keyed marks and spaces.
 """
 
 from __future__ import annotations
@@ -285,22 +272,11 @@ class AdaptiveDetector:
 
 class GatedNoiseDetector:
     """
-    Signal detector based on the energy ratio of the highest FFT bin to the
-    3rd-highest bin within a channel.
-
-    When a CW signal is present it concentrates in 1–2 bins, so
-    bin1 >> bin3, giving a large ratio.  Broadband noise distributes
-    relatively evenly across bins, keeping the ratio low.
-
-    Detection (Schmitt trigger on dB ratio):
-      ON  when 10*log10(bin1 / bin3) >= on_db   (default 12 dB)
-      OFF when 10*log10(bin1 / bin3) <  off_db  (default  6 dB)
-
-    No noise-floor EMA is needed — the ratio is self-normalising and immune
-    to AGC-induced level changes.  The SNR display value is the ratio in dB.
-
-    For channels with fewer than 3 bins, falls back to bin1/bin2 ratio.
-    For single-bin channels, ratio is always 0 dB (never triggers).
+    Detect marks when the strongest FFT bin exceeds the mean of the lower
+    half of the channel's bins by the configured threshold in dB. The lower
+    cutoff ends a mark, and the ratio supplies the displayed SNR estimate.
+    The ratio reduces to strongest over weakest for two-bin channels and is
+    0 dB for single-bin channels.
     """
 
     def __init__(
@@ -406,9 +382,8 @@ class GatedNoiseDetector:
 
         The Hann window spreads signal energy into adjacent bins (~-6 dB at
         ±1 bin).  Using only bin3 as the reference can include leakage.
-        Instead we use the mean of the lower half of bins (sorted descending),
-        which is always outside the signal's leakage regardless of how many
-        bins contain leakage.
+        The mean of the lower half of bins (sorted descending) reduces the
+        influence of leakage on the noise reference.
 
         With a 200 Hz channel / 25 Hz bins = 8 bins and signal in 1-2 bins:
           bins[0-1]: signal  bins[2]: leakage  bins[3-7]: noise

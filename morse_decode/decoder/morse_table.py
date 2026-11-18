@@ -1,5 +1,5 @@
 """
-Complete ITU Morse code table: letters, digits, punctuation, and prosigns.
+Morse code table for letters, digits, selected punctuation, and prosigns.
 
 Prosigns are keyed with angle-bracket names like '<AR>' and are decoded as a
 single printed token.  They share bit-sequences with some punctuation (e.g.

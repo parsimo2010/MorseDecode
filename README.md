@@ -1,32 +1,72 @@
 # MorseDecode
 
-A multi-channel Morse code (CW) decoder that processes audio in real time,
-simultaneously decoding up to 12 CW signals across a configurable frequency
-range via FFT bin analysis.
+MorseDecode decodes Morse code (CW) from audio in real time. The browser app
+follows one carrier from a microphone or audio input. The Python CLI processes
+multiple frequency channels and also accepts files and raw PCM on stdin.
 
-**Target performance:** < 5% Character Error Rate (CER), 5–50 WPM, including
-signals sent with a "bad fist" (irregular timing).
+## Browser app
+
+Build the static files with Node.js 24 from the checkout. The build has no
+package dependencies.
+
+```bash
+node web/build.mjs
+```
+
+Double-click `dist/index.html` to open it in desktop Chrome. You can copy this
+single HTML file to another computer. The stylesheet, decoder, and audio
+capture code are embedded, and decoding runs locally in the browser.
+
+Select an audio input, click **Start listening**, and grant microphone access.
+Play a keyed CW signal within the selected frequency range (400–1000 Hz by
+default). The page shows the carrier frequency estimate, speed in WPM, and
+transcript. Click **Stop** to finalize the transcript. If the browser blocks
+microphone access for a local file, serve `dist/` on localhost and open
+`http://127.0.0.1:8000/`.
+
+```bash
+python -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
+
+### Publish and install on a phone
+
+Serve the contents of `dist/` over HTTPS on any static host. For GitHub Pages,
+choose **GitHub Actions** under **Settings → Pages → Build and deployment**,
+then run **Publish MorseDecode to GitHub Pages** from the **Actions** tab. Run
+the workflow again for updates. With default project Pages settings, the URL is
+`https://parsimo2010.github.io/MorseDecode/`. GitHub Pages on a private repository
+requires an eligible plan. The workflow uploads only the static build output.
+[GitHub Pages publishing guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+
+- **Android (Chrome)** — Open the HTTPS page, open the three-dot menu, and choose
+  **Install app** or the install option under **Add to Home screen**. [Chrome help](https://support.google.com/chrome/answer/9658361?co=GENIE.Platform%3DAndroid)
+- **iPhone (Safari)** — Open the HTTPS page, tap **Share**, choose **Add to Home
+  Screen**, enable **Open as Web App** if offered, and tap **Add**. [Apple help](https://support.apple.com/guide/iphone/open-as-web-app-iphea86e5236/ios)
+
+Open the app and allow microphone access when prompted. Keep the app in the
+foreground while listening. After the first online load finishes caching the
+app, it can reopen offline.
 
 ---
 
-## Features
+## Python CLI features
 
 | Feature | Details |
 |---|---|
-| Multi-channel | Up to 12 simultaneous channels (default: 3 × 200 Hz across 400–1000 Hz) |
+| Multi-channel | Configurable channel count (default: 3 × 200 Hz across 400–1000 Hz) |
 | Audio input | Live device, audio file (WAV/FLAC), or stdin pipe (rtl_fm, gqrx, …) |
-| Auto gain | Exponentially-weighted RMS AGC, configurable time constant |
-| Ratio detection | Schmitt trigger on bin1/noise_ref energy ratio; immune to AGC-induced noise floor drift |
+| Auto gain | Optional exponentially weighted RMS AGC with a configurable time constant |
+| Ratio detection | Schmitt trigger on the strongest FFT bin relative to the lower-energy bins |
 | Mark confidence | Average ratio over each mark's duration → beam-search weight; marginal detections discounted |
 | Auto speed | Histogram valley detection separates dits from dahs; 5–50 WPM |
 | Auto spacing | Histogram-based inter-element / inter-letter / word-space thresholds |
 | Bad-fist tolerant | Soft (sigmoid) dit/dah decisions; mark-confidence noise branching; beam width 16 |
 | Beam search | Branching hypothesis search with log-probability scoring and pruning |
-| Prosigns | AR, SK, BT, KN, AS, CT, HH, SN, SOS |
+| Prosigns | AR, SK, BT, KN, AS, CT, SN |
 | Rewind buffer | Buffers timing events; re-decodes from buffer when speed estimate updates |
 | Speed reset | Resets estimator after configurable silence period; replays buffer |
 | Live terminal UI | Per-channel rows via Rich; inactive channels dim and text scrolls off |
-| File logging | Text or JSONL log with timestamp, frequency, decoded text, SNR ratio, speed |
+| File logging | Text and JSONL logs include timestamp, frequency, speed, and decoded text. JSONL also includes the signal ratio in dB. |
 | Config system | 3-layer: default file → --config file → CLI flags |
 | Cross-platform | Linux, Windows, macOS |
 
@@ -66,7 +106,7 @@ morse_decode/
 │   ├── segmenter.py       ON/OFF events → TimingEvents with mark_confidence; silence reset
 │   └── estimator.py       Log-histogram valley detection → dit/dah/space thresholds
 └── decoder/
-    ├── morse_table.py     Full ITU table: letters, digits, punctuation, prosigns; Morse trie
+    ├── morse_table.py     Letters, digits, selected punctuation and prosigns; Morse trie
     ├── buffer.py          Time-bounded ring buffer of TimingEvents for rewind
     └── beam_search.py     Soft-decision beam search; noise-branch on low confidence; callsign
 ```
@@ -91,8 +131,8 @@ Audio chunk
 1. **Ratio-based detection** — instead of tracking an adaptive noise floor (which fails when
    radio AGC amplifies in-band noise during silence), detection uses
    `10*log10(bin1 / mean(lower_half_bins))`.  A CW signal concentrates in 1–2 FFT bins;
-   the lower half of the channel's bins are pure noise, making the ratio self-normalising
-   and immune to AGC-induced level changes.
+   the lower half of the channel's bins supplies a noise reference, making the ratio
+   insensitive to uniform gain changes.
 
 2. **Schmitt trigger hysteresis** — ON threshold (24 dB) > OFF threshold (20 dB).
    Once a mark starts, signal can fade to 20 dB before the detector goes OFF, suppressing
@@ -119,12 +159,12 @@ Audio chunk
 ```bash
 git clone https://github.com/parsimo2010/MorseDecode.git
 cd MorseDecode
-pip install -e .
+python -m pip install -e .
 ```
 
 For development (includes pytest):
 ```bash
-pip install -e ".[dev]"
+python -m pip install -e ".[dev]"
 ```
 
 ### Dependencies
@@ -132,6 +172,7 @@ pip install -e ".[dev]"
 | Package | Purpose |
 |---|---|
 | `numpy` | FFT, histogram, signal processing |
+| `scipy` | Signal-processing dependency |
 | `sounddevice` | Cross-platform live audio capture |
 | `soundfile` | Audio file decoding (WAV, FLAC, OGG) |
 | `rich` | Live multi-line terminal UI |
@@ -237,21 +278,16 @@ Typical values for the 700 Hz channel on a 20 dB SNR CW signal: **28–32 dB** d
 ## Testing
 
 ```bash
-pytest
-pytest -v tests/test_morse_table.py   # Morse table + trie
-pytest -v tests/test_timing.py        # Timing estimator
-pytest -v tests/test_beam_search.py   # Beam decoder
+python -m pytest
+node tests/performance.mjs
 ```
 
----
+The browser suite reports character error rate on seeded synthetic CW and checks
+timing, frequency acquisition, and behavior under noise, jitter, and fading.
+The Python diagnostic `python test_decoder.py` runs synthetic examples and can
+also analyze a recording passed as an argument.
 
-## Roadmap
-
-- [ ] CER test harness against known audio recordings
-- [ ] Character language model (bigram) to improve ambiguous decoding
-- [ ] TX logging (log sent CW for QSO script replay)
-- [ ] Network audio input (UDP/TCP raw PCM)
-- [ ] Web UI for remote monitoring
+Ongoing work is tracked in the [GitHub issue tracker](https://github.com/parsimo2010/MorseDecode/issues).
 
 ---
 
