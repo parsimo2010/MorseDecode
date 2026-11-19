@@ -2,6 +2,9 @@ const field = id => document.getElementById(id);
 const device = field('device');
 const status = field('status');
 const transcript = field('transcript');
+const tabInput = 'browser-tab';
+const media = navigator.mediaDevices;
+const supportsTabAudio = Boolean(media?.getDisplayMedia && media.getSupportedConstraints().suppressLocalAudioPlayback);
 let active;
 let previous = '';
 let latest = '';
@@ -12,13 +15,15 @@ function scriptURL(source) {
 }
 
 async function listDevices() {
-  if (!navigator.mediaDevices) return;
-  const selected = device.value;
-  const inputs = (await navigator.mediaDevices.enumerateDevices()).filter(item => item.kind === 'audioinput' &&
+  if (!media) return;
+  const inputs = (await media.enumerateDevices().catch(() => [])).filter(item => item.kind === 'audioinput' &&
     item.deviceId && item.deviceId !== 'default');
-  device.replaceChildren(new Option('System default', ''),
-    ...inputs.map((item, i) => new Option(item.label || 'Audio input ' + (i + 1), item.deviceId)));
-  if (inputs.some(item => item.deviceId === selected)) device.value = selected;
+  const selected = device.value;
+  const options = [new Option('System default', '')];
+  if (supportsTabAudio) options.push(new Option('Browser tab audio', tabInput));
+  options.push(...inputs.map((item, i) => new Option(item.label || 'Audio input ' + (i + 1), item.deviceId)));
+  device.replaceChildren(...options);
+  if (options.some(option => option.value === selected)) device.value = selected;
 }
 
 function render(result) {
@@ -63,7 +68,8 @@ field('start').onclick = async () => {
     status.textContent = 'Enter an increasing frequency range between 100 and 3000 Hz.';
     return;
   }
-  if (!navigator.mediaDevices?.getUserMedia) {
+  const fromTab = device.value === tabInput;
+  if (!(fromTab ? supportsTabAudio : media?.getUserMedia)) {
     status.textContent = 'Open the HTTPS site or use localhost to enable microphone access.';
     return;
   }
@@ -78,15 +84,42 @@ field('start').onclick = async () => {
   offset = 0;
   render({text: '', preview: ''});
   busy(true);
-  status.textContent = 'Waiting for audio input permission…';
+  status.textContent = fromTab ? 'Choose the WebSDR tab and enable tab audio…' : 'Waiting for audio input permission…';
   try {
     session.context = new AudioContext();
+    if (fromTab) {
+      // The browser requires this call during the Start button gesture.
+      session.stream = await media.getDisplayMedia({
+        video: {displaySurface: 'browser'},
+        audio: {suppressLocalAudioPlayback: false},
+        selfBrowserSurface: 'exclude',
+        monitorTypeSurfaces: 'exclude',
+        systemAudio: 'exclude',
+        surfaceSwitching: 'exclude'
+      });
+      const [video] = session.stream.getVideoTracks();
+      if (video?.getSettings().displaySurface !== 'browser' || !session.stream.getAudioTracks().length) {
+        throw new Error('Select a browser tab and turn on Also share tab audio.');
+      }
+      // Display capture requires video in the request. The decoder uses the audio track alone.
+      video.stop();
+    }
     await session.context.resume();
-    const audio = {echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1};
-    if (device.value) audio.deviceId = {exact: device.value};
-    session.stream = await navigator.mediaDevices.getUserMedia({audio});
+    if (!fromTab) {
+      const audio = {echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1};
+      if (device.value) audio.deviceId = {exact: device.value};
+      session.stream = await media.getUserMedia({audio});
+    }
+    const [track] = session.stream.getAudioTracks();
+    track.addEventListener('ended', () => {
+      if (active !== session) return;
+      if (session.capture) stop();
+      else cleanup(session, 'Audio input stopped.');
+    }, {once: true});
+    if (track.readyState !== 'live') throw new Error('The audio input stopped before decoding began.');
     // A data URL also works when the HTML file has an opaque local origin.
     await session.context.audioWorklet.addModule('data:text/javascript,' + encodeURIComponent(captureSource));
+    if (active !== session) return;
     const workerURL = scriptURL(workerSource);
     try {
       session.worker = new Worker(workerURL);
@@ -98,7 +131,7 @@ field('start').onclick = async () => {
       if (active !== session) return;
       if (data.type === 'ready') {
         const source = session.context.createMediaStreamSource(session.stream);
-        session.capture = new AudioWorkletNode(session.context, 'morse-capture');
+        session.capture = new AudioWorkletNode(session.context, 'morse-capture', {channelCount: 1, channelCountMode: 'explicit'});
         session.capture.port.onmessage = ({data: samples}) => {
           if (samples === null) {
             source.disconnect();
@@ -112,7 +145,6 @@ field('start').onclick = async () => {
         // The worklet writes zeros to its output, keeping the capture graph
         // active without feeding the microphone back through the speakers.
         session.capture.connect(session.context.destination);
-        session.stream.getAudioTracks()[0].onended = stop;
         field('stop').disabled = false;
         status.textContent = 'Listening for a keyed carrier…';
       } else if (data.type === 'error') {
@@ -136,7 +168,7 @@ field('clear').onclick = () => {
   field('committed').textContent = '';
   field('preview').textContent = '';
 };
-navigator.mediaDevices?.addEventListener('devicechange', () => listDevices().catch(() => {}));
+media?.addEventListener('devicechange', () => listDevices().catch(() => {}));
 listDevices().catch(() => {});
 
 if (location.protocol === 'https:' || location.protocol === 'http:') {

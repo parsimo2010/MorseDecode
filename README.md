@@ -30,6 +30,14 @@ microphone access for a local file, serve `dist/` on localhost and open
 python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
+### Decode WebSDR or another browser tab
+
+In desktop Chrome or Edge, start the audio in the WebSDR tab. In MorseDecode,
+select **Browser tab audio** under **Audio input** and click **Start listening**.
+Choose the WebSDR tab in the browser picker and enable **Also share tab audio**.
+You can keep listening through your headphones while MorseDecode decodes the
+tab’s audio locally. Click **Stop** when you are done.
+
 ### Publish and install on a phone
 
 The live app is hosted on GitHub Pages. To publish an update, run **Publish
