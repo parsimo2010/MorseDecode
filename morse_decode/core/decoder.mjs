@@ -90,7 +90,7 @@ function estimateClock(history, dt, minUnit, maxUnit) {
   return unit;
 }
 
-function bestUnit(runs, grid, previous, clockUnit) {
+function bestUnit(runs, grid, previous, clockUnit, isolatedReceiver) {
   const max = grid.at(-1).unit;
   const usable = runs.filter(({on, length}) => on || length < (previous || max) * 4.8).slice(-48);
   if (usable.filter(run => run.on).length < 3) return previous;
@@ -106,12 +106,25 @@ function bestUnit(runs, grid, previous, clockUnit) {
       }
     }
   }
+  // A run of equally weighted dots can initially fit an all-dash clock
+  // at twice the speed. Two rising-edge interval clusters resolve the octave.
+  let logKeyedUnit = null;
+  if (isolatedReceiver && periods.length >= 4) {
+    const ordered = periods.slice().sort((a, b) => a - b);
+    const short = quantile(ordered, 0.35);
+    const dots = ordered.filter(period => Math.abs(period - short) < 0.16);
+    const dashes = ordered.filter(period => Math.abs(period - short - Math.LN2) < 0.16);
+    if (dots.length >= 3 && dashes.length && dots.length + dashes.length >= 0.8 * ordered.length) {
+      logKeyedUnit = quantile(dots, 0.5);
+    }
+  }
   let best = previous;
   let bestCost = Infinity;
   const logPrevious = previous ? Math.log(previous) : null;
   const logClock = clockUnit ? Math.log(clockUnit) : null;
   for (const {unit, logUnit} of grid) {
     let cost = logPrevious === null ? 0 : 0.065 * usable.length * Math.abs(logUnit - logPrevious);
+    if (logKeyedUnit !== null) cost += 0.45 * usable.length * Math.min(0.55, Math.abs(logKeyedUnit - logUnit));
     if (logClock !== null) cost += 0.28 * usable.length * Math.abs(logUnit - logClock);
     for (const {on, logLength} of usable) {
       const error = logLength - logUnit;
@@ -165,6 +178,37 @@ function estimateTiming(runs, unit, signalDb) {
   const extended = hasExtendedLetters && hasExtendedWords;
   const standard = gaps.some(({length}) => length < 4.1 * unit);
   return {...timing, letter: (extended ? best : 3) * unit, ready: extended || standard};
+}
+
+function regularKeying(runs, unit) {
+  if (!unit || runs.length < 10) return false;
+  // Consecutive onsets in a machine-keyed word are an even number of
+  // dits apart. Fit the period from these intervals even during a fade.
+  const intervals = [];
+  for (let i = 1; i < runs.length; i++) {
+    if (runs[i].on || runs[i].length > 4.3 * unit) continue;
+    const period = runs[i - 1].length + runs[i].length;
+    const count = 2 * Math.round(period / (2 * unit));
+    if (count >= 2 && count <= 8) intervals.push({period, count});
+  }
+  if (intervals.length < 5) return false;
+  const fitted = select(intervals.map(({period, count}) => period / count), 0.5);
+  const aligned = intervals.filter(({period, count}) => Math.abs(period / fitted - count) <= 0.20);
+  return aligned.length >= 0.88 * intervals.length;
+}
+
+function wordBoundary(runs, unit, letter) {
+  const standard = 1.57 * letter;
+  const gaps = runs.filter(run => !run.on).map(run => run.length);
+  const letters = gaps.filter(gap => gap > 1.9 * unit && gap < standard);
+  const words = gaps.filter(gap => gap >= standard && gap < 6 * letter);
+  if (letters.length < 3 || words.length < 2) return standard;
+  // Some operators vary their letter spaces but leave an unusually long
+  // pause between words. Estimate the boundary between those two groups.
+  const typicalLetter = select(letters, 0.5);
+  const typicalWord = select(words, 0.5);
+  if (typicalWord < 2.8 * letter || typicalLetter < 2.45 * unit) return standard;
+  return Math.max(standard, (typicalLetter + typicalWord) / 2);
 }
 
 function makeDecimator(factor) {
@@ -246,7 +290,7 @@ function decodeWords(marks, timing) {
   const words = [];
   let start = 0;
   for (let i = 0; i < marks.length; i++) {
-    if (i + 1 < marks.length && marks[i].gap <= timing.letter * 1.57) continue;
+    if (i + 1 < marks.length && marks[i].gap <= timing.word) continue;
     words.push(decodeWord(marks.slice(start, i + 1), timing));
     start = i + 1;
   }
@@ -644,6 +688,7 @@ class CWDecoder {
     const tone = this.tones[this.selected];
     const strong = carrierScore > minCarrierScore && withinBand && (!filtered || carrierScore >= 24 ||
       this.carrierCoherence(Math.max(startFrame, this.frame - this.acquisitionFrames), tone) > 0.38);
+    this.filtered = filtered;
     this.active = strong;
     this.signalDb = 10 * Math.log10(1 + carrierScore);
     const length = this.frame - startFrame;
@@ -658,6 +703,7 @@ class CWDecoder {
     }
     const isolated = !this.guard && !this.tones.some((other, index) =>
       Math.abs(other.hz - tone.hz) > this.lobeWidth * 1.9 && levels[index].peak > peak * 0.14);
+    this.isolatedReceiver = filtered && isolated;
     // A short window preserves fast elements. A long one trades time
     // resolution for more rejection of noise near a weak carrier.
     const window = (carrierScore > 150 && isolated) || (filtered && carrierScore > 35)
@@ -721,6 +767,8 @@ class CWDecoder {
       crest = Math.max(crest * decay, envelope[i]);
       localPeak[i] = Math.max(crest, localPeak[i]);
     }
+    const checkFades = filtered && strong && carrierScore > 220;
+    const regular = checkFades && regularKeying(this.runs.slice(-48), this.unit);
     const probes = this.tones.filter((tone, index) => {
       const distance = Math.abs(tone.hz - this.tones[this.selected].hz);
       return distance >= 2.1 * this.lobeWidth && distance <= 220 &&
@@ -755,6 +803,20 @@ class CWDecoder {
             const focused = this.tonePower(startFrame + i, tone.coeff, this.longWindow);
             const ratio = focusScale * focused / Math.max(1e-13, history[i]);
             multiple += 25 * Math.max(0, 1 - ratio / 0.70);
+          }
+          // A selective fade can erase just the middle dit of S. Require a
+          // narrow spectral peak at a plausible keying time before lowering
+          // the gate. Irregular senders need stronger spectral confirmation.
+          if (checkFades && this.timing && localPeak[i] < 0.64 * range && envelope[i] > 5 * sideNoise &&
+              envelope[i] <= floor + keyThreshold) {
+            const gap = this.keyClock - this.markEnd;
+            const element = gap > 0.40 * this.unit && gap < 1.85 * this.unit;
+            const letter = Math.abs(gap - this.timing.letter) < 0.60 * this.unit;
+            if (this.state || element || letter) {
+              const narrow = focusScale * this.tonePower(startFrame + i, tone.coeff, this.longWindow);
+              if (regular && narrow > 0.5 * history[i]) keyThreshold *= 0.20;
+              else if (narrow > 0.83 * history[i] && envelope[i] > 9 * sideNoise) keyThreshold *= 0.32;
+            }
           }
           keyThreshold = Math.max(keyThreshold, multiple * sideNoise);
         }
@@ -803,7 +865,7 @@ class CWDecoder {
       this.marks.at(-1).gap = gap;
       this.remember(false, gap);
       this.updateTiming();
-      if ((this.timing?.ready && gap > 1.57 * this.timing.letter) || this.marks.length >= 120) this.commitWord();
+      if ((this.timing?.ready && gap > this.timing.word) || this.marks.length >= 120) this.commitWord();
     }
     this.marks.push({length, gap: 0});
     this.markEnd = end;
@@ -817,15 +879,19 @@ class CWDecoder {
   }
 
   updateTiming() {
-    this.unit = bestUnit(this.runs, this.unitGrid, this.unit, this.clockUnit);
-    if (this.unit) this.timing = estimateTiming(this.runs.slice(-48), this.unit, this.signalDb);
+    this.unit = bestUnit(this.runs, this.unitGrid, this.unit, this.clockUnit, this.isolatedReceiver);
+    if (this.unit) {
+      this.timing = estimateTiming(this.runs.slice(-48), this.unit, this.signalDb);
+      this.timing.word = this.filtered ? wordBoundary(this.runs, this.unit, this.timing.letter) : 1.57 * this.timing.letter;
+    }
   }
 
   commitWord() {
     if (!this.marks.length) return;
     this.updateTiming();
     const unit = this.unit || this.marks[0].length;
-    const words = decodeWords(this.marks, this.timing || {dot: unit, dash: 3 * unit, element: unit, letter: 3 * unit});
+    const timing = this.timing || {dot: unit, dash: 3 * unit, element: unit, letter: 3 * unit, word: 4.71 * unit};
+    const words = decodeWords(this.marks, timing);
     this.text += (this.wordSeen ? ' ' : '') + words.join(' ');
     for (const word of words) {
       if (/^(?:[A-Z]{1,2}\d[A-Z]{2,3}|[A-Z]{2}\d[A-Z])$/.test(word)) this.callsign = word;

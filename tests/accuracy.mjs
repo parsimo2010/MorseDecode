@@ -99,7 +99,7 @@ function edits(a, b) {
   return row[b.length];
 }
 
-function receiverExchange(text, {idle = false, competing = false}, seed) {
+function receiverExchange(text, {idle = false, competing = false, fastFade = false}, seed) {
   const rate = 8000;
   const words = text.split(' ');
   const split = Math.ceil(words.length / 2);
@@ -118,7 +118,7 @@ function receiverExchange(text, {idle = false, competing = false}, seed) {
   let smoothReal = 0;
   let smoothImag = 0;
   const pole = -Math.expm1(-2 * Math.PI * 130 / rate);
-  const release = Math.exp(-1 / (0.085 * rate));
+  const release = Math.exp(-1 / ((fastFade ? 0.38 : 0.085) * rate));
   for (const [k, turn] of audio.entries()) {
     for (const value of turn) {
       // Two low-pass poles in quadrature form a fixed receiver passband.
@@ -127,9 +127,12 @@ function receiverExchange(text, {idle = false, competing = false}, seed) {
       smoothReal += pole * (real - smoothReal);
       smoothImag += pole * (imag - smoothImag);
       const angle = 2 * Math.PI * 694 * offset / rate;
-      const noise = 1.15 * (smoothReal * Math.cos(angle) + smoothImag * Math.sin(angle));
+      const noise = (fastFade ? 0.32 : 1.15) * (smoothReal * Math.cos(angle) + smoothImag * Math.sin(angle));
       const interference = other ? 0.20 * other[(offset + 191) % other.length] : 0;
-      const input = (idle ? 0 : value * (k === 1 ? 0.27 : 0.84)) + noise + interference;
+      // Fade the RF carrier before the receiver AGC. Dits that fall into a
+      // trough still have energy at the sender's pitch.
+      const fade = fastFade ? 1 - 0.87 * (0.5 + 0.5 * Math.cos(2 * Math.PI * 1.37 * offset / rate + seed)) ** 4 : 1;
+      const input = (idle ? 0 : value * (k === 1 ? 0.27 : 0.84) * fade) + noise + interference;
       envelope = Math.max(Math.abs(input), envelope * release);
       samples[offset++] = input / Math.max(0.13, envelope);
     }
@@ -161,6 +164,7 @@ const cases = [
   ['Idle noise and steady tone', {quiet: true, noiseDb: -4, qrn: 4, blocker: 2}],
   ['Receiver filter, AGC and station replies', {}, receiverExchange, 0.20],
   ['Receiver with a competing keyed station', {competing: true}, receiverExchange, 0.15],
+  ['Receiver with fast selective fading', {fastFade: true}, receiverExchange, 0.30],
   ['Receiver filter and idle AGC noise', {idle: true}, receiverExchange, 0]
 ];
 
