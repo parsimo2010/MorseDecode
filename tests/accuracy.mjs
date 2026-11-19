@@ -1,5 +1,6 @@
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
+import {pathToFileURL} from 'node:url';
 import {CWDecoder, MORSE} from '../morse_decode/core/decoder.mjs';
 
 const codes = new Map(Object.entries(MORSE).map(([code, text]) => [text, code]));
@@ -36,7 +37,8 @@ function keying(text, {wpm, jitter = 0, dah = 3, element = 1, letter = 3, word =
 
 function synth(text, options, seed) {
   const {rate = 8000, hz = 670, wpm = 23, drift = 0, fade = 0, fadeHz = 0.8, noiseDb = Infinity,
-    bandwidth = rate / 2, blocker = 0, qrm = 0, qrn = 0, quiet = false, ...timing} = options;
+    bandwidth = rate / 2, blocker = 0, qrm = 0, qrn = 0, quiet = false,
+    phaseResets = false, aliasInterferer = false, ...timing} = options;
   const rng = random(seed);
   const noiseRng = random(seed ^ 0x2ec15);
   const [marks, duration] = keying(text, {wpm, ...timing}, rng);
@@ -51,6 +53,8 @@ function synth(text, options, seed) {
   };
   const signal = makeEnvelope(marks);
   const other = makeEnvelope(interferer);
+  const offsets = phaseResets ? marks.map(() => 2 * Math.PI * rng()) : [];
+  let phaseIndex = 0;
   const samples = new Float32Array(Math.round(rate * duration));
   const noiseRms = Math.SQRT1_2 * 10 ** (-noiseDb / 20);
   // Gaussian quadrature noise with a one-pole low-pass centered on the carrier.
@@ -62,6 +66,7 @@ function synth(text, options, seed) {
   for (let i = 0; i < samples.length; i++) {
     const t = i / rate;
     const phase = 2 * Math.PI * (hz * t + drift * t * t / (2 * duration));
+    while (phaseResets && phaseIndex + 1 < marks.length && t >= marks[phaseIndex + 1][0]) phaseIndex++;
     const noiseAngle = 2 * Math.PI * noiseRng();
     const radius = Math.sqrt(-2 * Math.log(noiseRng()));
     const normal = radius * Math.cos(noiseAngle);
@@ -74,9 +79,10 @@ function synth(text, options, seed) {
     if (qrn && noiseRng() < 1.1 / rate) staticLevel = qrn;
     staticLevel *= 1 - 1 / (0.018 * rate);
     const gain = 1 - fade * (0.5 + 0.5 * Math.sin(2 * Math.PI * fadeHz * t + seed)) ** 3;
-    samples[i] = (quiet ? 0 : signal(t) * gain * Math.sin(phase)) + (noiseRms + staticLevel) * noise
+    samples[i] = (quiet ? 0 : signal(t) * gain * Math.sin(phase + (offsets[phaseIndex] || 0))) + (noiseRms + staticLevel) * noise
       + blocker * Math.sin(2 * Math.PI * (hz + 44) * t)
-      + qrm * other(t) * Math.sin(2 * Math.PI * (hz + 65) * t);
+      + qrm * other(t) * Math.sin(2 * Math.PI * (hz + 65) * t)
+      + (aliasInterferer ? 8 * other(t) * Math.sin(2 * Math.PI * (4000 - hz) * t) : 0);
   }
   return {samples, rate, reference: quiet ? '' : text};
 }
@@ -103,6 +109,9 @@ const cases = [
   ['−6 dB in 500 Hz noise', {noiseDb: -6, bandwidth: 500, wpm: 17}],
   ['−12 dB white noise', {noiseDb: -12, wpm: 22}],
   ['−15 dB white noise', {noiseDb: -15, wpm: 18}],
+  ['Fast CW in white noise', {noiseDb: -10, wpm: 38, hz: 732}],
+  ['Carrier restarts each mark', {noiseDb: -9, phaseResets: true}],
+  ['48 kHz with strong out-of-band CW', {rate: 48000, aliasInterferer: true}],
   ['Deep QSB', {fade: 0.94, fadeHz: 0.39, noiseDb: 2}],
   ['Near steady tone', {blocker: 1.55, noiseDb: -2}],
   ['Near keyed station', {qrm: 0.8, noiseDb: -3}],
@@ -123,7 +132,8 @@ const messages = [
 
 const args = process.argv.slice(2);
 const flag = name => args.find(arg => arg.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
-const versions = [['current', CWDecoder]];
+const candidate = flag('candidate') ? await import(pathToFileURL(flag('candidate'))) : null;
+const versions = [[flag('candidate') || 'current', candidate?.CWDecoder || CWDecoder]];
 if (flag('baseline')) {
   const source = execFileSync('git', ['show', `${flag('baseline')}:morse_decode/core/decoder.mjs`]);
   const baseline = await import(`data:text/javascript;base64,${source.toString('base64')}`);
@@ -138,8 +148,8 @@ function measure(Decoder, {samples, rate, reference}) {
     decoder.push(samples.subarray(i, i + block));
     if (i % (block * 6) === 0) decoder.snapshot();
   }
-  const {text} = decoder.finish();
-  return {edits: edits(reference, text), ms: performance.now() - started, text};
+  const {text, frequency, wpm} = decoder.finish();
+  return {edits: edits(reference, text), ms: performance.now() - started, text, frequency, wpm};
 }
 
 const fixture = flag('fixture');
@@ -149,7 +159,8 @@ if (fixture) {
   const samples = Float32Array.from({length: bytes.length / 2}, (_, i) => bytes.readInt16LE(2 * i) / 32768);
   for (const [label, Decoder] of versions) {
     const result = measure(Decoder, {samples, rate, reference});
-    console.log(label, `${result.edits}/${reference.length} edits`, result.text);
+    console.log(label, `${result.edits}/${reference.length} edits`);
+    if (args.includes('--verbose')) console.log(result.text);
   }
 } else {
   const holdout = args.includes('--holdout');
@@ -163,7 +174,10 @@ if (fixture) {
       let errors = 0;
       for (const fixture of fixtures) {
         const result = measure(Decoder, fixture);
-        if (args.includes('--verbose')) console.log(name, fixture.reference, `→ (${result.edits})`, result.text);
+        if (args.includes('--verbose')) {
+          console.log(name, fixture.reference, `→ (${result.edits})`, result.text,
+            `[${result.frequency ?? '?'} Hz, ${result.wpm?.toFixed(1) ?? '?'} WPM]`);
+        }
         errors += result.edits;
         totals[v].ms += result.ms;
       }

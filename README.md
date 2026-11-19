@@ -105,8 +105,10 @@ Linux it loads `$XDG_CONFIG_HOME/morsedecode/config.toml` when
 corresponding settings. If multiple input sources are configured, file input
 takes precedence over stdin, followed by live device input.
 
-The shared core supplies defaults for both interfaces. It uses a 50 ms Hann
-analysis window, 5 ms hop, and search-tone spacing of at most 12 Hz. Lower
+The shared core supplies defaults for both interfaces. It searches for carriers
+with a 50 ms Hann window, a 5 ms hop, and search-tone spacing of at most 12 Hz.
+Once it finds a carrier, it can use a shorter window for fast elements or a
+longer one for weak signals. Lower
 `--on-db` and `--off-db` values increase sensitivity on the historical 24/20
 scale. The JSONL field `snr_db` reports the decoder's signal contrast in dB.
 
@@ -118,12 +120,15 @@ files. The current decoder ignores these retired settings. The legacy
 ## Shared decoder
 
 [`morse_decode/core/decoder.mjs`](morse_decode/core/decoder.mjs) is the
-reference implementation. It analyzes audio around candidate carriers,
-tracks keying speed from recent marks and gaps, and searches possible Morse
-character boundaries across each word. A word in progress can be reinterpreted
-as the timing estimate updates. The terminal routes PCM to the core through
-a persistent Node.js process. The web build embeds the same module in a
-dedicated worker. An AudioWorklet captures and forwards browser audio.
+reference implementation. It downsamples with an anti-alias filter where the
+passband permits, follows the carrier as its pitch drifts, and adapts detection
+to fades and bursts of noise. It can use carrier phase when it remains stable
+through keying gaps. It tracks dot and dash timing separately from character
+spacing and scores possible Morse sequences by their timing. A compact history
+lets the browser revise the current word until it is ready to commit. The
+terminal routes PCM to the core through a persistent Node.js process. The web
+build embeds the same module in a dedicated worker. An AudioWorklet captures
+and forwards browser audio.
 
 Changes to gain control, detection, timing, or Morse decoding belong in that
 module. Rebuild the static HTML with `node web/build.mjs` after changing it and
@@ -135,13 +140,19 @@ rerun the Pages workflow to update a published site.
 python -m pip install -e ".[dev]"
 python -m pytest
 node tests/performance.mjs
+node tests/accuracy.mjs --holdout --baseline=6b2ba41
+python tests/recordings.py --baseline 6b2ba41
+node tests/realtime.mjs --baseline=6b2ba41
 ```
 
 The terminal integration tests exercise file and stdin input, multiple
 simultaneous carriers, final transcript logging, and exact parity with the
 web worker built into the standalone HTML. The shared decoder regression
 suite measures character error rate on seeded CW audio with noise, changing
-speed, timing jitter, fading, and interference.
+speed, timing jitter, fading, and interference. The recordings benchmark
+downloads public W1AW practice recordings and their transcripts. See the
+[benchmark results and methodology](docs/decoder-benchmarks.md) for accuracy,
+real-time costs, and how to repeat the browser measurement.
 
 Ongoing work is tracked in the [GitHub issue tracker](https://github.com/parsimo2010/MorseDecode/issues).
 

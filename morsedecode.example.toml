@@ -28,7 +28,8 @@ channel_width_hz = 200
 # 44100 Hz for stdin. File input always uses the recording's rate.
 sample_rate = 0
 
-# Hann analysis window in ms.
+# Base Hann carrier-search window in ms. The core can shorten or lengthen
+# the window used to measure a selected carrier.
 # window_ms = 50.0
 
 # Analysis hop in ms. Smaller hops update timing more often.
