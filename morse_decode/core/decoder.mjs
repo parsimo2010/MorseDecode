@@ -94,6 +94,18 @@ function bestUnit(runs, grid, previous, clockUnit) {
   const max = grid.at(-1).unit;
   const usable = runs.filter(({on, length}) => on || length < (previous || max) * 4.8).slice(-48);
   if (usable.filter(run => run.on).length < 3) return previous;
+  const periods = [];
+  if (runs.length <= 32) {
+    // A low threshold lengthens a mark and shortens the next space. The
+    // interval between their rising edges still measures two or four dits.
+    const gaps = runs.filter(run => !run.on).map(run => run.length).sort((a, b) => a - b);
+    const shortGap = quantile(gaps, 0.30);
+    for (let i = 1; i < runs.length; i++) {
+      if (!runs[i].on && runs[i].length <= 1.55 * shortGap) {
+        periods.push(Math.log((runs[i - 1].length + runs[i].length) / 2));
+      }
+    }
+  }
   let best = previous;
   let bestCost = Infinity;
   const logPrevious = previous ? Math.log(previous) : null;
@@ -106,6 +118,10 @@ function bestUnit(runs, grid, previous, clockUnit) {
       const one = logCost(error);
       const three = logCost(error - logThree);
       cost += Math.min(on ? 0.8 : 0.45, one, three);
+    }
+    for (const period of periods) {
+      const error = period - logUnit;
+      cost += 0.55 * Math.min(0.45, logCost(error), logCost(error - Math.LN2));
     }
     if (cost < bestCost) {
       bestCost = cost;
@@ -431,6 +447,76 @@ class CWDecoder {
     return Math.max(0, s1 * s1 + s2 * s2 - coeff * s1 * s2);
   }
 
+  hasFilteredNoise(levels, index) {
+    // A narrow receiver filter leaves quiet bins at its skirts. A noise
+    // estimate taken across the entire search band can then admit key-up hiss.
+    const hz = this.tones[index].hz;
+    const floors = levels.filter((_, i) => Math.abs(this.tones[i].hz - hz) >= 2.5 * this.lobeWidth)
+      .map(level => level.floor);
+    return floors.length >= 5 && select(floors, 0.70) > 4 * Math.max(1e-13, select(floors, 0.15));
+  }
+
+  flankIndices(index) {
+    const result = [];
+    for (let i = 0; i < this.tones.length; i++) {
+      const distance = Math.abs(this.tones[i].hz - this.tones[index].hz) / this.lobeWidth;
+      if (distance >= 2.3 && distance <= 6) result.push(i);
+    }
+    return result;
+  }
+
+  transmittedTogether(candidate, before, background) {
+    // A third station can become the loudest signal in every word space.
+    // Look for both carriers keyed at once before the apparent handoff.
+    if (before <= 0) return false;
+    const previous = this.tones[this.selected];
+    const other = this.tones[candidate];
+    const quietBins = (index, excludeHz) => this.flankIndices(index)
+      .filter(i => Math.abs(this.tones[i].hz - excludeHz) > 2 * this.lobeWidth);
+    const oldFlanks = quietBins(this.selected, other.hz);
+    const newFlanks = quietBins(candidate, previous.hz);
+    if (oldFlanks.length < 2 || newFlanks.length < 2) return false;
+    const oldPowers = new Float64Array(oldFlanks.length);
+    const newPowers = new Float64Array(newFlanks.length);
+    const keyedLevel = 0.42 * select(previous.history.slice(0, before), 0.84);
+    let keyed = 0;
+    let overlap = 0;
+    for (let i = 0; i < before; i += 3) {
+      if (previous.history[i] < keyedLevel ||
+          previous.history[i] < 6 * Math.max(background, this.flankNoise(oldFlanks, i, oldPowers))) continue;
+      keyed++;
+      if (other.history[i] > 7 * Math.max(background, this.flankNoise(newFlanks, i, newPowers))) overlap++;
+    }
+    return overlap >= Math.max(4, 0.20 * keyed);
+  }
+
+  findReply(background) {
+    // Bursts of receiver noise can keep the old channel "busy"
+    // throughout a reply. Check for a recent narrow peak on the new pitch.
+    const frames = this.lookaheadFrames + this.updateFrames + Math.round(0.16 / this.dt);
+    const recent = this.tones.map(tone => {
+      const powers = tone.history.slice(-frames);
+      return {low: select(powers, 0.20), high: select(powers, 0.89)};
+    });
+    const prominence = index => {
+      const sides = this.flankIndices(index).map(i => recent[i].high);
+      return sides.length >= 2 ? recent[index].high / Math.max(background, select(sides, 0.5)) : null;
+    };
+    const present = prominence(this.selected);
+    if (present === null || present >= 2.3) return {lost: false, reply: null};
+    let best = 0;
+    for (let i = 1; i < this.bandSize; i++) {
+      if (recent[i].high - recent[i].low > recent[best].high - recent[best].low) best = i;
+    }
+    const candidate = recent[best];
+    const separated = Math.abs(this.tones[best].hz - this.tones[this.selected].hz) > 2.5 * this.lobeWidth;
+    const keyed = candidate.high > 4 * candidate.low && candidate.high > 2.7 * recent[this.selected].high;
+    if (!separated || !keyed || prominence(best) <= 7) return {lost: true, reply: null};
+    const before = this.tones[best].history.length - frames;
+    if (this.transmittedTogether(best, before, background)) return {lost: true, reply: null, interfering: best};
+    return {lost: true, reply: best};
+  }
+
   processFrames(final = false) {
     const length = this.tones[0].history.length;
     if (length < (final ? this.finalFrames : this.acquisitionFrames)) return;
@@ -464,12 +550,22 @@ class CWDecoder {
       }
       return true;
     };
-    const current = this.selected === null ? null : levels[this.selected];
+    const previous = this.selected;
+    const current = previous === null ? null : levels[previous];
+    const filtered = this.hasFilteredNoise(levels, previous ?? best);
+    const {lost, reply, interfering} = filtered && current ? this.findReply(background) : {lost: false, reply: null};
+    const hasReply = reply !== null && inBand(reply);
+    if (hasReply) best = reply;
     const shouldSwitch = !current || (score(levels[best]) > 2.5 * score(current) &&
       !this.state && this.run > (this.unit || this.maxUnit) * 8);
-    if (shouldSwitch && score(levels[best]) > minCarrierScore && inBand(best)) {
+    const competing = interfering !== undefined && Math.abs(this.tones[interfering].hz - this.tones[best].hz) < 2 * this.lobeWidth;
+    if (hasReply || (shouldSwitch && !competing && score(levels[best]) > minCarrierScore && inBand(best))) {
       if (this.selected !== null && Math.abs(this.selected - best) > 2) {
+        if (this.state) this.storeMark(this.run - this.pending, this.keyClock - this.pending, false);
         this.commitWord();
+        this.state = false;
+        this.run = 0;
+        this.markPeak = 0;
         this.unit = null;
         this.timing = null;
         this.clockUnit = null;
@@ -502,7 +598,8 @@ class CWDecoder {
     const startFrame = this.frame - length;
     const endFrame = this.frame - (final ? 0 : this.lookaheadFrames);
     if (this.selected !== null) {
-      this.processKeying(levels, background, score(levels[this.selected]), inBand(this.selected), startFrame, endFrame);
+      const withinBand = inBand(this.selected) && !(lost && this.selected === previous);
+      this.processKeying(levels, background, score(levels[this.selected]), withinBand, startFrame, endFrame, filtered);
       this.cursor = endFrame;
     }
     if (length > this.historyFrames) {
@@ -511,14 +608,46 @@ class CWDecoder {
     }
   }
 
-  processKeying(levels, background, carrierScore, withinBand, startFrame, endFrame) {
+  carrierCoherence(startFrame, tone) {
+    const length = this.frame - startFrame;
+    const iq = new Float64Array(2 * length);
+    for (let i = 0; i < length; i++) this.tonePower(startFrame + i, tone.coeff, this.window, iq, 2 * i);
+    let coherence = 0;
+    for (const seconds of [0.055, 0.090, 0.135]) {
+      // Non-overlapping windows keep shared noise samples from imitating a
+      // carrier. A steady frequency offset rotates all products by one angle.
+      const lag = Math.max(Math.ceil(this.window.length / this.hop), Math.round(seconds / this.dt));
+      let real = 0;
+      let imag = 0;
+      let magnitude = 0;
+      for (let i = lag; i < length; i += 2) {
+        const a = 2 * i;
+        const b = 2 * (i - lag);
+        const re = iq[a] * iq[b] + iq[a + 1] * iq[b + 1];
+        const im = iq[a + 1] * iq[b] - iq[a] * iq[b + 1];
+        real += re;
+        imag += im;
+        magnitude += Math.hypot(re, im);
+      }
+      coherence += Math.hypot(real, imag) / Math.max(1e-15, magnitude);
+    }
+    return coherence / 3;
+  }
+
+  flankNoise(indices, frame, scratch) {
+    for (let k = 0; k < indices.length; k++) scratch[k] = this.tones[indices[k]].history[frame];
+    return select(scratch, 0.5);
+  }
+
+  processKeying(levels, background, carrierScore, withinBand, startFrame, endFrame, filtered) {
     let {floor, peak} = levels[this.selected];
-    const strong = carrierScore > minCarrierScore && withinBand;
+    const tone = this.tones[this.selected];
+    const strong = carrierScore > minCarrierScore && withinBand && (!filtered || carrierScore >= 24 ||
+      this.carrierCoherence(Math.max(startFrame, this.frame - this.acquisitionFrames), tone) > 0.38);
     this.active = strong;
     this.signalDb = 10 * Math.log10(1 + carrierScore);
     const length = this.frame - startFrame;
     const start = Math.max(0, this.cursor - startFrame);
-    const tone = this.tones[this.selected];
     let history = tone.history;
     let noiseBackground = background;
     if (this.frame % (4 * this.updateFrames) === 0) {
@@ -531,9 +660,9 @@ class CWDecoder {
       Math.abs(other.hz - tone.hz) > this.lobeWidth * 1.9 && levels[index].peak > peak * 0.14);
     // A short window preserves fast elements. A long one trades time
     // resolution for more rejection of noise near a weak carrier.
-    const window = carrierScore > 150 && isolated
+    const window = (carrierScore > 150 && isolated) || (filtered && carrierScore > 35)
       ? this.shortWindow : carrierScore < 10 ? this.longWindow : null;
-    const coherent = (carrierScore < 35 || isolated && carrierScore < 150) && withinBand;
+    const coherent = !filtered && (carrierScore < 35 || isolated && carrierScore < 150) && withinBand;
     if (window || coherent) {
       const from = Math.max(0, Math.min(start - Math.ceil(0.45 / this.dt), length - this.acquisitionFrames));
       const measured = new Float64Array(length);
@@ -552,7 +681,30 @@ class CWDecoder {
         noiseBackground *= filter.length / this.window.length * (projected ? 1.9 : 1);
       }
     }
-    const range = peak - floor;
+    const flanks = filtered ? this.flankIndices(this.selected) : [];
+    const flankPowers = new Float64Array(flanks.length);
+    if (filtered) {
+      // A returning station can be much stronger than the noise-only history
+      // at its pitch. Re-estimate the key level over the last acquisition window.
+      const recent = history.slice(Math.max(0, length - this.acquisitionFrames));
+      peak = Math.max(0.65 * peak, select(recent, 0.90));
+      if (flanks.length >= 3) {
+        // When the whole receiver output falls, its noise falls with it.
+        // A stale absolute threshold would erase the quieter station's dits.
+        const noiseLevels = [];
+        for (let j = 0; j < length; j += 5) noiseLevels.push(this.flankNoise(flanks, j, flankPowers));
+        const recentNoise = select(noiseLevels.slice(-Math.ceil(0.38 / (5 * this.dt))), 0.55);
+        const usualNoise = select(noiseLevels, 0.70);
+        if (usualNoise > 1e-13 && recentNoise < 0.65 * usualNoise) {
+          const gain = Math.max(0.05, recentNoise / usualNoise);
+          const local = history.slice(Math.max(0, length - Math.round(0.48 / this.dt)));
+          peak = Math.min(peak, Math.max(peak * gain, select(local, 0.85)));
+          floor *= gain;
+          noiseBackground *= gain;
+        }
+      }
+    }
+    const range = Math.max(0, peak - floor);
     const envelope = new Float64Array(length);
     const localPeak = new Float64Array(length);
     const decay = Math.exp(-this.dt / 0.072);
@@ -575,6 +727,8 @@ class CWDecoder {
         levels[index].peak < 14 * (background + levels[index].floor);
     });
     const adaptToFade = isolated && carrierScore > 55;
+    const noiseScale = window ? window.length / this.window.length : 1;
+    const focusScale = ((window || this.window).length / this.longWindow.length) ** 2;
     for (let i = start; i < endFrame - startFrame; i++) {
       const localContrast = Math.max(0.044 * range, Math.min(range, localPeak[i] - floor));
       const gain = this.state ? this.offGain : this.onGain;
@@ -586,7 +740,26 @@ class CWDecoder {
       // Otherwise the decaying crest can turn idle noise into an extra dit.
       const idle = !this.state && this.unit && this.keyClock - this.markEnd > 4.5 * this.unit;
       const relative = adaptToFade ? Math.max(localContrast, idle ? range * 0.11 : 0) : range;
-      const gate = floor + Math.max(gain * noise, relative * (this.state ? 0.075 : 0.14));
+      let keyThreshold = relative * (this.state ? 0.075 : 0.14);
+      if (filtered) {
+        // Receiver gain can rise sharply inside a word space. Compare the
+        // mark with simultaneous noise around its pitch and with keyed power.
+        keyThreshold = Math.max(keyThreshold, Math.max(0.5 * range, localContrast) * (this.state ? 0.21 : 0.29));
+        if (flanks.length >= 3) {
+          const sideNoise = noiseScale * this.flankNoise(flanks, i, flankPowers);
+          let multiple = 5;
+          if (envelope[i] > floor + Math.max(gain * noise, keyThreshold, 5 * sideNoise) &&
+              envelope[i] <= floor + 30 * sideNoise) {
+            // Broadband noise loses more power than a keyed tone in a
+            // narrower filter. Check ambiguous frames at both bandwidths.
+            const focused = this.tonePower(startFrame + i, tone.coeff, this.longWindow);
+            const ratio = focusScale * focused / Math.max(1e-13, history[i]);
+            multiple += 25 * Math.max(0, 1 - ratio / 0.70);
+          }
+          keyThreshold = Math.max(keyThreshold, multiple * sideNoise);
+        }
+      }
+      const gate = floor + Math.max(gain * noise, keyThreshold);
       this.keyFrame((this.state || strong) && envelope[i] > gate,
         (envelope[i] - floor) / Math.max(1e-13, noise * this.onGain), adaptToFade, carrierScore < 9.5);
     }

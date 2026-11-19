@@ -3,30 +3,60 @@
     "file": "websdr_recording_2026-11-19T04_44_53Z_7031.0kHz.wav",
     "sha256": "6b4a0b6c43f3fbc40ac6ad338956bcb083e01970f3606c0022d5f35aa6468745",
     "excerpts": [
-      [0, 76.176, "FB VIN SLD CPY <BT> HERE RIG K3 RUNNING 90 W TO EDZ OF 270 FT WIRE CENTER FED WITH 450 LADDER LINE CENTER UP 50 FT <BT> USE ANT FOR 160 TO 30"]
+      {
+        "start": 0,
+        "end": 76.176,
+        "text": "FB VIN SLD CPY <BT> HERE RIG K3 RUNNING 90 W TO EDZ OF 270 FT WIRE CENTER FED WITH 450 LADDER LINE CENTER UP 50 FT <BT> USE ANT FOR 160 TO 30",
+        "max_edits": 0
+      }
     ]
   },
   {
     "file": "websdr_recording_2026-11-19T04_46_40Z_7034.0kHz.wav",
     "sha256": "d90942da8cbf6850b611c31235e5f5c0bd066d31aa0e3835e42dc9fcb9c216f7",
     "excerpts": [
-      [1.42, 28.0, "VY TIRENG <BT> SOWL C S U HW IT GOES TMW <AR> NF7N K9UIY K D NF7N"],
-      [32.12, 35.86, "NU STILL"]
+      {
+        "start": 1.42,
+        "end": 28.0,
+        "text": "VY TIRENG <BT> SOWL C S U HW IT GOES TMW <AR> NF7N K9UIY K D NF7N",
+        "max_edits": 3
+      },
+      {
+        "start": 32.12,
+        "end": 35.86,
+        "text": "NU STILL",
+        "max_edits": 1
+      }
     ]
   },
   {
     "file": "websdr_recording_2026-11-19T04_47_27Z_7031.0kHz.wav",
     "sha256": "ca93763ce1eb787b173a46ec82ee739b138bf68a728501d85774868bfdcd5425",
     "excerpts": [
-      [0, 37.728, "GE 67 67 ES HAM 38 3 ZY ALSO MOSTLY CW <BT> RETIRED IN SUR ANCE / FINANCIAL"]
+      {
+        "start": 0,
+        "end": 37.728,
+        "text": "GE 67 67 ES HAM 38 3 ZY ALSO MOSTLY CW <BT> RETIRED IN SUR ANCE / FINANCIAL",
+        "max_edits": 0
+      }
     ]
   },
   {
     "file": "websdr_recording_2026-11-19T04_49_04Z_7029.0kHz.wav",
     "sha256": "68fce7a702ee1b1bad6b825aadc06d1fcf09419eefb6f5b7e85909d638cd7700",
     "excerpts": [
-      [0, 32.87, "Q DE K3PR K3PR CQ DE K3PR K K3PR K3PR"],
-      [34.37, 85.94, "W2GLN W2GLN K RR W2GLN DE K3PR GE TNX CALL UR 57N 57N QTH TRENTON , TX TRENT"]
+      {
+        "start": 0,
+        "end": 32.87,
+        "text": "Q DE K3PR K3PR CQ DE K3PR K K3PR K3PR",
+        "max_edits": 2
+      },
+      {
+        "start": 34.37,
+        "end": 85.94,
+        "text": "W2GLN W2GLN K RR W2GLN DE K3PR GE TNX CALL UR 57N 57N QTH TRENTON , TX TRENT",
+        "max_edits": 5
+      }
     ]
   }
 ]

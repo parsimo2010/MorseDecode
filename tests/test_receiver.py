@@ -12,6 +12,7 @@ from click.testing import CliRunner
 from morse_decode.cli import main
 from morse_decode.config import Config
 from morse_decode.receiver import DecoderError, Receiver
+from tests.recordings import measure_utah, utah_labels
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -120,3 +121,18 @@ def test_invalid_passband_returns_a_clear_error():
     cfg.input.freq_max = RATE // 2 + 100
     with pytest.raises(DecoderError, match="below half the sample rate"):
         Receiver(RATE, cfg)
+
+
+def test_filtered_receiver_noise_and_replies():
+    subprocess.run(["node", "tests/accuracy.mjs", "--match=receiver", "--holdout", "--check"],
+                   cwd=ROOT, check=True)
+
+
+@pytest.mark.parametrize("recording", utah_labels(), ids=lambda recording: recording["file"])
+def test_utah_recording(recording, tmp_path):
+    path = ROOT / "recordings" / recording["file"]
+    if not path.exists():
+        pytest.skip(f"Local WebSDR recording required: {path.name}")
+    for excerpt, results in measure_utah(path, recording, tmp_path / "field.json"):
+        measured = results["current"]
+        assert measured["edits"] <= excerpt["max_edits"], measured["text"]

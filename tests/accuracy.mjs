@@ -99,6 +99,44 @@ function edits(a, b) {
   return row[b.length];
 }
 
+function receiverExchange(text, {idle = false, competing = false}, seed) {
+  const rate = 8000;
+  const words = text.split(' ');
+  const split = Math.ceil(words.length / 2);
+  const turns = [words.slice(0, split).join(' '), words.slice(split).join(' '), 'R TNX'];
+  const audio = turns.map((turn, i) => synth(turn, {
+    hz: i === 1 ? 617 : 752, wpm: i === 1 ? 26 : 19, jitter: 0.07,
+    letter: i === 1 ? 3 : 3.7, word: i === 1 ? 7 : 8.6
+  }, seed + i).samples);
+  const samples = new Float32Array(audio.reduce((sum, turn) => sum + turn.length, 0));
+  const other = competing ? synth('TEST K7RV 5NN TU CQ JA DE JA3AB K', {hz: 847, wpm: 26}, 1234).samples : null;
+  const rng = random(seed ^ 0x39fa);
+  let offset = 0;
+  let envelope = 0;
+  let real = 0;
+  let imag = 0;
+  let smoothReal = 0;
+  let smoothImag = 0;
+  const pole = -Math.expm1(-2 * Math.PI * 130 / rate);
+  const release = Math.exp(-1 / (0.085 * rate));
+  for (const [k, turn] of audio.entries()) {
+    for (const value of turn) {
+      // Two low-pass poles in quadrature form a fixed receiver passband.
+      real += pole * (rng() - 0.5 - real);
+      imag += pole * (rng() - 0.5 - imag);
+      smoothReal += pole * (real - smoothReal);
+      smoothImag += pole * (imag - smoothImag);
+      const angle = 2 * Math.PI * 694 * offset / rate;
+      const noise = 1.15 * (smoothReal * Math.cos(angle) + smoothImag * Math.sin(angle));
+      const interference = other ? 0.20 * other[(offset + 191) % other.length] : 0;
+      const input = (idle ? 0 : value * (k === 1 ? 0.27 : 0.84)) + noise + interference;
+      envelope = Math.max(Math.abs(input), envelope * release);
+      samples[offset++] = input / Math.max(0.13, envelope);
+    }
+  }
+  return {samples, rate, reference: idle ? '' : turns.join(' ')};
+}
+
 const cases = [
   ['Clean', {}],
   ['Clean, high speed', {wpm: 46, hz: 945}],
@@ -120,7 +158,10 @@ const cases = [
   ['Straight key', {jitter: 0.27, swing: 0.16, dah: 2.55, element: 1.29, letter: 3.7}],
   ['Bug', {jitter: 0.20, swing: 0.13, dah: 4, element: 0.86, letter: 2.7}],
   ['Farnsworth', {wpm: 25, letter: 6.2, word: 13.7}],
-  ['Idle noise and steady tone', {quiet: true, noiseDb: -4, qrn: 4, blocker: 2}]
+  ['Idle noise and steady tone', {quiet: true, noiseDb: -4, qrn: 4, blocker: 2}],
+  ['Receiver filter, AGC and station replies', {}, receiverExchange, 0.20],
+  ['Receiver with a competing keyed station', {competing: true}, receiverExchange, 0.15],
+  ['Receiver filter and idle AGC noise', {idle: true}, receiverExchange, 0]
 ];
 
 const messages = [
@@ -169,9 +210,12 @@ if (fixture) {
   const holdout = args.includes('--holdout');
   const selected = holdout ? messages.slice(4) : messages.slice(0, 4);
   const totals = versions.map(() => ({edits: 0, chars: 0, ms: 0}));
-  for (const [label, options] of cases) {
+  for (const [label, options, generate = synth, limit] of cases) {
     if (flag('match') && !label.toLowerCase().includes(flag('match').toLowerCase())) continue;
-    const fixtures = selected.map((message, i) => synth(message, options, (holdout ? 7121 : 47) + i * 81));
+    const fixtures = selected.map((message, i) => {
+      const seed = (holdout ? 7121 : 47) + i * 81;
+      return generate(message, options, seed);
+    });
     const chars = fixtures.reduce((n, fixture) => n + fixture.reference.length, 0);
     const scores = versions.map(([name, Decoder], v) => {
       let errors = 0;
@@ -186,11 +230,15 @@ if (fixture) {
       }
       totals[v].edits += errors;
       totals[v].chars += chars;
+      if (args.includes('--check') && v === versions.length - 1 && limit !== undefined && errors > limit * chars) {
+        throw new Error(`${label}: ${errors} edits exceeds the limit of ${Math.floor(limit * chars)}`);
+      }
       return `${errors}/${chars}`;
     });
     console.log(label.padEnd(37), scores.join(' → '));
   }
   for (const [[name], {edits, chars, ms}] of versions.map((version, i) => [version, totals[i]])) {
-    console.log(name, `${edits}/${chars} edits, ${(100 * edits / chars).toFixed(2)}% CER, ${(ms / 1000).toFixed(2)} s processing`);
+    const metric = chars ? `${edits}/${chars} edits, ${(100 * edits / chars).toFixed(2)}% CER` : `${edits} insertions`;
+    console.log(name, `${metric}, ${(ms / 1000).toFixed(2)} s processing`);
   }
 }
