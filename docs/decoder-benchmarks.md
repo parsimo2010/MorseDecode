@@ -1,7 +1,13 @@
 # Decoder accuracy and real-time benchmarks
 
+The Northern Utah WebSDR evaluation reduced character edits from 109 to 8
+on 402 labeled off-air characters. It includes the manual copy, receiver-noise
+and handoff tests, and current Chrome timings. [Northern Utah field results](utah-websdr.md)
+
+## Earlier optimization benchmarks
+
 The terminal and web app use the same JavaScript decoder. The reference for
-these comparisons is [`6b2ba41`](https://github.com/parsimo2010/MorseDecode/commit/6b2ba41).
+the historical tables below is [`6b2ba41`](https://github.com/parsimo2010/MorseDecode/commit/6b2ba41).
 
 ## Optimization priorities and outcomes
 
@@ -66,8 +72,9 @@ across the two splits. [Open measurements and follow-up](https://github.com/pars
 The recording benchmark uses the published W1AW audio and transcripts. It
 downloads the source files to a local cache and scores the first labeled
 excerpt. A second run applies repeatable fading and Gaussian noise to that
-same audio. The recordings are machine-keyed practice material. Off-air
-hand-sent CW with labeled interference remains a separate validation need.
+same audio. The recordings are machine-keyed practice material. The Utah
+benchmark adds locally supplied off-air recordings. The field recording issue
+tracks the public corpus.
 [15 WPM archive](https://www.arrl.org/15-wpm-code-archive) · [20 WPM archive](https://www.arrl.org/20-wpm-code-archive) · [Field recording issue](https://github.com/parsimo2010/MorseDecode/issues/5)
 
 | Recording | Before | After |

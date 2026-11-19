@@ -130,7 +130,8 @@ files. The current decoder ignores these retired settings. The legacy
 [`morse_decode/core/decoder.mjs`](morse_decode/core/decoder.mjs) is the
 reference implementation. It downsamples with an anti-alias filter where the
 passband permits, follows the carrier as its pitch drifts, and adapts detection
-to fades and bursts of noise. It can use carrier phase when it remains stable
+to fades and bursts of noise. On filtered receiver audio it checks noise on
+both sides of the signal and can acquire a reply on a different pitch. It can use carrier phase when it remains stable
 through keying gaps. It tracks dot and dash timing separately from character
 spacing and scores possible Morse sequences by their timing. A compact history
 lets the browser revise the current word until it is ready to commit. The
@@ -161,6 +162,12 @@ speed, timing jitter, fading, and interference. The recordings benchmark
 downloads public W1AW practice recordings and their transcripts. See the
 [benchmark results and methodology](docs/decoder-benchmarks.md) for accuracy,
 real-time costs, and how to repeat the browser measurement.
+
+With the four Northern Utah WebSDR WAVs in `recordings/`, run
+`python tests/recordings.py --utah --baseline 5c33295 --verbose` to compare
+the decoder with the manually transcribed passages. The benchmark covers a
+CQ, a two-station exchange, signal reports and a description of a wire antenna.
+[Transcripts, uncertain passages and field results](docs/utah-websdr.md)
 
 Ongoing work is tracked in the [GitHub issue tracker](https://github.com/parsimo2010/MorseDecode/issues).
 

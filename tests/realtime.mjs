@@ -1,7 +1,7 @@
 import {execFileSync, spawn} from 'node:child_process';
 import {mkdtemp, readFile, rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
-import {join, resolve} from 'node:path';
+import {basename, join, resolve} from 'node:path';
 import {setTimeout as sleep} from 'node:timers/promises';
 import {CWDecoder} from '../morse_decode/core/decoder.mjs';
 
@@ -46,6 +46,29 @@ function report(title, {load, p95, p99}) {
   console.log(title, `${load.toFixed(1)}% of real time, p95 ${p95.toFixed(2)} ms, p99 ${p99.toFixed(2)} ms per 20 ms block`);
 }
 
+function timeRecording(install, samples) {
+  let text;
+  const endpoint = {postMessage(message) {
+    if (message.type === 'error') throw new Error(message.message);
+    if (message.type === 'finished') text = message.text;
+  }};
+  install(endpoint);
+  const rate = 48000;
+  const block = rate / 50;
+  endpoint.onmessage({data: {type: 'start', rate}});
+  const times = [];
+  for (let i = 0; i < samples.length; i += block) {
+    const data = {type: 'audio', samples: samples.subarray(i, i + block)};
+    const start = performance.now();
+    endpoint.onmessage({data});
+    times.push(performance.now() - start);
+  }
+  endpoint.onmessage({data: {type: 'stop'}});
+  times.sort((a, b) => a - b);
+  return {text, load: times.reduce((sum, d) => sum + d, 0) * rate / (10 * samples.length),
+    p95: times[Math.floor(times.length * 0.95)], p99: times[Math.floor(times.length * 0.99)]};
+}
+
 const scenarios = [
   ['default passband', [{}]],
   ['weak CW', [{}], true],
@@ -64,6 +87,8 @@ for (const [version, Decoder] of versions) {
 }
 
 const executable = flag('browser');
+const recordings = args.filter(arg => arg.startsWith('--wav=')).map(arg => arg.slice(6));
+if (recordings.length && !executable) throw new Error('--wav requires --browser with the path to Chrome.');
 if (executable) {
   execFileSync(process.execPath, ['web/build.mjs']);
   const page = await readFile('dist/index.html', 'utf8');
@@ -125,6 +150,31 @@ if (executable) {
       await command('Emulation.setCPUThrottlingRate', {rate: 6});
       const slow = await evaluate(`(() => { ${worker}\nreturn ${run}; })()`);
       report(`Chrome page at 6× slowdown, ${label}`, slow);
+      await command('Emulation.setCPUThrottlingRate', {rate: 1});
+    }
+    for (const filename of recordings) {
+      const encoded = (await readFile(filename)).toString('base64');
+      await evaluate(`(async () => {
+        const bytes = Uint8Array.from(atob(${JSON.stringify(encoded)}), c => c.charCodeAt(0));
+        const wav = await new OfflineAudioContext(1, 1, 48000).decodeAudioData(bytes.buffer);
+        if (wav.numberOfChannels !== 1) throw new Error('The field benchmark expects a mono WAV.');
+        globalThis.fieldSamples = wav.getChannelData(0);
+      })()`);
+      const run = `(${timeRecording})(self => { ${worker} }, samples)`;
+      const source = `self.onmessage = ({data: samples}) => self.postMessage(${run});`;
+      const direct = await evaluate(`new Promise((done, reject) => {
+        const url = URL.createObjectURL(new Blob([${JSON.stringify(source)}], {type: 'text/javascript'}));
+        const worker = new Worker(url);
+        worker.onmessage = ({data}) => { worker.terminate(); URL.revokeObjectURL(url); done(data); };
+        worker.onerror = error => reject(new Error(error.message));
+        worker.postMessage(fieldSamples);
+      })`);
+      report(`Chrome worker, ${basename(filename)}`, direct);
+      if (args.includes('--verbose')) console.log(direct.text);
+      await command('Emulation.setCPUThrottlingRate', {rate: 6});
+      const slow = await evaluate(`(samples => ${run})(fieldSamples)`);
+      if (slow.text !== direct.text) throw new Error('Field transcript changed under CPU throttling.');
+      report(`Chrome page at 6× slowdown, ${basename(filename)}`, slow);
       await command('Emulation.setCPUThrottlingRate', {rate: 1});
     }
   } finally {
