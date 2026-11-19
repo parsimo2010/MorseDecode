@@ -73,8 +73,10 @@ The recording benchmark uses the published W1AW audio and transcripts. It
 downloads the source files to a local cache and scores the first labeled
 excerpt. A second run applies repeatable fading and Gaussian noise to that
 same audio. The recordings are machine-keyed practice material. The Utah
-benchmark adds locally supplied off-air recordings. The field recording issue
-tracks the public corpus.
+benchmark now includes public WAV clips from seven off-air recordings with
+manually reviewed transcripts and a decoder-independent scorer. The latest
+comparison reduced field edits from 55 to 31 on 1,476 characters.
+[Public corpus](../benchmarks/cw/README.md) · [Field results](utah-morning.md)
 [15 WPM archive](https://www.arrl.org/15-wpm-code-archive) · [20 WPM archive](https://www.arrl.org/20-wpm-code-archive) · [Field recording issue](https://github.com/parsimo2010/MorseDecode/issues/5)
 
 | Recording | Before | After |

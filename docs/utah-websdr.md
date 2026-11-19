@@ -1,6 +1,8 @@
-# Northern Utah WebSDR field recordings
+# First four Northern Utah WebSDR field recordings
 
-The shared JavaScript decoder made **8 character edits in 402 reference characters** on six labeled excerpts. The previous release made **109 edits** on the same samples. The excerpts cover 228.7 seconds of the 239.6 seconds recorded. These four recordings guided development. Their scores measure improvement on these operators and reception conditions.
+At Git revision `3463ef4`, the shared JavaScript decoder made **8 character edits in 402 reference characters** on six labeled excerpts. The previous release made **109 edits** on the same samples. The excerpts cover 228.7 seconds of the 239.6 seconds recorded. These four recordings guided development. Their scores measure improvement on these operators and reception conditions.
+
+The public corpus now also includes three morning recordings. [New transcripts and seven-recording comparison](utah-morning.md)
 
 ## Reading the recordings
 
@@ -90,7 +92,7 @@ Chrome resampled each complete WAV to 48 kHz and ran it through the bundled work
 
 ## Repeat the checks
 
-The WAVs stay in the local `recordings/` directory. The committed fixture identifies each file by name and SHA-256 and supplies the time bounds, reference text, and regression budget. The synthetic receiver cases also run in a fresh checkout. [Field fixtures](../tests/fixtures/utah-cw.json)
+The seven-recording benchmark now reads the committed WAV clips. The corpus records source and clip hashes and exact sample bounds. Full original WAVs in `recordings/` can also be replayed in the Chrome check below. [Portable field corpus](../benchmarks/cw/README.md)
 
 ```powershell
 python tests/recordings.py --utah --baseline 5c33295 --verbose

@@ -163,11 +163,12 @@ downloads public W1AW practice recordings and their transcripts. See the
 [benchmark results and methodology](docs/decoder-benchmarks.md) for accuracy,
 real-time costs, and how to repeat the browser measurement.
 
-With the four Northern Utah WebSDR WAVs in `recordings/`, run
-`python tests/recordings.py --utah --baseline 5c33295 --verbose` to compare
-the decoder with the manually transcribed passages. The benchmark covers a
-CQ, a two-station exchange, signal reports and a description of a wire antenna.
-[Transcripts, uncertain passages and field results](docs/utah-websdr.md)
+The repository includes 33 manually transcribed WAV clips from seven Northern
+Utah WebSDR recordings. Run `python tests/recordings.py --utah --baseline 3463ef4`
+to compare the shared decoder with the preceding release. The public corpus
+also has a standalone scorer for other CW decoders, an importer for reviewed
+recordings and a portable SQLite export.
+[Benchmark another decoder](benchmarks/cw/README.md) · [Morning transcripts and results](docs/utah-morning.md) · [Earlier transcripts](docs/utah-websdr.md)
 
 Ongoing work is tracked in the [GitHub issue tracker](https://github.com/parsimo2010/MorseDecode/issues).
 
