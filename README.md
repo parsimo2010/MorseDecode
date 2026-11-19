@@ -6,8 +6,9 @@ inside the selected passband. The terminal can run several passbands in parallel
 
 ## Browser app
 
-Build the static files with Node.js 24 from the checkout. The build has no
-package dependencies.
+Open the [live MorseDecode web app](https://parsimo2010.github.io/MorseDecode/)
+to start decoding. To build a local copy, run this command with Node.js 24 from
+the checkout. The build has no package dependencies.
 
 ```bash
 node web/build.mjs
@@ -31,12 +32,11 @@ python -m http.server 8000 --bind 127.0.0.1 --directory dist
 
 ### Publish and install on a phone
 
-Serve the contents of `dist/` over HTTPS on any static host. For GitHub Pages,
-choose **GitHub Actions** under **Settings → Pages → Build and deployment**,
-then run **Publish MorseDecode to GitHub Pages** from the **Actions** tab. Run
-the workflow again for updates. With default project Pages settings, the URL is
-`https://parsimo2010.github.io/MorseDecode/`. GitHub Pages on a private repository
-requires an eligible plan. The workflow uploads only the static build output.
+The live app is hosted on GitHub Pages. To publish an update, run **Publish
+MorseDecode to GitHub Pages** from the repository’s **Actions** tab. To publish
+a fork, first choose **GitHub Actions** under **Settings → Pages → Build and
+deployment**. The workflow uploads the static build output. You can also serve
+the contents of `dist/` over HTTPS on any static host.
 [GitHub Pages publishing guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 
 - **Android (Chrome)** — Open the HTTPS page, open the three-dot menu, and choose
