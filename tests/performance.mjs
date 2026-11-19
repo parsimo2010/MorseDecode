@@ -79,12 +79,12 @@ const cases = [
   ['Jitter ±15%', {jitter: 0.15}, 0.06],
   ['Jitter ±35%', {jitter: 0.35}, 0.20],
   ['White noise −6 dB', {snr: -6}, 0.12],
-  ['White noise −12 dB', {snr: -12}, 0.43],
+  ['White noise −12 dB', {snr: -12}, 0.27],
   ['White noise −18 dB', {snr: -18}],
   ['Fade to 35% amplitude', {fade: 0.65}, 0.18],
-  ['Fade to 10% amplitude', {fade: 0.9}],
+  ['Fade to 10% amplitude', {fade: 0.9}, 0.05],
   ['Steady interferer +6 dB', {blocker: 2, snr: -3}, 0.13],
-  ['Combined noise, jitter and fading', {snr: -8, jitter: 0.18, fade: 0.55}]
+  ['Combined noise, jitter and fading', {snr: -8, jitter: 0.18, fade: 0.55}, 0.39]
 ];
 const failures = [];
 for (const [label, conditions, limit] of cases) {
@@ -109,3 +109,7 @@ assert.equal(reference.text, messages[0]);
 assert.ok(Math.abs(reference.frequency - 721) < 15, JSON.stringify(reference));
 assert.ok(Math.abs(reference.wpm - 26) < 3, JSON.stringify(reference));
 assert.deepEqual(decode(messages[0], {hz: 721, wpm: 26}, 128), reference);
+
+const cut = new CWDecoder(8000);
+cut.push(synth(messages[2], {wpm: 40}).subarray(0, -7999));
+assert.equal(cut.finish().text, messages[2]);
