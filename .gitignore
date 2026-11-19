@@ -93,6 +93,7 @@ Thumbs.db
 *.flac
 *.ogg
 !tests/fixtures/*.wav
+!benchmarks/cw/audio/*.wav
 
 # Logs
 *.log

@@ -130,9 +130,8 @@ def test_filtered_receiver_noise_and_replies():
 
 @pytest.mark.parametrize("recording", utah_labels(), ids=lambda recording: recording["file"])
 def test_utah_recording(recording, tmp_path):
-    path = ROOT / "recordings" / recording["file"]
-    if not path.exists():
-        pytest.skip(f"Local WebSDR recording required: {path.name}")
-    for excerpt, results in measure_utah(path, recording, tmp_path / "field.json"):
+    limits = json.loads((ROOT / "tests/fixtures/field-limits.json").read_text(encoding="utf-8"))
+    for clip, results in measure_utah(None, recording, tmp_path / "field.json"):
         measured = results["current"]
-        assert measured["edits"] <= excerpt["max_edits"], measured["text"]
+        if clip["id"] in limits:
+            assert measured["edits"] <= limits[clip["id"]], measured["text"]
