@@ -157,10 +157,13 @@ if (fixture) {
   const {rate, pcm, reference} = JSON.parse(readFileSync(fixture, 'utf8'));
   const bytes = Buffer.from(pcm, 'base64');
   const samples = Float32Array.from({length: bytes.length / 2}, (_, i) => bytes.readInt16LE(2 * i) / 32768);
-  for (const [label, Decoder] of versions) {
-    const result = measure(Decoder, {samples, rate, reference});
-    console.log(label, `${result.edits}/${reference.length} edits`);
-    if (args.includes('--verbose')) console.log(result.text);
+  const results = versions.map(([label, Decoder]) => [label, measure(Decoder, {samples, rate, reference})]);
+  if (args.includes('--json')) console.log(JSON.stringify(results));
+  else {
+    for (const [label, result] of results) {
+      console.log(label, `${result.edits}/${reference.length} edits`);
+      if (args.includes('--verbose')) console.log(result.text);
+    }
   }
 } else {
   const holdout = args.includes('--holdout');
