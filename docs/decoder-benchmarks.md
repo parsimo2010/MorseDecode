@@ -4,6 +4,35 @@ The Northern Utah WebSDR evaluation reduced character edits from 109 to 8
 on 402 labeled off-air characters. It includes the manual copy, receiver-noise
 and handoff tests, and current Chrome timings. [Northern Utah field results](utah-websdr.md)
 
+## DC and Texas WebSDR recordings
+
+The 35 reviewed clips from three recordings were used to develop weak-mark
+recovery. When the sender maintains a steady cadence, the decoder can check
+the middle of a predicted dit for energy at the carrier frequency. This
+recovers some marks that fall below the usual threshold during a fade.
+The table compares character edits against the decoder at `64793a7` on
+the same labeled WAVs. [Recordings and scoring](../benchmarks/cw/README.md)
+
+| Recording | Clips | Reference characters | Before | After |
+| --- | ---: | ---: | ---: | ---: |
+| DC W1AW bulletin | 13 | 320 | 55 | 45 |
+| Texas W1AW bulletin | 10 | 431 | 2 | 2 |
+| Texas conversation | 12 | 606 | 28 | 28 |
+| Earlier Utah recordings | 33 | 1,476 | 31 | 31 |
+| Total | 68 | 2,833 | 116 | 106 |
+
+Five DC clips improved, including the nearby-tone excerpt labeled
+`ISLAND, IOTA OC DASH`, which went from nine edits to seven. Every other
+clip kept its previous score. With the gain-fade test enabled, all 68 clips
+matched their previous scores (140 edits). Scores also matched per example
+on both synthetic suites and on the two archived W1AW excerpts tested
+with and without added fade and noise.
+
+On the DC nearby-tone clip, the Chrome worker took 1.0 ms at the 95th
+percentile per 20 ms audio block (1.4 ms at the 99th percentile). In the
+Node real-time test, default-passband processing used 0.9% of real time on
+both revisions, and weak CW used 1.0% on both.
+
 ## Earlier optimization benchmarks
 
 The terminal and web app use the same JavaScript decoder. The reference for

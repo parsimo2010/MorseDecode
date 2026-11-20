@@ -197,6 +197,64 @@ function regularKeying(runs, unit) {
   return aligned.length >= 0.88 * intervals.length;
 }
 
+function fadedKeyingGrid(history, {floor, peak}, runs, unit) {
+  // A constant key weight shifts all mark lengths by a similar amount. Look
+  // for scattered lengths after removing that bias, as a selective fade can
+  // make a threshold crossing move within an otherwise clocked transmission.
+  const errors = runs.filter(run => run.on).map(({length}) =>
+    length / unit - (length < 1.95 * unit ? 1 : 3));
+  if (errors.length < 8) return null;
+  const bias = select(errors, 0.5);
+  if (errors.filter(error => Math.abs(error - bias) > 0.2).length < 0.18 * errors.length) return null;
+
+  // Compare strong marks across several groups before using their level as
+  // a reference for a weak one. It becomes unreliable during a gain change.
+  const span = Math.max(1, Math.round(12 * unit));
+  if (history.length < 2 * span) return null;
+  let lowest = Infinity;
+  let highest = 0;
+  for (let end = history.length; end >= span; end -= span) {
+    const level = select(history.slice(end - span, end), 0.88);
+    lowest = Math.min(lowest, level);
+    highest = Math.max(highest, level);
+  }
+  if (lowest < 0.5 * highest) return null;
+
+  const edges = [];
+  const first = Math.max(0, history.length - Math.round(42 * unit));
+  const threshold = floor + 0.19 * (peak - floor);
+  for (let i = first + 1; i < history.length; i++) {
+    const before = history[i - 1];
+    const after = history[i];
+    if ((before > threshold) === (after > threshold)) continue;
+    edges.push(i - 1 + (threshold - before) / (after - before));
+  }
+  if (edges.length < 14 || edges.at(-1) - edges[0] < 24 * unit) return null;
+
+  // Rising edges recur at even dit counts and falling edges at odd counts.
+  // Their signed sum gives both the period and the phase of the keying.
+  let grid = null;
+  let best = 0.67 * edges.length;
+  for (let step = 0; step <= 25; step++) {
+    const period = unit * (0.9 + step * 0.008);
+    const angle = Math.PI / period;
+    let real = 0;
+    let imag = 0;
+    let sign = history[first] > threshold ? -1 : 1;
+    for (const edge of edges) {
+      real += sign * Math.cos(edge * angle);
+      imag += sign * Math.sin(edge * angle);
+      sign = -sign;
+    }
+    const strength = Math.hypot(real, imag);
+    if (strength > best) {
+      best = strength;
+      grid = {period, origin: Math.atan2(imag, real) / angle};
+    }
+  }
+  return grid && Math.abs(grid.period / unit - 1) < 0.09 ? grid : null;
+}
+
 function wordBoundary(runs, unit, letter) {
   const standard = 1.57 * letter;
   const gaps = runs.filter(run => !run.on).map(run => run.length);
@@ -379,6 +437,7 @@ class CWDecoder {
     this.tones = frequencies.map(hz => ({hz, coeff: 2 * Math.cos(2 * Math.PI * hz / analysisRate), history: []}));
     this.frame = 0;
     this.cursor = 0;
+    this.tunedAt = 0;
     this.selected = null;
     this.active = false;
     this.signalDb = null;
@@ -605,6 +664,7 @@ class CWDecoder {
     const competing = interfering !== undefined && Math.abs(this.tones[interfering].hz - this.tones[best].hz) < 2 * this.lobeWidth;
     if (hasReply || (shouldSwitch && !competing && score(levels[best]) > minCarrierScore && inBand(best))) {
       if (this.selected !== null && Math.abs(this.selected - best) > 2) {
+        this.tunedAt = this.frame;
         if (this.state) this.storeMark(this.run - this.pending, this.keyClock - this.pending, false);
         this.commitWord();
         this.state = false;
@@ -777,6 +837,10 @@ class CWDecoder {
     const adaptToFade = isolated && carrierScore > 55;
     const noiseScale = window ? window.length / this.window.length : 1;
     const focusScale = ((window || this.window).length / this.longWindow.length) ** 2;
+    const grid = filtered && isolated && strong && !checkFades && flanks.length >= 3 && this.unit && startFrame >= this.tunedAt
+      ? fadedKeyingGrid(tone.history, levels[this.selected], this.runs, this.unit) : null;
+    let previousCell;
+    let focusedMark = false;
     for (let i = start; i < endFrame - startFrame; i++) {
       const localContrast = Math.max(0.044 * range, Math.min(range, localPeak[i] - floor));
       const gain = this.state ? this.offGain : this.onGain;
@@ -822,7 +886,23 @@ class CWDecoder {
         }
       }
       const gate = floor + Math.max(gain * noise, keyThreshold);
-      this.keyFrame((this.state || strong) && envelope[i] > gate,
+      if (grid) {
+        const cell = Math.floor((i - grid.origin) / grid.period);
+        if (cell !== previousCell) {
+          previousCell = cell;
+          focusedMark = false;
+          const center = Math.round(grid.origin + (cell + 0.5) * grid.period);
+          if (center >= 0 && center < length) {
+            // Measure once in the middle of a dit, away from the keying
+            // edges. Require energy above both the noise floor and the
+            // simultaneous off-frequency noise before restoring the mark.
+            const focused = focusScale * this.tonePower(startFrame + center, tone.coeff, this.longWindow);
+            const side = noiseScale * this.flankNoise(flanks, center, flankPowers);
+            focusedMark = focused > Math.max(0.08 * range, floor + this.onGain * (noise + side));
+          }
+        }
+      }
+      this.keyFrame((this.state || strong) && (envelope[i] > gate || focusedMark),
         (envelope[i] - floor) / Math.max(1e-13, noise * this.onGain), adaptToFade, carrierScore < 9.5);
     }
   }
