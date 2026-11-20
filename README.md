@@ -163,8 +163,8 @@ downloads public W1AW practice recordings and their transcripts. See the
 [benchmark results and methodology](docs/decoder-benchmarks.md) for accuracy,
 real-time costs, and how to repeat the browser measurement.
 
-The repository includes 33 manually transcribed WAV clips from seven Northern
-Utah WebSDR recordings. Run `python tests/recordings.py --utah --baseline 3463ef4`
+The repository includes 68 reviewed WAV clips from ten WebSDR recordings
+in northern Utah, the Washington DC area and Crowley, Texas. Run `python tests/recordings.py --utah --baseline 3463ef4`
 to compare the shared decoder with the preceding release. The public corpus
 also has a standalone scorer for other CW decoders, an importer for reviewed
 recordings and a portable SQLite export.

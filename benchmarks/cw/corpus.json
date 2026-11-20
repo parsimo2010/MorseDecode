@@ -322,6 +322,290 @@
       "frequency_khz": 7031.0,
       "source": "Northern Utah WebSDR",
       "usage": "development"
+    },
+    {
+      "id": "na5b-20261120-010303",
+      "source": "NA5B WebSDR, Washington DC area (na5b.com:8901)",
+      "recorded_utc": "2026-11-20T01:03:03Z",
+      "frequency_khz": 7047.5,
+      "usage": "development",
+      "file": "websdr_recording_2026-11-20T01_03_03Z_7047.5kHz.wav",
+      "sha256": "d011ebeb5406262279b3ae15cae8ab9290a3c47728fc897a9eb784c336a7b83a",
+      "sample_rate": 8000,
+      "frames": 2469504,
+      "clips": [
+        {
+          "id": "na5b-20261120-010303-0",
+          "start_frame": 0,
+          "end_frame": 330480,
+          "pcm_sha256": "867d931365df64c53f77611d0608834268281f735d9c575e88482d795ee88173",
+          "text": "4U1ITU FROM GENEVA FROM NOVEMBER 18 TO 26. ACTIVITY WILL BE ON HF"
+        },
+        {
+          "id": "na5b-20261120-010303-356240",
+          "start_frame": 356240,
+          "end_frame": 430880,
+          "pcm_sha256": "0271e21e7b1535246cbdcc14ea8a5a0e5a79dc77e8e0e3f8cac293b3467f705d",
+          "text": "VARIOUS MODES."
+        },
+        {
+          "id": "na5b-20261120-010303-520480",
+          "start_frame": 520480,
+          "end_frame": 715680,
+          "pcm_sha256": "63a378413fe1d9dc72ffc63d1d43381e4caaef833fa7bb092aeab43a6605b6e4",
+          "text": "CHARLES, NK8O, IS QRV AS 5H3DX FROM"
+        },
+        {
+          "id": "na5b-20261120-010303-773360",
+          "start_frame": 773360,
+          "end_frame": 838560,
+          "pcm_sha256": "33886fe479163d8c5382a98362632c3d00fe43bf75802f317241bc5dfd23e77d",
+          "text": "ACTIVITY IS ON"
+        },
+        {
+          "id": "na5b-20261120-010303-852160",
+          "start_frame": 852160,
+          "end_frame": 965200,
+          "pcm_sha256": "5c2e53fd5bce95a3f53c86b3b933a8b31b6ea0344e6bd70d4b36188312d2c054",
+          "text": "USING VARIOUS MODES. <BT>"
+        },
+        {
+          "id": "na5b-20261120-010303-999440",
+          "start_frame": 999440,
+          "end_frame": 1049360,
+          "pcm_sha256": "2de877dfc28f3fdf76c7e00794cb9e53d65c422fa4f9257914442e297ca3e4a4",
+          "text": "MALDIVES."
+        },
+        {
+          "id": "na5b-20261120-010303-1134880",
+          "start_frame": 1134880,
+          "end_frame": 1311760,
+          "pcm_sha256": "8ad1a3524d6478c497281af5c2bb8fb98e4388b076bbd7886f3c6f803cef9723",
+          "text": "IS QRV AS 8Q7XX FROM THE MALDIVES."
+        },
+        {
+          "id": "na5b-20261120-010303-1378080",
+          "start_frame": 1378080,
+          "end_frame": 1474080,
+          "pcm_sha256": "698235a31650e2b8792d702cef68962680930d938996b750a41987563eaa266c",
+          "text": "80 TO 6 METERS USING"
+        },
+        {
+          "id": "na5b-20261120-010303-1550880",
+          "start_frame": 1550880,
+          "end_frame": 1667120,
+          "pcm_sha256": "cc65a02d45302d8d12c8a03075d6bc5b40b1aae76f35fef7a7d063b102602920",
+          "text": "INCLUDING PARTICIPATION"
+        },
+        {
+          "id": "na5b-20261120-010303-1740800",
+          "start_frame": 1740800,
+          "end_frame": 1790880,
+          "pcm_sha256": "bde7719a31f6c44a7bc919b802e7531833cc7f9a7f951155cb20993a9691cf55",
+          "text": "WIDE DX CW"
+        },
+        {
+          "id": "na5b-20261120-010303-2069360",
+          "start_frame": 2069360,
+          "end_frame": 2235760,
+          "pcm_sha256": "9e80d086f3397c014cf69cbc929cfa4e5bb62ed75bd7e0a37cd0b8502ec3a924",
+          "text": "AND A31TD WILL BE QRV FROM VAVA U"
+        },
+        {
+          "id": "na5b-20261120-010303-2235760",
+          "start_frame": 2235760,
+          "end_frame": 2336640,
+          "pcm_sha256": "d98b97f397f300b38cbe2ce22cd5b5c2cd024d134b45ccdbda724c1aa0b4ad75",
+          "text": "ISLAND, IOTA OC DASH"
+        },
+        {
+          "id": "na5b-20261120-010303-2377600",
+          "start_frame": 2377600,
+          "end_frame": 2461760,
+          "pcm_sha256": "36777e5ff603180e1ae28217ebb73b99e54f9dd05659f793804d975198bfd738",
+          "text": "BEGINNING NOVEMBER"
+        }
+      ]
+    },
+    {
+      "id": "w2db-20261120-010928",
+      "source": "W2DB WebSDR, Crowley, Texas (2360.ddns.me:8901)",
+      "recorded_utc": "2026-11-20T01:09:28Z",
+      "frequency_khz": 7047.5,
+      "usage": "development",
+      "file": "websdr_recording_2026-11-20T01_09_28Z_7047.5kHz.wav",
+      "sha256": "4f53e4a2ec045b1141f863f6b9b4862b071c6d4c879fc35fef918ea785876e8d",
+      "sample_rate": 8000,
+      "frames": 2177280,
+      "clips": [
+        {
+          "id": "w2db-20261120-010928-7200",
+          "start_frame": 7200,
+          "end_frame": 237600,
+          "pcm_sha256": "40ad63ce476ffb311aebf0f6c998b72db3a81ddb2db8dc63204967b8de7a2886",
+          "text": "DASH 024, BEGINNING NOVEMBER 22, INCLUDING"
+        },
+        {
+          "id": "w2db-20261120-010928-237600",
+          "start_frame": 237600,
+          "end_frame": 473280,
+          "pcm_sha256": "4107a683722bdc765b3e681a06ca7516ecda8274985995d3e2ceb1f534076e4a",
+          "text": "PARTICIPATION IN THE CQ WORLD WIDE DX CW CONTEST."
+        },
+        {
+          "id": "w2db-20261120-010928-473280",
+          "start_frame": 473280,
+          "end_frame": 671680,
+          "pcm_sha256": "2c10be22e1f7f6ee056af8586139b2df6ca3b9c0635922bb1906456e80121396",
+          "text": "CW ACTIVITY IS EXPECTED DURING THE CONTEST."
+        },
+        {
+          "id": "w2db-20261120-010928-671680",
+          "start_frame": 671680,
+          "end_frame": 891360,
+          "pcm_sha256": "cb7c3a3a3dd4ae9d9cfcd351d66da88c1d7ee6f986774090b828f794fc076559",
+          "text": "OTHER BANDS AND MODES HAVE NOT BEEN SPECIFIED. <BT>"
+        },
+        {
+          "id": "w2db-20261120-010928-891360",
+          "start_frame": 891360,
+          "end_frame": 1188000,
+          "pcm_sha256": "46d5a3a157ae3ea4a7c008dd0810ba20a5a658f57ff1fbb6968662a24955aaff",
+          "text": "OX, GREENLAND. NADIA, OZ7AM, WILL BE QRV AS OX7AM FROM"
+        },
+        {
+          "id": "w2db-20261120-010928-1188000",
+          "start_frame": 1188000,
+          "end_frame": 1368240,
+          "pcm_sha256": "696263dad944aa3d147700f25d98f6b8e8b7440b86cf1326a8c4d0f276be53b6",
+          "text": "KANGERLUSSUAQ, IOTA NA DASH 018,"
+        },
+        {
+          "id": "w2db-20261120-010928-1368240",
+          "start_frame": 1368240,
+          "end_frame": 1530400,
+          "pcm_sha256": "1966bee70fee1555fda6f07f8403898dd41a827b87b248ef2503128c2740ea86",
+          "text": "FROM NOVEMBER 23 TO DECEMBER 7."
+        },
+        {
+          "id": "w2db-20261120-010928-1530400",
+          "start_frame": 1530400,
+          "end_frame": 1737360,
+          "pcm_sha256": "08abc6875a5f8e240467603fbbffc2b6edfd923e6dcc14f7c4493980e669688c",
+          "text": "ACTIVITY WILL BE ON HF USING CW, INCLUDING"
+        },
+        {
+          "id": "w2db-20261120-010928-1737360",
+          "start_frame": 1737360,
+          "end_frame": 1975200,
+          "pcm_sha256": "abdcaafc7ad4d322e4f194ddaa9abafaa4fcc69410247be6f36895d2bc972ac3",
+          "text": "PARTICIPATION IN THE CQ WORLD WIDE DX CW CONTEST."
+        },
+        {
+          "id": "w2db-20261120-010928-1975200",
+          "start_frame": 1975200,
+          "end_frame": 2172320,
+          "pcm_sha256": "d95de167ff1363b035fa5a1d12225b5f2669a7c496290deae46a3646960261de",
+          "text": "<BT> PZ, SURINAME. WIAN, PE1K, WILL BE"
+        }
+      ]
+    },
+    {
+      "id": "w2db-20261120-011544",
+      "source": "W2DB WebSDR, Crowley, Texas (2360.ddns.me:8901)",
+      "recorded_utc": "2026-11-20T01:15:44Z",
+      "frequency_khz": 7025.5,
+      "usage": "development",
+      "file": "websdr_recording_2026-11-20T01_15_44Z_7025.5kHz.wav",
+      "sha256": "4a41dceee7c767a0511b058dd3b17ce5ecc793e3ca14aac926da2a284a9be058",
+      "sample_rate": 8000,
+      "frames": 1752960,
+      "clips": [
+        {
+          "id": "w2db-20261120-011544-8160",
+          "start_frame": 8160,
+          "end_frame": 173200,
+          "pcm_sha256": "861fc5f66eada5381f0e49bed2761017a37f9d4c53e985f6fc9343cae1888193",
+          "text": "DRIFTED AWAY HEE BUT ACTUALLY FULLY RETIRED JAN OF 2T17"
+        },
+        {
+          "id": "w2db-20261120-011544-173200",
+          "start_frame": 173200,
+          "end_frame": 361680,
+          "pcm_sha256": "accb0b6160ce8e562e609084b664baf8451ca4f94077600ef88eb022e15093af",
+          "text": "SO FOR PAST ALMOST DECADE BEEN A FREE MAN EXCEPT FOR MY BETTER HALF HI <BT>"
+        },
+        {
+          "id": "w2db-20261120-011544-361680",
+          "start_frame": 361680,
+          "end_frame": 448640,
+          "pcm_sha256": "4f76e1bf8ccd80ed6650e156b8e3d28e5de4e2ec996bf8dcddf88444e805590f",
+          "text": "W WAS ACTUALLY VERY NICI NICE"
+        },
+        {
+          "id": "w2db-20261120-011544-486880",
+          "start_frame": 486880,
+          "end_frame": 537200,
+          "pcm_sha256": "78b8df26ec66dd53c7eaa6eb111f3cebc51270f2c624d2bd430c65d155202679",
+          "text": "MIKE, WIND CALMED"
+        },
+        {
+          "id": "w2db-20261120-011544-554080",
+          "start_frame": 554080,
+          "end_frame": 694480,
+          "pcm_sha256": "e8b2d4b400f1c15f897ae67cd40198b2569d7f1d23724b9e04de427666258b78",
+          "text": "DWN ES ABT 57F, AT 7K FEET U COOK AT 57 IN SUN HI,"
+        },
+        {
+          "id": "w2db-20261120-011544-694480",
+          "start_frame": 694480,
+          "end_frame": 850320,
+          "pcm_sha256": "f1b50ab09d7aabd9aa79d82fd57d7b8a12bbc33d39069b7c5e78aa1212a310f5",
+          "text": "IN JANUARY IF 5OF ES SUNNY ES OUT OF WIND IVE BEEN IN TEE SHIRT"
+        },
+        {
+          "id": "w2db-20261120-011544-850320",
+          "start_frame": 850320,
+          "end_frame": 953360,
+          "pcm_sha256": "2755b27e36ace2b162f6dc233143c47fdc7a030a902dfe0a161148e5a2b3d5cb",
+          "text": "<BT> W9RNY DE K1JD K R R K1JD <AS>"
+        },
+        {
+          "id": "w2db-20261120-011544-1013280",
+          "start_frame": 1013280,
+          "end_frame": 1069200,
+          "pcm_sha256": "ae378c31f43d4abc8686c96b0ff2ca2cfc62557ea8b2d32458dd87d86f2b888f",
+          "text": "IT ON WRONG ANTENNA 5EE"
+        },
+        {
+          "id": "w2db-20261120-011544-1069200",
+          "start_frame": 1069200,
+          "end_frame": 1275600,
+          "pcm_sha256": "fbf5ea9d19188b506c4304a3ef59203860758581c623f456551b8d89e7a99b53",
+          "text": "<BT> BUT OK <BT> WELL FB ON MOST JOHN BOY BAND NOT STABLE FER ME HR THIS EVENING"
+        },
+        {
+          "id": "w2db-20261120-011544-1275600",
+          "start_frame": 1275600,
+          "end_frame": 1370640,
+          "pcm_sha256": "0a4821d339fc3b86c044464c4711b69d670dc0d84be443dce0d48f5cc6df4986",
+          "text": "<BT> BUT FB ON U BEING 10 YRS OLDER"
+        },
+        {
+          "id": "w2db-20261120-011544-1382480",
+          "start_frame": 1382480,
+          "end_frame": 1554560,
+          "pcm_sha256": "3811db90aae2a65bd6611b75430d27998ed63e665b6d84ce7eff1448ef1215e0",
+          "text": "I ES I HPE I CAN STILL HANDLE A KEY LIKE U DO WEN I REACH TT AGE HEE <BT>"
+        },
+        {
+          "id": "w2db-20261120-011544-1554560",
+          "start_frame": 1554560,
+          "end_frame": 1742000,
+          "pcm_sha256": "9ae2ac519d2e4e84fc70336f1ec8908dd9524302f498f1d0923989ab53720179",
+          "text": "<BT> OK ON TSE WIND ALSO <BT> BOY JOHN HATE TO RUN ON U BUT JUST MISSING"
+        }
+      ]
     }
   ]
 }
