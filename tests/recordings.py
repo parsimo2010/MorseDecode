@@ -46,7 +46,10 @@ def measure_utah(path, recording, fixture, versions=(), gain_fade=False):
                                        "pcm": base64.b64encode(pcm).decode("ascii")}), encoding="utf-8")
         result = subprocess.run(["node", "tests/accuracy.mjs", f"--fixture={fixture}", "--json", *versions],
                                 cwd=ROOT, capture_output=True, text=True, check=True)
-        yield clip, dict(json.loads(result.stdout))
+        measurements = dict(json.loads(result.stdout))
+        for measurement in measurements.values():
+            measurement.update(benchmark.score_text(clip["text"], measurement["text"]))
+        yield clip, measurements
 
 
 def score_utah(directory, versions, verbose, gain_fade=False, predictions=None):
@@ -63,7 +66,7 @@ def score_utah(directory, versions, verbose, gain_fade=False, predictions=None):
                     print(f"  reference  {clip['text']}")
                 for version, measurement in results.items():
                     errors = measurement["edits"]
-                    chars = len(clip["text"])
+                    chars = measurement["characters"]
                     print(f"  {clip['id']}  {version}  {errors}/{chars} edits")
                     if verbose:
                         print(f"    {measurement['text']}")

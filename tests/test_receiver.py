@@ -197,7 +197,8 @@ def test_filtered_receiver_noise_and_replies():
 @pytest.mark.parametrize("recording", utah_labels(), ids=lambda recording: recording["file"])
 def test_utah_recording(recording, tmp_path):
     limits = json.loads((ROOT / "tests/fixtures/field-limits.json").read_text(encoding="utf-8"))
+    missing = {clip["id"] for clip in recording["clips"]} - limits.keys()
+    assert not missing, f"Missing field regression budgets: {sorted(missing)}"
     for clip, results in measure_utah(None, recording, tmp_path / "field.json"):
         measured = results["current"]
-        if clip["id"] in limits:
-            assert measured["edits"] <= limits[clip["id"]], measured["text"]
+        assert measured["edits"] <= limits[clip["id"]], measured["text"]

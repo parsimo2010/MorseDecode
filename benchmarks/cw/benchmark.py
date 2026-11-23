@@ -219,6 +219,13 @@ def symbols(text):
     return re.findall(r"<[A-Z]+>|[^ ]", text)
 
 
+def score_text(reference, prediction):
+    ref, hyp = normalize(reference), normalize(prediction)
+    keys, decoded = symbols(ref), symbols(hyp)
+    return dict(edits=distance(ref, hyp), characters=len(ref),
+                symbol_edits=distance(keys, decoded), symbols=len(keys))
+
+
 def score(data, guesses):
     expected = {c["id"] for r in data["recordings"] for c in r["clips"]}
     if guesses.keys() != expected:
@@ -229,12 +236,9 @@ def score(data, guesses):
     rows = []
     for r in data["recordings"]:
         for c in r["clips"]:
-            ref, hyp = normalize(c["text"]), normalize(guesses[c["id"]])
-            keys, decoded = symbols(ref), symbols(hyp)
-            counts = [distance(ref, hyp), len(ref), distance(keys, decoded), len(keys)]
-            totals = [a + b for a, b in zip(totals, counts)]
-            rows.append(dict(id=c["id"], edits=counts[0], characters=counts[1],
-                             symbol_edits=counts[2], symbols=counts[3]))
+            counts = score_text(c["text"], guesses[c["id"]])
+            totals = [a + b for a, b in zip(totals, counts.values())]
+            rows.append(dict(id=c["id"], **counts))
     if not rows:
         raise ValueError("The corpus contains no scored clips")
     edits, chars, key_edits, keys = totals
