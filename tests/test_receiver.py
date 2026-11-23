@@ -1,7 +1,9 @@
 """Exercise the shared decoder through the terminal and bundled web worker."""
 
 import json
+import socket
 import subprocess
+import threading
 import wave
 from pathlib import Path
 
@@ -144,6 +146,32 @@ def test_cli_flushes_pending_word_once_when_capture_is_interrupted(tmp_path, mon
     assert result.exit_code == 0, result.output
     assert "CQ" in result.output
     assert [json.loads(line)["text"] for line in log.read_text().splitlines()] == ["CQ"]
+
+
+def test_cli_decodes_tcp_pcm_to_eof(tmp_path, monkeypatch):
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    pcm = (synth("CQ", 673)[:-RATE] * 32767).astype("<i2").tobytes()
+    with socket.socket() as server:
+        server.bind(("127.0.0.1", 0))
+        server.listen()
+        server.settimeout(3)
+        port = server.getsockname()[1]
+
+        def send():
+            connection, _ = server.accept()
+            with connection:
+                connection.sendall(pcm[:401])
+                connection.sendall(pcm[401:] + b"\xff")
+
+        producer = threading.Thread(target=send, daemon=True)
+        producer.start()
+        result = CliRunner().invoke(main, ["--network", f"tcp://127.0.0.1:{port}",
+                                           "--sample-rate", str(RATE), "--channel-width", "600"])
+        producer.join(timeout=4)
+    assert result.exit_code == 0, result.output
+    assert "CQ" in result.output
+    assert "partial PCM sample" in result.output
 
 
 @pytest.mark.parametrize(("options", "message"), [

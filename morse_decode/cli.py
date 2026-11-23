@@ -110,6 +110,7 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
         sample_rate=cfg.audio.sample_rate,
         chunk_ms=50.0,
         on_status=report_audio_status,
+        network=cfg.input.network,
     )
     sample_rate = source.sample_rate
     with Receiver(sample_rate, cfg) as receiver:
@@ -200,6 +201,8 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
               help="Decode an audio file instead of live input.")
 @click.option("--stdin", is_flag=True,
               help="Read signed 16-bit mono PCM from stdin.")
+@click.option("--network", metavar="URL",
+              help="Connect to tcp://HOST:PORT or listen on udp://BIND:PORT for signed 16-bit little-endian mono PCM.")
 @click.option("--freq-min", default=None, type=int, metavar="HZ",
               help="Lower frequency edge in Hz (default: 400).")
 @click.option("--freq-max", default=None, type=int, metavar="HZ",
@@ -210,7 +213,7 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
               help="Receiver passband width in Hz (default: 200).")
 # Audio / detection
 @click.option("--sample-rate", default=None, type=int, metavar="HZ",
-              help="Sample rate for live or stdin input (defaults: device rate or 44100 Hz).")
+              help="Sample rate for live, stdin, or network input (defaults: device rate or 44100 Hz).")
 @click.option("--on-db", default=None, type=float, metavar="DB",
               help="Override the core's signal-on threshold. Lower is more sensitive.")
 @click.option("--off-db", default=None, type=float, metavar="DB",
@@ -233,6 +236,7 @@ def main(
     device: str | None,
     audio_file: str | None,
     stdin: bool,
+    network: str | None,
     freq_min: int | None,
     freq_max: int | None,
     bin_width: int | None,
@@ -249,7 +253,7 @@ def main(
     """Terminal interface for the shared CW (Morse code) decoder.
 
     Decodes simultaneous CW signals across a configurable frequency range
-    from a live audio device, audio file, or stdin pipe.
+    from a live audio device, audio file, stdin pipe, or network PCM producer.
     """
     if list_devs:
         click.echo(list_devices())
@@ -263,6 +267,7 @@ def main(
         "input__device": device,
         "input__file": audio_file,
         "input__stdin": stdin or None,
+        "input__network": network,
         "input__freq_min": freq_min,
         "input__freq_max": freq_max,
         "input__bin_width": bin_width,
@@ -306,6 +311,10 @@ def main(
         run_decoder(cfg, logger=logger)
     except DecoderError as exc:
         raise click.ClickException(str(exc)) from exc
+    except (ValueError, OSError) as exc:
+        if cfg.input.network is None:
+            raise
+        raise click.ClickException(f"Network audio: {exc}") from exc
     finally:
         if logger:
             logger.close()

@@ -1,10 +1,11 @@
 """
 Audio source abstraction.
 
-Three input modes are supported:
+Four input modes are supported:
   1. Live audio device (via sounddevice)
   2. Audio file (formats supported by libsndfile)
   3. Raw PCM from stdin
+  4. Raw PCM over TCP or UDP
 
 All modes yield mono NumPy float32 chunks at the source sample rate.
 """
@@ -12,8 +13,10 @@ All modes yield mono NumPy float32 chunks at the source sample rate.
 from __future__ import annotations
 
 import queue
+import socket
 import sys
 from typing import Callable, Generator
+from urllib.parse import urlsplit
 
 import numpy as np
 
@@ -239,6 +242,76 @@ class StdinSource(AudioSource):
             yield _to_mono(arr)
 
 
+class NetworkSource(AudioSource):
+    """Connect to a TCP PCM producer or listen for UDP PCM datagrams."""
+
+    def __init__(
+        self, endpoint: str, sample_rate: int = 0, chunk_ms: float = 50,
+        on_status: Callable[[str], None] | None = None,
+    ) -> None:
+        try:
+            target = urlsplit(endpoint)
+            port = target.port
+            if (target.scheme not in ("tcp", "udp") or not target.hostname or not port
+                    or target.username is not None or target.path or target.query or target.fragment):
+                raise ValueError
+        except ValueError as exc:
+            raise ValueError("Use a network endpoint of the form tcp://HOST:PORT or udp://BIND:PORT.") from exc
+        self.sample_rate = sample_rate or 44100
+        if not 1 <= self.sample_rate <= 384000:
+            raise ValueError("Choose a network sample rate between 1 and 384000 Hz.")
+        self._address = (target.hostname, port)
+        self._tcp = target.scheme == "tcp"
+        self._chunk_bytes = 2 * max(1, int(self.sample_rate * chunk_ms / 1000))
+        self._on_status = on_status
+
+    def _open(self) -> socket.socket:
+        if self._tcp:
+            return socket.create_connection(self._address, timeout=3)
+        family, kind, protocol, _, address = socket.getaddrinfo(
+            *self._address, type=socket.SOCK_DGRAM, flags=socket.AI_PASSIVE,
+        )[0]
+        connection = socket.socket(family, kind, protocol)
+        try:
+            connection.bind(address)
+        except BaseException:
+            connection.close()
+            raise
+        return connection
+
+    def stream(self) -> Generator[np.ndarray, None, None]:
+        pending = b""
+        with self._open() as connection:
+            # Periodically return to Python so Ctrl-C can be handled on Windows.
+            connection.settimeout(0.25)
+            while True:
+                try:
+                    data = connection.recv(self._chunk_bytes if self._tcp else 65535)
+                except socket.timeout:
+                    continue
+                except ConnectionResetError:
+                    if not self._tcp:
+                        raise
+                    if self._on_status:
+                        self._on_status("TCP audio producer reset the connection.")
+                    break
+                if self._tcp:
+                    if not data:
+                        break
+                    data = pending + data
+                    end = len(data) & ~1
+                    pending, data = data[end:], data[:end]
+                elif len(data) % 2:
+                    if self._on_status:
+                        self._on_status("Ignored a UDP datagram with a partial PCM sample.")
+                    continue
+                for start in range(0, len(data), self._chunk_bytes):
+                    pcm = np.frombuffer(data[start:start + self._chunk_bytes], dtype="<i2")
+                    yield pcm.astype(np.float32) / 32768
+        if pending and self._on_status:
+            self._on_status("Ignored a partial PCM sample at the end of the TCP stream.")
+
+
 # ---------------------------------------------------------------------------
 # Factory
 # ---------------------------------------------------------------------------
@@ -252,12 +325,17 @@ def create_source(
     stdin_dtype: str = "int16",
     stdin_channels: int = 1,
     on_status: Callable[[str], None] | None = None,
+    network: str | None = None,
 ) -> AudioSource:
     """
     Create and return the appropriate AudioSource based on arguments.
 
-    Priority: file > stdin > device
+    Network input is exclusive of file, stdin, and an explicit audio device.
     """
+    if network is not None:
+        if file is not None or stdin or device not in (None, "default"):
+            raise ValueError("--network cannot be combined with --file, --stdin, or --device.")
+        return NetworkSource(network, sample_rate, chunk_ms, on_status)
     if file is not None:
         return FileSource(file, chunk_ms=chunk_ms)
     if stdin:

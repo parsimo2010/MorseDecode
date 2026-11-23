@@ -37,6 +37,7 @@ class InputConfig:
     device: str | int = "default"   # device name/index, or "default"
     file: str | None = None          # path to audio file
     stdin: bool = False              # read raw audio from stdin
+    network: str | None = None       # TCP producer or UDP bind endpoint
     freq_min: int = 400              # Hz
     freq_max: int = 1000             # Hz
     bin_width: int | None = None

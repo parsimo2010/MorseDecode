@@ -95,6 +95,27 @@ run the stdin example through Command Prompt.
 cmd.exe /c 'morsedecode --stdin --sample-rate 44100 < recording.pcm'
 ```
 
+### Network PCM
+
+Use `--network tcp://HOST:PORT` to connect to a PCM producer, or
+`--network udp://BIND:PORT` to receive UDP datagrams. Both use signed
+16-bit little-endian mono PCM with no header. Set `--sample-rate` to the
+sender's rate, which defaults to 44,100 Hz. Use either of these commands
+with a producer configured for 8 kHz mono PCM.
+
+```bash
+morsedecode --network tcp://127.0.0.1:7355 --sample-rate 8000
+morsedecode --network udp://127.0.0.1:7355 --sample-rate 8000
+```
+
+TCP flushes the transcript when the producer closes the stream. UDP runs
+until Ctrl-C. Each UDP packet must contain whole samples. Use a single sender
+and a trusted network since UDP has no authentication, sequencing, or loss
+recovery. Either endpoint may be set as `[input].network` in TOML. Clear
+any file, stdin or explicit device selection before using a network source.
+
+### Passband settings
+
 The terminal defaults to three 200 Hz passbands over 400–1000 Hz. Use this
 command to match the browser's default single passband.
 
