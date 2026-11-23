@@ -1,4 +1,4 @@
-"""Score published W1AW practice audio or the public WebSDR corpus."""
+"""Score published W1AW practice audio or the public field corpus."""
 
 import argparse
 import base64
@@ -113,8 +113,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline", help="Git revision of the reference JavaScript decoder")
     parser.add_argument("--cache", type=Path, default=Path(tempfile.gettempdir()) / "morsedecode-w1aw")
-    parser.add_argument("--utah", action="store_true", help="Score all reviewed WebSDR excerpts")
-    parser.add_argument("--gain-fade", action="store_true", help="Vary receiver output gain on the WebSDR benchmark")
+    parser.add_argument("--utah", action="store_true", help="Score all reviewed field excerpts")
+    parser.add_argument("--gain-fade", action="store_true", help="Vary receiver output gain on the field benchmark")
     parser.add_argument("--directory", type=Path, help="Use the original full WAVs in this directory instead of the bundled clips")
     parser.add_argument("--predictions", type=Path, help="Write current decoder JSONL for the public corpus scorer")
     parser.add_argument("--verbose", action="store_true", help="Print the reference and decoded text")

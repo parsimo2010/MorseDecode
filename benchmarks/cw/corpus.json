@@ -606,6 +606,1336 @@
           "text": "<BT> OK ON TSE WIND ALSO <BT> BOY JOHN HATE TO RUN ON U BUT JUST MISSING"
         }
       ]
+    },
+    {
+      "id": "gqrx-20261122-235106-p5495",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-22T23:51:06Z",
+      "frequency_khz": 14030.5,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261122_235106_14030500.wav",
+        "capture_sha256": "1fa471d01121b875b7e319e342b01f37762392174bfd3ecf962767f73ffed7a1",
+        "capture_rate_hz": 48000,
+        "capture_frames": 1207152,
+        "capture_mode": "audio",
+        "tuned_hz": 14030500,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "offset_hz": 549.5,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.787017980956641
+      },
+      "file": "gqrx-20261122-235106-p5495.wav",
+      "sha256": "3f32ebfc6bbe6462d1c2722bac696e116de31ee6a617cef59275eddb194d2afa",
+      "sample_rate": 8000,
+      "frames": 201192,
+      "clips": [
+        {
+          "id": "gqrx-20261122-235106-p5495-13360",
+          "start_frame": 13360,
+          "end_frame": 77600,
+          "pcm_sha256": "092e7633f4509b587b9bf9f82b8a5a07f47be2f78126d22c77a703ab563cc24a",
+          "text": "BAND GONE HI"
+        },
+        {
+          "id": "gqrx-20261122-235106-p5495-112800",
+          "start_frame": 112800,
+          "end_frame": 172400,
+          "pcm_sha256": "35546560c0b45ecb3f679d56cc18f30a2c66a45a197176d4d4f234ee993ce21f",
+          "text": "DE W1AW/7"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261122-235137-p5505",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-22T23:51:37Z",
+      "frequency_khz": 14030.5,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261122_235137_14030500.wav",
+        "capture_sha256": "8ed3b2faf8a86fe18633a06d88e99cc9f1fe96ba574ef4ba2f9d945811c2c757",
+        "capture_rate_hz": 48000,
+        "capture_frames": 568176,
+        "capture_mode": "audio",
+        "tuned_hz": 14030500,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "offset_hz": 550.5,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.959691312928858
+      },
+      "file": "gqrx-20261122-235137-p5505.wav",
+      "sha256": "7847761d01f9dcf5ea5d1b41dc473ffc0da3c87b5f7ece58ce926ebf5bf5d3da",
+      "sample_rate": 8000,
+      "frames": 94696,
+      "clips": [
+        {
+          "id": "gqrx-20261122-235137-p5505-37600",
+          "start_frame": 37600,
+          "end_frame": 76640,
+          "pcm_sha256": "49ad66f1e7137280fad7220552addd972e453d124fb01d8c008d651f8ca446d1",
+          "text": "W1AWX"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261122-235226-p7497",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-22T23:52:26Z",
+      "frequency_khz": 14030.7,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261122_235226_14030700.wav",
+        "capture_sha256": "822d51ceefa5ceeddf87c3ee1ddfb831281e3e1b604518483e85fb767d2ef68a",
+        "capture_rate_hz": 48000,
+        "capture_frames": 361328,
+        "capture_mode": "audio",
+        "tuned_hz": 14030700,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "offset_hz": 749.7,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.893058789517989
+      },
+      "file": "gqrx-20261122-235226-p7497.wav",
+      "sha256": "8a8aa3b9c2aa021dd2ab66e868c8411fb89cea6a347a84da2cb4d9d968824d10",
+      "sample_rate": 8000,
+      "frames": 60222,
+      "clips": [
+        {
+          "id": "gqrx-20261122-235226-p7497-3120",
+          "start_frame": 3120,
+          "end_frame": 39600,
+          "pcm_sha256": "05cc3d8e8964cf99d29ab5ef13037b49c1c808206825e8aef445fefa12336aae",
+          "text": "K5AF?"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261122-235235-p7537",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-22T23:52:35Z",
+      "frequency_khz": 14030.7,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261122_235235_14030700.wav",
+        "capture_sha256": "a9ac46a4d3a89e8c5212e0ff51666ef75c3ee26bfea7f9ec3bca61f2206e4a0c",
+        "capture_rate_hz": 48000,
+        "capture_frames": 2177904,
+        "capture_mode": "audio",
+        "tuned_hz": 14030700,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "offset_hz": 753.7,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.737291625966459
+      },
+      "file": "gqrx-20261122-235235-p7537.wav",
+      "sha256": "fc82ad4ae434d7f3a9fa8321ffeb961a0ecf9c16d9b841e0bd3202c1975ec9a2",
+      "sample_rate": 8000,
+      "frames": 362984,
+      "clips": [
+        {
+          "id": "gqrx-20261122-235235-p7537-16400",
+          "start_frame": 16400,
+          "end_frame": 134160,
+          "pcm_sha256": "b158165e4daec449fac209caed25a2c1dd3d3cc8abbc6571d86c01ffa8c27586",
+          "text": "GUD CU NEW BAND HI 5NN WA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000356-p6791",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:03:56Z",
+      "frequency_khz": 14029.6,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000356_14029600.wav",
+        "capture_sha256": "ed8241c8035a71441c3d6dd2ccdff59f79cbbee837f6b57af875b47ed2064993",
+        "capture_rate_hz": 48000,
+        "capture_frames": 1731440,
+        "capture_mode": "audio",
+        "tuned_hz": 14029600,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "offset_hz": 679.1,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.563438004558585
+      },
+      "file": "gqrx-20261123-000356-p6791.wav",
+      "sha256": "e50bdc63cca3fc973b15f9c02446bb5750cc69feb0c2ce282add3ef5337a3a47",
+      "sample_rate": 8000,
+      "frames": 288574,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000356-p6791-252400",
+          "start_frame": 252400,
+          "end_frame": 280400,
+          "pcm_sha256": "a441b0ebd66492d3dbed2fd71b473a81ed97bef55e4576891080c970714e477c",
+          "text": "GUV?"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000455-p7218",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:04:55Z",
+      "frequency_khz": 14030.5,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000455_14030500.wav",
+        "capture_sha256": "7f53db6b2534f5158ef8e91c2c097c9cb126090d2300d721d500a1e4dcf04f96",
+        "capture_rate_hz": 48000,
+        "capture_frames": 1225584,
+        "capture_mode": "audio",
+        "tuned_hz": 14030500,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "offset_hz": 721.8,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.523177523653187
+      },
+      "file": "gqrx-20261123-000455-p7218.wav",
+      "sha256": "d44403f9c2ef8828d5e27a7b2188a045f9585f5f6a423db50b64e897867791a9",
+      "sample_rate": 8000,
+      "frames": 204264,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000455-p7218-111360",
+          "start_frame": 111360,
+          "end_frame": 145040,
+          "pcm_sha256": "1428ee53efcd312f9667af2a71792814fb96cd9d3256934fde6437448fb82c4e",
+          "text": "JER CA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-m55757",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14028.024300000001,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": -5575.7,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 6.0329102126443575
+      },
+      "file": "gqrx-20261123-000841-m55757.wav",
+      "sha256": "cb92fbe9e2dc744993bda056ca61dcd03728210c630439e77d44d1bac454c7bf",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-m55757-155360",
+          "start_frame": 155360,
+          "end_frame": 199600,
+          "pcm_sha256": "df8a1a59f89f2bcc3f94c9c1c248b9057f126c7ec365c1e36290ef512745960a",
+          "text": "TU BOB WA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-m30861",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14030.5139,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": -3086.1,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 5.983848773963442
+      },
+      "file": "gqrx-20261123-000841-m30861.wav",
+      "sha256": "6fd399dd6ea6cc4cd2025fc0391a85aa702d5e7a06df77cdd0a17d595e11674a",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-m30861-220160",
+          "start_frame": 220160,
+          "end_frame": 302240,
+          "pcm_sha256": "bf45154a39d730859a298c768b0b7773f90d0313f63c86459b63ec6538a825fe",
+          "text": "VE7CTE GE JER CA"
+        },
+        {
+          "id": "gqrx-20261123-000841-m30861-424800",
+          "start_frame": 424800,
+          "end_frame": 473920,
+          "pcm_sha256": "818a78379c38acfd6694f05a20ad32adc95cae64ebbc67816d0c270f3a7d598d",
+          "text": "SST NJ6Q"
+        },
+        {
+          "id": "gqrx-20261123-000841-m30861-737040",
+          "start_frame": 737040,
+          "end_frame": 832080,
+          "pcm_sha256": "4a43a9ff98c9566380a48577eb0bf7647d0485707bd75a9753befbda69e7415b",
+          "text": "KB0HP GE JER CA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p19111",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14035.5111,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 1911.1,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 8.323880077847768
+      },
+      "file": "gqrx-20261123-000841-p19111.wav",
+      "sha256": "7a66228f1750b25dbc631e8e2bf0448314cf021be241454b98155f93394e3117",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p19111-249200",
+          "start_frame": 249200,
+          "end_frame": 328320,
+          "pcm_sha256": "4c7ac8303be4adaf9281fa00751404433c0968cc9c418b8319180f2f9431c215",
+          "text": "CQ SST DE NB7O"
+        },
+        {
+          "id": "gqrx-20261123-000841-p19111-533200",
+          "start_frame": 533200,
+          "end_frame": 577680,
+          "pcm_sha256": "be8a10c9d0e393ff13d5fa3cbeaed59fca07f84c7964c4219f5a40b7db220550",
+          "text": "KEVIN OR"
+        },
+        {
+          "id": "gqrx-20261123-000841-p19111-1110640",
+          "start_frame": 1110640,
+          "end_frame": 1189440,
+          "pcm_sha256": "5f648b866d3105ecd009087eb2b4c8c190c6e393bb85b0dcc1da6013314b94a4",
+          "text": "CQ SST DE NB7O"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p34286",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14037.0286,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 3428.6,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 26.418114882461563
+      },
+      "file": "gqrx-20261123-000841-p34286.wav",
+      "sha256": "12ac3b1e219e1dbd4ab5c42d8f1cb56856e6371c2fb7a92c5b41e0104dfbb30e",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p34286-1126800",
+          "start_frame": 1126800,
+          "end_frame": 1147520,
+          "pcm_sha256": "ba7c02c40fffdf3ca225a6d834866bd1b3a4eb30c73b8f9fb8ecd8fe993de99c",
+          "text": "73"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p44135",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14038.0135,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 4413.5,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 6.060797666314071
+      },
+      "file": "gqrx-20261123-000841-p44135.wav",
+      "sha256": "00f30411669664fc857fc8fdfb19c1cfefc2be7f11932f323f3be684cba7725d",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p44135-684400",
+          "start_frame": 684400,
+          "end_frame": 716320,
+          "pcm_sha256": "51567061dbb610d87fae7c475c29ea991b51b23e015f57c2934412e482cb0c0f",
+          "text": "N6CHU"
+        },
+        {
+          "id": "gqrx-20261123-000841-p44135-823440",
+          "start_frame": 823440,
+          "end_frame": 868000,
+          "pcm_sha256": "03a2ceb646f74477cc2056ac9874a6c523cdaa239d7f8da0d0039546b913add5",
+          "text": "TU BOB WA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p58696",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14039.4696,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 5869.6,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 9.540245294790717
+      },
+      "file": "gqrx-20261123-000841-p58696.wav",
+      "sha256": "2b80675fcabb6f273ee442a6c7034cf63841067ede889d9e03472fe5e2508e8e",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p58696-1187520",
+          "start_frame": 1187520,
+          "end_frame": 1219120,
+          "pcm_sha256": "73be80f7cbf3c4f7c93a7a88e3365b3e746830488a655bc75e5a9db90c4ef74b",
+          "text": "N6CHU"
+        },
+        {
+          "id": "gqrx-20261123-000841-p58696-1244480",
+          "start_frame": 1244480,
+          "end_frame": 1276240,
+          "pcm_sha256": "49094ef0a70c56f3283580438231b27e8b1e39495b10f99fa68b3885553894f3",
+          "text": "N6CHU"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p64402",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14040.0402,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 6440.2,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 10.599498623856245
+      },
+      "file": "gqrx-20261123-000841-p64402.wav",
+      "sha256": "681c3ae5a252ef07f57fc223899280e50dde579269eb9972e87109dd745340ef",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p64402-389440",
+          "start_frame": 389440,
+          "end_frame": 484640,
+          "pcm_sha256": "fba220f28a77d5af6fc9575ddc58590a303b873e8b78c0aa8355d9ad6f1cff6e",
+          "text": "CQ CQ SST KN6YKN"
+        },
+        {
+          "id": "gqrx-20261123-000841-p64402-493440",
+          "start_frame": 493440,
+          "end_frame": 524400,
+          "pcm_sha256": "9f57e8ffb892d9d1833ed789b210fbe08da354a75aa2d3ff1b564516749f8578",
+          "text": "AB7MP"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p84973",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14042.097300000001,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 8497.3,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 25.506728399556117
+      },
+      "file": "gqrx-20261123-000841-p84973.wav",
+      "sha256": "7659a1c173ddee00e15f245d059a06e02112d9a42ca9e1000655b26adb315ccf",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p84973-659040",
+          "start_frame": 659040,
+          "end_frame": 695760,
+          "pcm_sha256": "f91426b4a470e3176584729a7a4bf4bbca373e8a5fc8e54f945e9d81bc4e4a7e",
+          "text": "KI6OY"
+        },
+        {
+          "id": "gqrx-20261123-000841-p84973-997760",
+          "start_frame": 997760,
+          "end_frame": 1025520,
+          "pcm_sha256": "83952af3367e9e107512c982fa53e331d17d717be9fa60cdca95b62558eecf92",
+          "text": "LEE CA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-000841-p164121",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:08:41Z",
+      "frequency_khz": 14050.0121,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+        "capture_sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+        "capture_rate_hz": 48000,
+        "capture_frames": 8024045,
+        "capture_mode": "iq",
+        "tuned_hz": 14033600,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": true,
+        "offset_hz": 16412.1,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 16.359425664374857
+      },
+      "file": "gqrx-20261123-000841-p164121.wav",
+      "sha256": "adb675d8147cb35af979b09edf4758936d93269501f2f4b59a0b1b16c14d1c61",
+      "sample_rate": 8000,
+      "frames": 1337341,
+      "clips": [
+        {
+          "id": "gqrx-20261123-000841-p164121-483920",
+          "start_frame": 483920,
+          "end_frame": 531920,
+          "pcm_sha256": "0c0fbe60cabf8a5b43847e0e8ec53f996fe4279891660f0398b7bccb762c8e60",
+          "text": "WA6MOW AR"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-573600",
+          "start_frame": 573600,
+          "end_frame": 756720,
+          "pcm_sha256": "63fe0ff09124150a5ed9522d02b1d1e7986a326f8141c254a1daa415700107ab",
+          "text": "CQ CQ POTA CQ POTA DE WA6MOW WA6MOW AR"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001221-p8061",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:12:21Z",
+      "frequency_khz": 14027.2061,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+        "capture_sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+        "capture_rate_hz": 48000,
+        "capture_frames": 7481318,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": true,
+        "offset_hz": 806.1,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 55.28194419390042
+      },
+      "file": "gqrx-20261123-001221-p8061.wav",
+      "sha256": "6660106d2123dde5685784f958be8bd0204e4d47d253bebe62686f539cd102ae",
+      "sample_rate": 8000,
+      "frames": 1246887,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001221-p8061-675680",
+          "start_frame": 675680,
+          "end_frame": 744640,
+          "pcm_sha256": "4c38266072ef953480eb53ec884713cd2b64971443b74c9d5f44425593928f25",
+          "text": "CQ KI6OY SST"
+        },
+        {
+          "id": "gqrx-20261123-001221-p8061-881280",
+          "start_frame": 881280,
+          "end_frame": 940880,
+          "pcm_sha256": "f646d4d635055752ca84f5065f8ead02f01f247185d76eef9d98d984f02bb83c",
+          "text": "CQ KI6OY SST"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001221-p41072",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:12:21Z",
+      "frequency_khz": 14030.5072,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+        "capture_sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+        "capture_rate_hz": 48000,
+        "capture_frames": 7481318,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": true,
+        "offset_hz": 4107.2,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 8.624572946852066
+      },
+      "file": "gqrx-20261123-001221-p41072.wav",
+      "sha256": "dc79eec52f3431f0c0503a091d87e59418dc2cc62fc1ef7f4b59b67c8eb4a75a",
+      "sample_rate": 8000,
+      "frames": 1246887,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001221-p41072-12160",
+          "start_frame": 12160,
+          "end_frame": 61920,
+          "pcm_sha256": "6a9fbe14c41cbac4a89d81a0a10deb85d15b275f75f7744fba4f71c082e697c1",
+          "text": "SST NJ6Q"
+        },
+        {
+          "id": "gqrx-20261123-001221-p41072-273520",
+          "start_frame": 273520,
+          "end_frame": 319840,
+          "pcm_sha256": "a215519dff76001215077ef8ed69da3094bbde9cdaa0c5c1d6e6e750235d2b9f",
+          "text": "GE JER CA"
+        },
+        {
+          "id": "gqrx-20261123-001221-p41072-843840",
+          "start_frame": 843840,
+          "end_frame": 892880,
+          "pcm_sha256": "ddfbd60613234c95d7f18c160c10fe72aec65d724d704e31f9c6e7a5e8b300fd",
+          "text": "SST NJ6Q"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001221-p106332",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:12:21Z",
+      "frequency_khz": 14037.0332,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+        "capture_sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+        "capture_rate_hz": 48000,
+        "capture_frames": 7481318,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": true,
+        "offset_hz": 10633.2,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 24.340193235970307
+      },
+      "file": "gqrx-20261123-001221-p106332.wav",
+      "sha256": "7e8ab028fa96bde4ecaa355970b12ad2a3a79f8bd92c550678e7c4b9d343b9b1",
+      "sample_rate": 8000,
+      "frames": 1246887,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001221-p106332-813120",
+          "start_frame": 813120,
+          "end_frame": 856960,
+          "pcm_sha256": "5b8ac0239943d1e2ec419079899e10083da669afac6796d77b7801a48bce0d09",
+          "text": "DE W7LHT K"
+        },
+        {
+          "id": "gqrx-20261123-001221-p106332-1149200",
+          "start_frame": 1149200,
+          "end_frame": 1227680,
+          "pcm_sha256": "dfa1eb750d54db98b81edc0a9869c08b784b5b2b643fa7d1e5090024ea5ada04",
+          "text": "SST DE W7LHT W7LHT"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001221-p136350",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:12:21Z",
+      "frequency_khz": 14040.035,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+        "capture_sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+        "capture_rate_hz": 48000,
+        "capture_frames": 7481318,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": true,
+        "offset_hz": 13635.0,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 10.788077975364514
+      },
+      "file": "gqrx-20261123-001221-p136350.wav",
+      "sha256": "217f0616fd90bd5c5e907f08dafe27a285614a8878122542e771bedc7965808b",
+      "sample_rate": 8000,
+      "frames": 1246887,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001221-p136350-153520",
+          "start_frame": 153520,
+          "end_frame": 198160,
+          "pcm_sha256": "214706ba1b2477f4c133a0032bbac91ff71f8947c68ad9831ade66c4b30916d0",
+          "text": "TU BOB WA"
+        },
+        {
+          "id": "gqrx-20261123-001221-p136350-452160",
+          "start_frame": 452160,
+          "end_frame": 507120,
+          "pcm_sha256": "097645fe246b53196643787c14265a67ee2ada54cab80d5d648e87cf9046eabb",
+          "text": "SST KN6YKN"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001221-p156874",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:12:21Z",
+      "frequency_khz": 14042.0874,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+        "capture_sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+        "capture_rate_hz": 48000,
+        "capture_frames": 7481318,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": true,
+        "offset_hz": 15687.4,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 7.88729926900064
+      },
+      "file": "gqrx-20261123-001221-p156874.wav",
+      "sha256": "ac2f3bbfd4d58e5da53d7fad4f4312529eeefa5d0c40a522c82dc9bcce808ace",
+      "sample_rate": 8000,
+      "frames": 1246887,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001221-p156874-611680",
+          "start_frame": 611680,
+          "end_frame": 644000,
+          "pcm_sha256": "29ae1e02a6f0f8d44910e08e87f1a18760a63a532d250818c0530acd86756c0d",
+          "text": "N6CHU"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001221-p236049",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:12:21Z",
+      "frequency_khz": 14050.0049,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+        "capture_sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+        "capture_rate_hz": 48000,
+        "capture_frames": 7481318,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": true,
+        "offset_hz": 23604.9,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 617.6410922120366
+      },
+      "file": "gqrx-20261123-001221-p236049.wav",
+      "sha256": "73a8d0e0b1f8ce653dcd5645fc01b6e5cde78a7d3373e8bcb1678fa27a194db6",
+      "sample_rate": 8000,
+      "frames": 1246887,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001221-p236049-383120",
+          "start_frame": 383120,
+          "end_frame": 431120,
+          "pcm_sha256": "017761d17338c99c7dba198fde8a6d54560e7c77bd550a63217a578dac646954",
+          "text": "WA6MOW AR"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001614-p27092",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:16:14Z",
+      "frequency_khz": 14029.109199999999,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001614_14026400-USB-39_9k-noagc.wav",
+        "capture_sha256": "1d213476de29cd5485ece961608aa35b47f26c6488f1a9d4aa07b8a9ccfb9285",
+        "capture_rate_hz": 48000,
+        "capture_frames": 3563494,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": false,
+        "offset_hz": 2709.2,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 15.034546451361456
+      },
+      "file": "gqrx-20261123-001614-p27092.wav",
+      "sha256": "75f786fd59dd96522919e6afbee0fc7845b39fcbccb72aa3286bca9df0388c1d",
+      "sample_rate": 8000,
+      "frames": 593916,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001614-p27092-155760",
+          "start_frame": 155760,
+          "end_frame": 217760,
+          "pcm_sha256": "2dc5dd1c7c1453e000e21499a682d7ed3975bc117ae8c021de548189329fcf78",
+          "text": "CQ SST N6CHU"
+        },
+        {
+          "id": "gqrx-20261123-001614-p27092-268240",
+          "start_frame": 268240,
+          "end_frame": 346880,
+          "pcm_sha256": "e7b95a4b1d5d296a8aea8d7b2460007c33fa267704e1e0a5ca03f50ab131a480",
+          "text": "KI6OY TU BOB WA"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001614-p41212",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:16:14Z",
+      "frequency_khz": 14030.5212,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001614_14026400-USB-39_9k-noagc.wav",
+        "capture_sha256": "1d213476de29cd5485ece961608aa35b47f26c6488f1a9d4aa07b8a9ccfb9285",
+        "capture_rate_hz": 48000,
+        "capture_frames": 3563494,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": false,
+        "offset_hz": 4121.2,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 35.96101625349838
+      },
+      "file": "gqrx-20261123-001614-p41212.wav",
+      "sha256": "4e10e4a5aec0e69bcff6c173ce4acbfed56c0886edbed59d0b50fa84803db93c",
+      "sample_rate": 8000,
+      "frames": 593916,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001614-p41212-210400",
+          "start_frame": 210400,
+          "end_frame": 290320,
+          "pcm_sha256": "129cbe7697db770d3ef3a2b4625d351ca61a7037a6d7e0385b27582979b87d8e",
+          "text": "W7FV GE JER CA"
+        },
+        {
+          "id": "gqrx-20261123-001614-p41212-353200",
+          "start_frame": 353200,
+          "end_frame": 394240,
+          "pcm_sha256": "995b43e36f593e9b67b378095b4fb9931c4ff89fe236ff27e5ffed1c37afda4a",
+          "text": "DAN 73"
+        },
+        {
+          "id": "gqrx-20261123-001614-p41212-520480",
+          "start_frame": 520480,
+          "end_frame": 572800,
+          "pcm_sha256": "35c0153f07ecd5a58771ba37bc81ecf8b3222fe76d59d6859bcc72deaf4d3c6b",
+          "text": "SST NJ6Q"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001614-p106359",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:16:14Z",
+      "frequency_khz": 14037.0359,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001614_14026400-USB-39_9k-noagc.wav",
+        "capture_sha256": "1d213476de29cd5485ece961608aa35b47f26c6488f1a9d4aa07b8a9ccfb9285",
+        "capture_rate_hz": 48000,
+        "capture_frames": 3563494,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": false,
+        "offset_hz": 10635.9,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 167.9438760529565
+      },
+      "file": "gqrx-20261123-001614-p106359.wav",
+      "sha256": "5c96abae4a367798425854b2b5bec488b643bbcb5fb44ede65d573b87fe75dd6",
+      "sample_rate": 8000,
+      "frames": 593916,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001614-p106359-352640",
+          "start_frame": 352640,
+          "end_frame": 418880,
+          "pcm_sha256": "be6cf7229c3af84311f08d8d36a819a52a8816b27ac87b23d620f67af9d05327",
+          "text": "CQ SST DE W7LHT"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001614-p136181",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:16:14Z",
+      "frequency_khz": 14040.0181,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001614_14026400-USB-39_9k-noagc.wav",
+        "capture_sha256": "1d213476de29cd5485ece961608aa35b47f26c6488f1a9d4aa07b8a9ccfb9285",
+        "capture_rate_hz": 48000,
+        "capture_frames": 3563494,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": false,
+        "offset_hz": 13618.1,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 96.85265478079732
+      },
+      "file": "gqrx-20261123-001614-p136181.wav",
+      "sha256": "18bc3d481f3dc0620751031a297491e71245481484cd0a9b5c1e9954a313b783",
+      "sample_rate": 8000,
+      "frames": 593916,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001614-p136181-145760",
+          "start_frame": 145760,
+          "end_frame": 237040,
+          "pcm_sha256": "174bd3e97d369b433d9102c6622b12c933cd6d2848628ec4d4c3815c731332cc",
+          "text": "CQ CQ SST KN6YKN"
+        },
+        {
+          "id": "gqrx-20261123-001614-p136181-287120",
+          "start_frame": 287120,
+          "end_frame": 380000,
+          "pcm_sha256": "8b9c50d902dffd85c35bcfe77a1ef6f0b61b051bcff2018511a4604148906bc7",
+          "text": "CQ CQ SST KN6YKN"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001614-p236150",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:16:14Z",
+      "frequency_khz": 14050.015,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001614_14026400-USB-39_9k-noagc.wav",
+        "capture_sha256": "1d213476de29cd5485ece961608aa35b47f26c6488f1a9d4aa07b8a9ccfb9285",
+        "capture_rate_hz": 48000,
+        "capture_frames": 3563494,
+        "capture_mode": "usb",
+        "tuned_hz": 14026400,
+        "capture_filter_hz": 39900,
+        "gqrx_agc": false,
+        "offset_hz": 23615.0,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 3255.741289588004
+      },
+      "file": "gqrx-20261123-001614-p236150.wav",
+      "sha256": "7c4aa6f4fed268c567717175686b9f897fdc0b23c627c8f136842bfdc222745d",
+      "sample_rate": 8000,
+      "frames": 593916,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001614-p236150-7280",
+          "start_frame": 7280,
+          "end_frame": 55200,
+          "pcm_sha256": "8be82de875710a4e93c0c51e8671d9c26993a4f256615eb5d3280cd9d956ceae",
+          "text": "WA6MOW AR"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-m113803",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14022.019699999999,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": -11380.3,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 52.9971805285272
+      },
+      "file": "gqrx-20261123-001827-m113803.wav",
+      "sha256": "e6568bd49e8a6f8b7f0adbe598e61607a90bc9d95d36d9cdf2239d49e5174f17",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-m113803-153840",
+          "start_frame": 153840,
+          "end_frame": 169920,
+          "pcm_sha256": "146744488ce559e748ba83c6bb1c56780e1b6faf05acbd8d66f4d45366fd0821",
+          "text": "CQ"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-m42897",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14029.1103,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": -4289.7,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 14.751627400248875
+      },
+      "file": "gqrx-20261123-001827-m42897.wav",
+      "sha256": "20c59390d21f1c4fc23bbcb3cb1486033bf0fee122ab7ad9224a7a9f95f79d98",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-m42897-571600",
+          "start_frame": 571600,
+          "end_frame": 615440,
+          "pcm_sha256": "58b592bd723d2f6b7dc6b498da9aae2bc9085bceb5db6d5d14f01d26a0a9ce96",
+          "text": "TU BOB WA"
+        },
+        {
+          "id": "gqrx-20261123-001827-m42897-726320",
+          "start_frame": 726320,
+          "end_frame": 788560,
+          "pcm_sha256": "03b91dda28d184dca6e0f12295890d4542e0c1ec3459f44e1307e17d8c1c187f",
+          "text": "CQ SST N6CHU"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-m28765",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14030.5235,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": -2876.5,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 17.381706955706218
+      },
+      "file": "gqrx-20261123-001827-m28765.wav",
+      "sha256": "ceb48e0770c79740155d564c6be0378694da1d2d8831d0459a9c286335dc1136",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-m28765-19680",
+          "start_frame": 19680,
+          "end_frame": 89840,
+          "pcm_sha256": "c5adaad8e7ccf8ab9a7b324a7caf8eaf53b3e90b49ce8ae79a5439194b13703c",
+          "text": "CQ SST NJ6Q"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-386560",
+          "start_frame": 386560,
+          "end_frame": 435360,
+          "pcm_sha256": "63de8d63c43e1836bcf57fd67f8761304bb6a2906e771149a6939ad1800c7644",
+          "text": "GA JER CA"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-712880",
+          "start_frame": 712880,
+          "end_frame": 782640,
+          "pcm_sha256": "01afe12cde5e6cecfef6895e405c4e5675e2da0a9e0c227d09123b4ba38bad49",
+          "text": "CQ SST NJ6Q"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-p21176",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14035.5176,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": 2117.6,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 34.97244440275404
+      },
+      "file": "gqrx-20261123-001827-p21176.wav",
+      "sha256": "b03aca0526b429571eba5faedec9a04699f88b197bb05c695c8f6e4b11279c53",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-p21176-102480",
+          "start_frame": 102480,
+          "end_frame": 184400,
+          "pcm_sha256": "a9a1110e501a222c905639054eb991ea864ecfb1d95398190e3b4f60e5b69762",
+          "text": "KX4SR KEVIN OR"
+        },
+        {
+          "id": "gqrx-20261123-001827-p21176-240640",
+          "start_frame": 240640,
+          "end_frame": 299680,
+          "pcm_sha256": "4c85ef20ad4414142f7bc12e1f1b9e42f6221b247a3c897730b64415d335dd95",
+          "text": "GE VINCE TU"
+        },
+        {
+          "id": "gqrx-20261123-001827-p21176-332880",
+          "start_frame": 332880,
+          "end_frame": 411760,
+          "pcm_sha256": "837b9b032eab5732bca91825fd4c5b872f912427fe939f7215944cd47a6e4192",
+          "text": "CQ SST DE NB7O"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-p36396",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14037.0396,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": 3639.6,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 73.4585712481305
+      },
+      "file": "gqrx-20261123-001827-p36396.wav",
+      "sha256": "ad2990c49dc13e34513032a54fc47b9597802758262bb87045218811ccc0d5f0",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-p36396-162000",
+          "start_frame": 162000,
+          "end_frame": 197920,
+          "pcm_sha256": "34e137b08e81ec0101572057232fad2c68827d349f1d5a156242b934833f7d43",
+          "text": "W7LHT K"
+        },
+        {
+          "id": "gqrx-20261123-001827-p36396-464160",
+          "start_frame": 464160,
+          "end_frame": 500000,
+          "pcm_sha256": "f9b8b510573b84bf52bcf4fc9d96fb04fc3e6afa4ce83c755aaaf1f016c47390",
+          "text": "W7LHT K"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-p66222",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14040.0222,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": 6622.2,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 43.48779528766915
+      },
+      "file": "gqrx-20261123-001827-p66222.wav",
+      "sha256": "3530ba26abf7e533e896cf994efabb75fb1b336d68584e864e36c3ce7ed392d7",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-p66222-864320",
+          "start_frame": 864320,
+          "end_frame": 914720,
+          "pcm_sha256": "21a8d2b8a5bf8dbbe13da869026bc3a4eb749a0420ca360dfe936fda8505b684",
+          "text": "CQ CQ SST"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-001827-p166198",
+      "source": "Gqrx with RTL-SDR and attic EFHW",
+      "recorded_utc": "2026-11-23T00:18:27Z",
+      "frequency_khz": 14050.0198,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+        "capture_sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+        "capture_rate_hz": 48000,
+        "capture_frames": 5842918,
+        "capture_mode": "iq",
+        "tuned_hz": 14033400,
+        "capture_filter_hz": 80000,
+        "gqrx_agc": false,
+        "offset_hz": 16619.8,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 108.05144208577853
+      },
+      "file": "gqrx-20261123-001827-p166198.wav",
+      "sha256": "f0610eee88d9fb0f6d0ddebfcd8988b4b6dfd575ff41680f14e9201f88b75594",
+      "sample_rate": 8000,
+      "frames": 973820,
+      "clips": [
+        {
+          "id": "gqrx-20261123-001827-p166198-763600",
+          "start_frame": 763600,
+          "end_frame": 811680,
+          "pcm_sha256": "c23fd5041efb83255fe0697aa5f1347520b74d3f1c1b6359b90770dc0237c3a3",
+          "text": "WA6MOW AR"
+        }
+      ]
     }
   ]
 }

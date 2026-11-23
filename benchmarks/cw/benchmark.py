@@ -36,6 +36,14 @@ def validate(data):
             raise ValueError(f"Invalid recording: {filename}")
         if not recording["clips"] or not recording["source"] or recording["usage"] not in {"development", "holdout"}:
             raise ValueError(f"Missing clips, source or dataset split: {filename}")
+        channel = recording.get("channel")
+        if channel is not None:
+            capture_file = channel["capture_file"]
+            if (Path(capture_file).name != capture_file
+                    or not re.fullmatch(r"[a-f0-9]{64}", channel["capture_sha256"])
+                    or not 0 < channel["tone_hz"] < recording["sample_rate"] / 2
+                    or channel["filter_hz"] <= 0):
+                raise ValueError(f"Invalid channel provenance: {filename}")
         end = 0
         for entry in [recording, *recording["clips"]]:
             key = entry["id"]
@@ -101,6 +109,8 @@ def add(catalog, original, review):
     with wave.open(str(original)) as wav:
         rate, frames = wav.getframerate(), wav.getnframes()
     r = {key: review[key] for key in ("id", "source", "recorded_utc", "frequency_khz", "usage")}
+    if "channel" in review:
+        r["channel"] = review["channel"]
     r.update(file=original.name, sha256=digest(original.read_bytes()), sample_rate=rate, frames=frames, clips=[])
     for label in review["clips"]:
         first, end = label["start_frame"], label["end_frame"]
@@ -138,14 +148,16 @@ def export(catalog, data, target):
         try:
             db.executescript("""
                 CREATE TABLE recordings(id TEXT PRIMARY KEY, file TEXT, sha256 TEXT, recorded_utc TEXT,
-                                        frequency_khz REAL, sample_rate INTEGER, frames INTEGER, source TEXT, usage TEXT);
+                                        frequency_khz REAL, sample_rate INTEGER, frames INTEGER, source TEXT,
+                                        usage TEXT, channel_json TEXT);
                 CREATE TABLE clips(id TEXT PRIMARY KEY, recording_id TEXT REFERENCES recordings(id),
                                    start_frame INTEGER, end_frame INTEGER, pcm_sha256 TEXT, audio TEXT, text TEXT);
             """)
             with (stage / "inputs.jsonl").open("w", encoding="utf-8", newline="\n") as inputs:
                 for r in data["recordings"]:
                     db.execute("INSERT INTO recordings VALUES (:id,:file,:sha256,:recorded_utc,"
-                               ":frequency_khz,:sample_rate,:frames,:source,:usage)", r)
+                               ":frequency_khz,:sample_rate,:frames,:source,:usage,:channel_json)",
+                               dict(r, channel_json=json.dumps(r["channel"]) if "channel" in r else None))
                     for c in r["clips"]:
                         clip_audio(catalog.parent, r, c)
                         audio = audio_path(c).as_posix()

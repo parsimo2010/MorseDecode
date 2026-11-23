@@ -1,6 +1,16 @@
 # CW recording benchmark
 
-Each WAV contains one reviewed passage. The catalog records its reference text, receiver, UTC time, tuned frequency, sample rate, source-file SHA-256, original sample bounds and clip PCM SHA-256. The 68 clips come from ten recordings and contain about 23 MB of mono 8 kHz, 16-bit PCM audio. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
+Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, receiver, UTC time, frequency, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256. The 126 clips include 68 from ten WebSDR recordings and 58 from 33 channels extracted from Gqrx captures. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
+
+## Gqrx IQ and USB recordings
+
+The Gqrx development clips come from an RTL-SDR and attic EFHW antenna.
+Each channel entry records the original capture filename and SHA-256, receiver
+settings, signed IQ or audio offset, extraction bandwidth, mono pitch, and
+peak gain. The exported SQLite database includes this metadata in
+`recordings.channel_json`. The source frame bounds of a clip are on the
+full-duration, resampled channel's 8 kHz grid.
+[Per-capture results and reproduction instructions](../../docs/gqrx-recordings.md) · [Full machine copy](gqrx-decodes.json)
 
 ## W1AW bulletin and nearby interference
 
@@ -65,7 +75,7 @@ ORDER BY r.recorded_utc, c.start_frame;
 
 ## Add reviewed material
 
-1. Keep the original mono 16-bit PCM WAV. Find boundaries in silence on either side of complete Morse groups. Split around doubtful passages. Preserve repeated letters, spelling, cut numbers and prosigns. Use `development` for recordings used to tune a decoder. Reserve `holdout` for independently labeled recordings set aside before tuning.
+1. Keep the original mono 16-bit PCM WAV or a full-duration mono channel extracted from a wideband capture. Find boundaries in silence on either side of complete Morse groups. Split around doubtful passages. Preserve repeated letters, spelling, cut numbers and prosigns. Use `development` for recordings used to tune a decoder. Reserve `holdout` for independently labeled recordings set aside before tuning.
 2. Write a UTF-8 review file like the example below. Replace the example values with the recording details and your copy. Frame numbers are zero-based with an exclusive end. At 8 kHz, `[8000, 24000)` covers exactly two seconds.
 3. Run `python benchmark.py add original.wav review.json` in this directory. It checks the source format, computes both hashes, validates the intervals, extracts the WAVs and appends the recording to the catalog. Commit the catalog and new clips together. Existing records can be rebuilt with `python benchmark.py build PATH_TO_ORIGINAL_WAVS`.
 

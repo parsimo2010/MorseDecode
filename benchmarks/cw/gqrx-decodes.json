@@ -1,0 +1,573 @@
+[
+  {
+    "path": "gqrx_20261122_235106_14030500.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 1207152,
+    "tuned_hz": 14030500,
+    "recorded_utc": "2026-11-22T23:51:06Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "1fa471d01121b875b7e319e342b01f37762392174bfd3ecf962767f73ffed7a1",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 1,
+    "confirmed_cw_count": 1,
+    "signals": [
+      {
+        "offset_hz": 549.5,
+        "rf_hz": null,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.787017980956641,
+        "text": "NX BAND G O NE HI CUAGN DE W1AW/7 I IEE E T",
+        "contrast_db": 28.5,
+        "benchmark_recording_id": "gqrx-20261122-235106-p5495"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261122_235137_14030500.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 568176,
+    "tuned_hz": 14030500,
+    "recorded_utc": "2026-11-22T23:51:37Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "8ed3b2faf8a86fe18633a06d88e99cc9f1fe96ba574ef4ba2f9d945811c2c757",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 1,
+    "confirmed_cw_count": 1,
+    "signals": [
+      {
+        "offset_hz": 550.5,
+        "rf_hz": null,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.959691312928858,
+        "text": "OAW/7 W1AWX NE I",
+        "contrast_db": 26.9,
+        "benchmark_recording_id": "gqrx-20261122-235137-p5505"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261122_235226_14030700.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 361328,
+    "tuned_hz": 14030700,
+    "recorded_utc": "2026-11-22T23:52:26Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "822d51ceefa5ceeddf87c3ee1ddfb831281e3e1b604518483e85fb767d2ef68a",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 1,
+    "confirmed_cw_count": 1,
+    "signals": [
+      {
+        "offset_hz": 749.7,
+        "rf_hz": null,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.893058789517989,
+        "text": "K5AF? S E I",
+        "contrast_db": 22.7,
+        "benchmark_recording_id": "gqrx-20261122-235226-p7497"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261122_235235_14030700.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 2177904,
+    "tuned_hz": 14030700,
+    "recorded_utc": "2026-11-22T23:52:35Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "a9ac46a4d3a89e8c5212e0ff51666ef75c3ee26bfea7f9ec3bca61f2206e4a0c",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 1,
+    "confirmed_cw_count": 1,
+    "signals": [
+      {
+        "offset_hz": 753.7,
+        "rf_hz": null,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.737291625966459,
+        "text": "SAF GUD CU NEW BAN D HI 5NN WA EE EE I",
+        "contrast_db": 23.9,
+        "benchmark_recording_id": "gqrx-20261122-235235-p7537"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261123_000356_14029600.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 1731440,
+    "tuned_hz": 14029600,
+    "recorded_utc": "2026-11-23T00:03:56Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "ed8241c8035a71441c3d6dd2ccdff59f79cbbee837f6b57af875b47ed2064993",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 2,
+    "confirmed_cw_count": 1,
+    "signals": [
+      {
+        "offset_hz": 679.1,
+        "rf_hz": null,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.563438004558585,
+        "text": "1 E A D IN E E O TO TO GUV? EEEIEIEEI RUV ? I",
+        "contrast_db": 31.3,
+        "benchmark_recording_id": "gqrx-20261123-000356-p6791"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261123_000455_14030500.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 1225584,
+    "tuned_hz": 14030500,
+    "recorded_utc": "2026-11-23T00:04:55Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "7f53db6b2534f5158ef8e91c2c097c9cb126090d2300d721d500a1e4dcf04f96",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 2,
+    "confirmed_cw_count": 1,
+    "signals": [
+      {
+        "offset_hz": 721.8,
+        "rf_hz": null,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 4.523177523653187,
+        "text": "WK E EE EI N0TA TU JER CA EE EE",
+        "contrast_db": 29.3,
+        "benchmark_recording_id": "gqrx-20261123-000455-p7218"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261123_000603_14122600.wav",
+    "mode": "audio",
+    "sample_rate": 48000,
+    "frames": 2836254,
+    "tuned_hz": 14122600,
+    "recorded_utc": "2026-11-23T00:06:03Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "18d859cd22e5ebe80a9e4dc9ec6623fe28e91abf6a63209ca625b1b07dc8a275",
+    "search_hz": [
+      100,
+      3000
+    ],
+    "candidate_count": 0,
+    "confirmed_cw_count": 0,
+    "signals": []
+  },
+  {
+    "path": "gqrx_20261123_000841_14033600-IQ-80k.wav",
+    "mode": "iq",
+    "sample_rate": 48000,
+    "frames": 8024045,
+    "tuned_hz": 14033600,
+    "recorded_utc": "2026-11-23T00:08:41Z",
+    "filter_hz": 80000,
+    "gqrx_agc": true,
+    "sha256": "8e86914e6c7b4fabaa05481e23fb9f350e37e6667c75d6a78fb5fc13402ec7d0",
+    "search_hz": [
+      -24000.0,
+      24000.0
+    ],
+    "candidate_count": 10,
+    "confirmed_cw_count": 9,
+    "signals": [
+      {
+        "offset_hz": -5575.7,
+        "rf_hz": 14028024.3,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 6.0329102126443575,
+        "text": "ETT TTT ET Y E E T BOB WA EE E E T NI O E E <AS>T TE I",
+        "contrast_db": 26.9,
+        "benchmark_recording_id": "gqrx-20261123-000841-m55757"
+      },
+      {
+        "offset_hz": -3086.1,
+        "rf_hz": 14030513.9,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 5.983848773963442,
+        "text": "E E JE@Y Z S 73I E SST NJ6M E EAEZEC TE VE7CTE GE JER CA TU JEA CAL BC CAL 73 I EE SST NJ6Q E KD AST NJ6Q E E CQ SST NJ6Q E E AB0 HP GE JER CA E E EEE T B 0 H P J E E R C A EE F K E N E7 3 EE E S ST",
+        "contrast_db": 32.2,
+        "benchmark_recording_id": "gqrx-20261123-000841-m30861"
+      },
+      {
+        "offset_hz": 1911.1,
+        "rf_hz": 14035511.1,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 8.323880077847768,
+        "text": "MK N0KM KEVIN OR I EE E GE I RAN DYTUEE XEI CQ SST DE NB7O EE ISSE WW 0 ? EI S WW0Z KEVIN OR E5IE GE BRIANTU EE IAT N7 ? EA IIEE N7BBQ KEVIN OR SI S GE ER ON TU EE EES CQ SST DE NB7O EE E CQ SST DE NB7",
+        "contrast_db": 31.1,
+        "benchmark_recording_id": "gqrx-20261123-000841-p19111"
+      },
+      {
+        "offset_hz": 3428.6,
+        "rf_hz": 14037028.6,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 26.418114882461563,
+        "text": "MEEE ST M W7LHA KI G ET W2? EES LTT QIT A PEM CH EWA AAE T U T NEI M I I EDN PAK4HTTM7ZDTERG G?E5 TTTE TTTTTE TTTT E EETNE TTT T A E NEE M MRET U 8HME 73EEEE EE EM3 EE E RER WTE MEZI TU",
+        "contrast_db": 13.7,
+        "benchmark_recording_id": "gqrx-20261123-000841-p34286"
+      },
+      {
+        "offset_hz": 4413.5,
+        "rf_hz": 14038013.5,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 6.060797666314071,
+        "text": "E N6CHU E E A BOB WA E",
+        "contrast_db": 28.9,
+        "benchmark_recording_id": "gqrx-20261123-000841-p44135"
+      },
+      {
+        "offset_hz": 5869.6,
+        "rf_hz": 14039469.6,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 9.540245294790717,
+        "text": "I EE E TMEM E IS E T E 6 V OX E T RN I AE MART AB E E 6CHU E E E EE 6CHU I E E E",
+        "contrast_db": 29.3,
+        "benchmark_recording_id": "gqrx-20261123-000841-p58696"
+      },
+      {
+        "offset_hz": 6440.2,
+        "rf_hz": 14040040.2,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 10.599498623856245,
+        "text": "E E IX G 7 W EY Y E T U IM IKE CWA E SE R T U 7 3EE I NQ CQ SST KN6YKN E AB7MP E EA ? EE ABZ EEEEAB7 MP E B ? AB 7MP NR AB7MP RR MIKE CWA TU MARK WA I REI E EMARK Z 73EEEE EE T KN6YKN R9 6EECQCQ SST KN6YKN TE E",
+        "contrast_db": 26.9,
+        "benchmark_recording_id": "gqrx-20261123-000841-p64402"
+      },
+      {
+        "offset_hz": 8497.3,
+        "rf_hz": 14042097.3,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 25.506728399556117,
+        "text": "TI I SE T MI EEEE 5 S M D ITS A U E Y E ET ITT E TM IA EE T AT T E LN S E KI6OY E E S UVHOYE E EEEI DEE AEI LEE CA I EEE I I DEE CA EET EH IS UN A TE",
+        "contrast_db": 18.9,
+        "benchmark_recording_id": "gqrx-20261123-000841-p84973"
+      },
+      {
+        "offset_hz": 16412.1,
+        "rf_hz": 14050012.1,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 16.359425664374857,
+        "text": "A D EWA6 MOW WA6M OW AR EIEEI CQ CQP O TA CQ POT AFEE WA6 MOW WR6M OW AR I EEE CQ NNQP O TA CQ POT A D EWA6EMOW WA6M OW AR ELT IE ECQ CQ P O TA CQ POT AELIOA6 MOW WA6M OW AR S SE CQ CQ P O TA CQ POT A D EWA6MOW WA6MMW AR I IIE CQ CQ PEO TA CQ POT ALEOA6MOW WA-M OWEAR E TEETII",
+        "contrast_db": 22.6,
+        "benchmark_recording_id": "gqrx-20261123-000841-p164121"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261123_001221_14026400-USB-39_9k.wav",
+    "mode": "usb",
+    "sample_rate": 48000,
+    "frames": 7481318,
+    "tuned_hz": 14026400,
+    "recorded_utc": "2026-11-23T00:12:21Z",
+    "filter_hz": 39900,
+    "gqrx_agc": true,
+    "sha256": "641a6d55b290e6a68b0317b134e3cfc23183b9d98fe4fdf25bbdfe7da456dc2f",
+    "search_hz": [
+      0,
+      24000.0
+    ],
+    "candidate_count": 8,
+    "confirmed_cw_count": 6,
+    "signals": [
+      {
+        "offset_hz": 806.1,
+        "rf_hz": 14027206.1,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 55.28194419390042,
+        "text": "QRL? KI6OY I E E DCQEKI6OY SST SE SI CQ KI6OY SST E E CQ KI6OY SST CQ E IFEEE CQ KI6OY SST E 5 CQEKI6OY SUT EA E I CQ KI6OY SST EESE5EEEE CQ KI6OY SST S",
+        "contrast_db": 20.4,
+        "benchmark_recording_id": "gqrx-20261123-001221-p8061"
+      },
+      {
+        "offset_hz": 4107.2,
+        "rf_hz": 14030507.2,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 8.624572946852066,
+        "text": "SST NJ6Q E T 0 EEEE E WI0WA GE JER CA UI N EBUGS 73 EE SI ESST NJ IQ ENEEE KC2M GE JEN CA EEI E N FODD 73 EE E ESSST NJ6Q IIEEEE I EI E <KN> ? IH SH OM0J ? E EEEU T",
+        "contrast_db": 32.5,
+        "benchmark_recording_id": "gqrx-20261123-001221-p41072"
+      },
+      {
+        "offset_hz": 10633.2,
+        "rf_hz": 14037033.2,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 24.340193235970307,
+        "text": "KM7 <AS> EEEEE E ME7 L IIAET Z IC H MA EE RRETU Z E ETE73EE E ENIEH CQ SST DE WKSLHT K EEEI EE CMRSST DE W7LHT K EEISEIE CQ SST DE W7<AS>DT P7LHTEYE <AR>Q SST DE W7WHT W7LHT C EE IE",
+        "contrast_db": 21.7,
+        "benchmark_recording_id": "gqrx-20261123-001221-p106332"
+      },
+      {
+        "offset_hz": 13635.0,
+        "rf_hz": 14040035.0,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 10.788077975364514,
+        "text": "C W A AGN? I I I K E C W A E TU BOB WA E RR T U 73EE EE E EEI E ST KN6YKN E NQ ERQ IESST KN6YKN 6 V O X E E ? E<SN>E 6 V O X IE E E6 V O X EAR VE 6 V O X RR T UE EM I KE C WA I E E ME EEE ME EI TART E I E T MA R T E73EE E T KN6YKN E",
+        "contrast_db": 31.3,
+        "benchmark_recording_id": "gqrx-20261123-001221-p136350"
+      },
+      {
+        "offset_hz": 15687.4,
+        "rf_hz": 14042087.4,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 7.88729926900064,
+        "text": "E E EE E EM6CHU E A BTAB WA T ET",
+        "contrast_db": 27.0,
+        "benchmark_recording_id": "gqrx-20261123-001221-p156874"
+      },
+      {
+        "offset_hz": 23604.9,
+        "rf_hz": 14050004.9,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 617.6410922120366,
+        "text": "<SK>TKS OR 73 EE E EI EEE CQECQ P O TM CQ POT A DEEWA6 MOW WA6M OW AREI HE ECQ CQ P O TA CQ POT A DEWA<BT>MOW WA6M OWETR EEE E 6U GPEE5 RNEBM I I HEHE BK T KS B R I A N E73EE ES II A",
+        "contrast_db": 20.5,
+        "benchmark_recording_id": "gqrx-20261123-001221-p236049"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261123_001614_14026400-USB-39_9k-noagc.wav",
+    "mode": "usb",
+    "sample_rate": 48000,
+    "frames": 3563494,
+    "tuned_hz": 14026400,
+    "recorded_utc": "2026-11-23T00:16:14Z",
+    "filter_hz": 39900,
+    "gqrx_agc": false,
+    "sha256": "1d213476de29cd5485ece961608aa35b47f26c6488f1a9d4aa07b8a9ccfb9285",
+    "search_hz": [
+      0,
+      24000.0
+    ],
+    "candidate_count": 6,
+    "confirmed_cw_count": 5,
+    "signals": [
+      {
+        "offset_hz": 2709.2,
+        "rf_hz": 14029109.2,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 15.034546451361456,
+        "text": "TU N6CHU EH4 ECQ SST N6CHU AI6OY ES ESEKI6OY TU BOB WA HEECA TU N6CHU E EIEEIE WA2LTH TU BOB WA TI H S",
+        "contrast_db": 40.3,
+        "benchmark_recording_id": "gqrx-20261123-001614-p27092"
+      },
+      {
+        "offset_hz": 4121.2,
+        "rf_hz": 14030521.2,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 35.96101625349838,
+        "text": "B I I EH WZ<SN> V EEIE E W7 F I EEI W7FV IIW7FV GE JER CA EEIEGE DAT OR EDAN 73EE MNI SE SST NJ6Q EHIIIE CQ SST NJ6Q EES/",
+        "contrast_db": 34.9,
+        "benchmark_recording_id": "gqrx-20261123-001614-p41212"
+      },
+      {
+        "offset_hz": 10635.9,
+        "rf_hz": 14037035.9,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 167.9438760529565,
+        "text": "DRWBM BNE TU Z A CH EITEA E XI E E TEMARC EEEE MA RC EETNEE II CQ SSBDE W7LHT W7LHD 5EE CQ SSTE DE W7LHT M7LHT N",
+        "contrast_db": 18.4,
+        "benchmark_recording_id": "gqrx-20261123-001614-p106359"
+      },
+      {
+        "offset_hz": 13618.1,
+        "rf_hz": 14040018.1,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 96.85265478079732,
+        "text": "SQSST KN6YKN E ETD CQ CQ SST KN6YKN E E EEEIE CQ CQ SST KN6YKN IEEHE <AR>Q CQ SST KN6 YKN ESS A",
+        "contrast_db": 26.1,
+        "benchmark_recording_id": "gqrx-20261123-001614-p136181"
+      },
+      {
+        "offset_hz": 23615.0,
+        "rf_hz": 14050015.0,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 3255.741289588004,
+        "text": "W WA6M OW AREE EEE E E E9 MF B5MZBK E E HEIIE NRETOHER ON 7VE",
+        "contrast_db": 19.0,
+        "benchmark_recording_id": "gqrx-20261123-001614-p236150"
+      }
+    ]
+  },
+  {
+    "path": "gqrx_20261123_001827_14033400-IQ-80k-noagc.wav",
+    "mode": "iq",
+    "sample_rate": 48000,
+    "frames": 5842918,
+    "tuned_hz": 14033400,
+    "recorded_utc": "2026-11-23T00:18:27Z",
+    "filter_hz": 80000,
+    "gqrx_agc": false,
+    "sha256": "2127534b588722e4b9c1be1eea470774ea8c22afd717aae9694ada5183e87cb8",
+    "search_hz": [
+      -24000.0,
+      24000.0
+    ],
+    "candidate_count": 7,
+    "confirmed_cw_count": 7,
+    "signals": [
+      {
+        "offset_hz": -11380.3,
+        "rf_hz": 14022019.7,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 52.9971805285272,
+        "text": "CQ EEI IEI WYD UL Q TNQ EMYDETLL IIIHE F6T IE HCQ EWYCAL D I T C",
+        "contrast_db": 24.8,
+        "benchmark_recording_id": "gqrx-20261123-001827-m113803"
+      },
+      {
+        "offset_hz": -4289.7,
+        "rf_hz": 14029110.3,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 14.751627400248875,
+        "text": "C K SST I6CHU EIEI H UB0HP TU BOB WA ESESE E A N6CHU EE EM E CQ SST N6CHU I K6NT S5K6NT TU BOB WA IT<AS>AEKE CATU N6CHU EEAIIE ECQ SST N6CHU FE TI EKM6JE TU BOB WA E",
+        "contrast_db": 35.3,
+        "benchmark_recording_id": "gqrx-20261123-001827-m42897"
+      },
+      {
+        "offset_hz": -2876.5,
+        "rf_hz": 14030523.5,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 17.381706955706218,
+        "text": "E EE E EGQ SST NJ6Q KN6YMN T SST NJ6Q KN6YKN E? KN6YKN E E AN6Y KN R GA JER CA E RR G E M I KE TCWA EEEEMIKE 73 EE EE IST NJ6Q E CQ SST NJ6Q ECQ SST NJ6Q ICQ SST NJ6Q",
+        "contrast_db": 33.4,
+        "benchmark_recording_id": "gqrx-20261123-001827-m28765"
+      },
+      {
+        "offset_hz": 2117.6,
+        "rf_hz": 14035517.6,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 34.97244440275404,
+        "text": "DE NB7O E E V AX4SR KEVIN OR S5 U GE VINCE TUEE SE5 CQ SST DE NB7O EIE ER RQ SST DE XSZOE T CQ SSTE EA ET CQ SST DE NB7O E<SN>HE",
+        "contrast_db": 29.3,
+        "benchmark_recording_id": "gqrx-20261123-001827-p21176"
+      },
+      {
+        "offset_hz": 3639.6,
+        "rf_hz": 14037039.6,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 73.4585712481305,
+        "text": "GUTMES W7LHT W7LHT K EIEII CQ SST DE W7LHTFREE5S CQ SST EDE W7LHTEWQLHT K I E TI N7? EHE IE N7EZBKET ED U E2 EEE IEEEESE E73E E ETEE W CQ SST DE W7L IT W7LHT K H 5T",
+        "contrast_db": 21.4,
+        "benchmark_recording_id": "gqrx-20261123-001827-p36396"
+      },
+      {
+        "offset_hz": 6622.2,
+        "rf_hz": 14040022.2,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 43.48779528766915,
+        "text": "E E E E TTTT Q CQ SST KN6YKN",
+        "contrast_db": 26.3,
+        "benchmark_recording_id": "gqrx-20261123-001827-p66222"
+      },
+      {
+        "offset_hz": 16619.8,
+        "rf_hz": 14050019.8,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 108.05144208577853,
+        "text": "IURY 73EE H E I RQ CQEP O TA CQ POT A BEWA6 M8M WA6MJW AR E UJ6C Q A T AK6<SN> Q 5NNMK ES E B KTVS CA GE3 EE T CQ CQ P O TA CQ POT A D EWA6 MOW WA6M OW AR HI E R V ET TS A I",
+        "contrast_db": 19.0,
+        "benchmark_recording_id": "gqrx-20261123-001827-p166198"
+      }
+    ]
+  }
+]

@@ -125,6 +125,19 @@ Remove `beam_width`, `histogram_bins`, `estimator_decay`, `outlier_pct`,
 files. The current decoder ignores these retired settings. The legacy
 `--beam-width` flag is accepted with a warning.
 
+## Wideband SDR recordings
+
+Use the offline pipeline to search Gqrx IQ and USB captures for CW, isolate
+each candidate carrier, and decode it with the shared decoder.
+
+```powershell
+python -m pip install -e ".[wideband]"
+python -m morse_decode.wideband "recordings/gqrx*.wav" --output decode-output --workers 4
+```
+
+Each capture gets a JSON report and a mono WAV per candidate. The pipeline
+also accepts native Gqrx IQ `.raw` files. [Capture settings, results and benchmark workflow](docs/gqrx-recordings.md)
+
 ## Shared decoder
 
 [`morse_decode/core/decoder.mjs`](morse_decode/core/decoder.mjs) is the
