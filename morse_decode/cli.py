@@ -18,9 +18,11 @@ from __future__ import annotations
 
 import datetime
 import json
+import math
 import os
 import signal
 import threading
+import time
 from contextlib import closing
 from pathlib import Path
 from typing import TextIO
@@ -30,6 +32,7 @@ import click
 from .config import Config, ConfigError, load_config
 from .audio.source import create_source, list_devices
 from .receiver import DecoderError, Receiver
+from .qso import qso_timeline
 from .output.display import Display, BinDisplayState
 
 
@@ -53,16 +56,17 @@ class ChannelLogger:
     def log(self, freq_hz: int, text: str, snr_db: float, speed_wpm: float) -> None:
         if not text.strip() or self._fh is None:
             return
-        ts = datetime.datetime.now().isoformat(timespec="seconds")
         if self._fmt == "jsonl":
             line = json.dumps({
-                "timestamp": ts,
+                "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds"),
+                "direction": "rx",
                 "freq_hz": freq_hz,
                 "text": text,
                 "snr_db": round(snr_db, 1),
                 "speed_wpm": round(speed_wpm, 1),
             })
         else:
+            ts = datetime.datetime.now().isoformat(timespec="seconds")
             line = f"{ts}  {freq_hz:5d}Hz  {speed_wpm:5.1f}wpm  {text}"
         self._fh.write(line + "\n")
         self._fh.flush()
@@ -229,6 +233,12 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
               help="Enable file logging to FILE.")
 @click.option("--log-format", default=None, type=click.Choice(["text", "jsonl"]),
               help="Log format: text (default) or jsonl.")
+@click.option("--replay", type=click.Path(exists=True, dir_okay=False, path_type=Path),
+              help="Print the timestamped events from a QSO JSONL log.")
+@click.option("--tx-events", type=click.Path(exists=True, dir_okay=False, path_type=Path),
+              help="Merge timestamped transmit events from this JSONL file into --replay.")
+@click.option("--replay-speed", type=click.FloatRange(min=0, min_open=True),
+              help="Play events with their recorded spacing scaled by this factor.")
 @click.version_option(package_name="morsedecode")
 def main(
     config_file: str | None,
@@ -249,12 +259,35 @@ def main(
     speed_max: float | None,
     log_path: str | None,
     log_format: str | None,
+    replay: Path | None,
+    tx_events: Path | None,
+    replay_speed: float | None,
 ) -> None:
     """Terminal interface for the shared CW (Morse code) decoder.
 
     Decodes simultaneous CW signals across a configurable frequency range
     from a live audio device, audio file, stdin pipe, or network PCM producer.
     """
+    if replay is not None:
+        if replay_speed is not None and not math.isfinite(replay_speed):
+            raise click.UsageError("--replay-speed must be finite.")
+        try:
+            events = qso_timeline(replay, tx_events)
+        except (OSError, ValueError) as exc:
+            raise click.ClickException(str(exc)) from exc
+        previous = None
+        for event in events:
+            timestamp = datetime.datetime.fromisoformat(event["timestamp"])
+            if previous is not None and replay_speed is not None:
+                try:
+                    time.sleep((timestamp - previous).total_seconds() / replay_speed)
+                except (OverflowError, OSError) as exc:
+                    raise click.ClickException("The replay delay is too long. Increase --replay-speed.") from exc
+            click.echo(json.dumps(event))
+            previous = timestamp
+        return
+    if tx_events is not None or replay_speed is not None:
+        raise click.UsageError("--tx-events and --replay-speed require --replay.")
     if list_devs:
         click.echo(list_devices())
         return

@@ -3,6 +3,7 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from click.testing import CliRunner
 
 from morse_decode import cli
 
@@ -10,7 +11,24 @@ from morse_decode import cli
 @pytest.fixture
 def fixed_timestamp(monkeypatch):
     now = datetime.datetime(2026, 11, 23, 12, 0)
-    monkeypatch.setattr(cli, "datetime", SimpleNamespace(datetime=SimpleNamespace(now=lambda: now)))
+    monkeypatch.setattr(cli, "datetime", SimpleNamespace(
+        datetime=SimpleNamespace(now=lambda tz=None: now.replace(tzinfo=tz)),
+        timezone=datetime.timezone,
+    ))
+
+
+def test_replay_merges_receive_and_transmit_logs(tmp_path, monkeypatch):
+    rx = tmp_path / "rx.jsonl"
+    tx = tmp_path / "tx.jsonl"
+    rx.write_text('{"timestamp":"2026-11-23T19:00:02+00:00","text":"K"}\n')
+    tx.write_text('{"timestamp":"2026-11-23T12:00:00-07:00","text":"CQ"}\n')
+    delays = []
+    monkeypatch.setattr(cli.time, "sleep", delays.append)
+    result = CliRunner().invoke(cli.main, ["--replay", str(rx), "--tx-events", str(tx), "--replay-speed", "2"])
+    assert result.exit_code == 0, result.output
+    events = [json.loads(line) for line in result.output.splitlines()]
+    assert [(event["direction"], event["text"]) for event in events] == [("tx", "CQ"), ("rx", "K")]
+    assert delays == [1]
 
 
 @pytest.mark.parametrize("name", ["receive.jsonl", "receive.log", "receive"])

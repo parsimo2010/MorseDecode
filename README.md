@@ -82,6 +82,30 @@ When logging is enabled, files rotate at 10 MiB by default. Archives sit next
 to the active log and retain its extension; a timestamp and, if needed, a
 sequence number distinguish them. Set `[log].rotate_mb` to 0 to disable rotation.
 
+### Reconstruct a QSO
+
+Record receive copy with `--log rx.jsonl --log-format jsonl`. The log
+timestamps decoder output in UTC and marks it as `rx`. Export transmit
+events from your keyer or log them separately in UTF-8 JSONL. Each event
+needs the keyed text and an ISO 8601 timestamp with a UTC offset. Add
+`freq_hz` if the keyer records it.
+
+```json
+{"timestamp":"2026-11-23T19:00:00.125Z","direction":"tx","text":"CQ CQ DE W1AW"}
+```
+
+```bash
+morsedecode --replay rx.jsonl --tx-events tx.jsonl > qso.jsonl
+morsedecode --replay qso.jsonl --replay-speed 1
+```
+
+Combine rotated receive files before replaying a session that spans
+multiple files. Legacy receive timestamps without an offset use the
+replay machine's local timezone. Use synchronized clocks on the keyer
+and receiver. Receive timestamps mark when copy was emitted by the decoder.
+
+### Audio input
+
 Use a device name from `--list-devices`. If several devices match the name,
 append the host API shown in the error, as in the example above.
 
