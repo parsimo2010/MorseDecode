@@ -1,6 +1,6 @@
 # Gqrx recordings from the attic EFHW
 
-The 11 captures yielded 33 confirmed CW carriers. A count is per recording
+The first 11 captures yielded 33 confirmed CW carriers. A count is per recording
 and per carrier frequency. A station can appear at multiple frequencies or
 in multiple recordings, and a frequency can carry both sides of a contact.
 I checked the channel audio for Morse-length keying and repeated groups. The
@@ -30,6 +30,39 @@ repeated the +4107 Hz carrier's marks at the same times. Other rejected peaks
 had no readable CW or consistent Morse timing. For ordinary receiver audio,
 the offset is the measured audio pitch and the catalog frequency is the
 receiver tuning. [Machine transcripts](../benchmarks/cw/gqrx-decodes.json) · [Reviewed text and audio](../benchmarks/cw/corpus.json)
+
+## 40 m native IQ capture
+
+The filename `gqrx_20261123_014653_132062140_125000_fc.raw` gives a center
+of 132,062,140 Hz. Adding the Ham It Up correction of −125,003,650 Hz gives
+7,058,490 Hz. The 125 ksample/s rate agrees with 2 MSPS and 16× decimation.
+The file contains 211.75 seconds of complex float32 IQ.
+
+| Estimated RF (kHz) | Reviewed copy |
+| ---: | --- |
+| 7027.975 | `CQ CQ DE WA6 M E M WA6 M E M WA6 M E M K` |
+| 7028.973 | `CQ` |
+| 7030.476 | `CQ CQ` |
+| 7031.971 | `CQCQCQ` |
+| 7032.536 | `CQ` |
+| 7043.969 | `CQ CQ` |
+| 7054.978 | `BK SRI`, `BETTER`, `73` |
+| 7058.976 | `SATURDAY BUT`, `KIDS GAMES ALL DAY <BT>`, `THE NA SPRINT WITH` |
+| 7102.475 | Brief callsign-like transmission with a clear `MU` ending |
+
+The six-worker run extracted and decoded 93 spectral candidates in about
+62 seconds. Repeating the spectral scan with one and six FFT workers gave
+identical frequencies and contrast scores. Both scans took about 18
+seconds on this machine. I reviewed the weaker candidates with narrower
+filters and shorter-time spectrograms to distinguish fixed-frequency Morse
+marks from steady tones and digital bursts. The corpus contains 19 reviewed
+excerpts from the nine confirmed carriers. The shared decoder made 32
+character edits on 209 reference characters in those excerpts.
+[Machine transcripts and extraction settings](../benchmarks/cw/gqrx-decodes.json) · [Benchmark catalog](../benchmarks/cw/corpus.json)
+
+```powershell
+python -m morse_decode.wideband recordings/gqrx_20261123_014653_132062140_125000_fc.raw --tuned-hz 7058490 --output raw-40m-output --workers 6
+```
 
 ## Contest recording format
 
@@ -106,4 +139,4 @@ separate search and review step. [Corpus commands](../benchmarks/cw/README.md)
 On the 58 new excerpts, both the current shared decoder and `636f0ff`
 made 28 character edits on 601 reference characters (4.66% CER).
 The two runs each made 134 edits on 3,434 characters across all 126
-corpus clips.
+clips in that benchmark run.

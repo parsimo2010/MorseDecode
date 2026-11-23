@@ -88,6 +88,7 @@ ehthumbs.db
 Thumbs.db
 
 # Audio test files (large)
+/recordings/*.raw
 *.wav
 *.mp3
 *.flac

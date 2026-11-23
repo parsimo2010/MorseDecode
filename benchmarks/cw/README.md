@@ -1,6 +1,6 @@
 # CW recording benchmark
 
-Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, receiver, UTC time, frequency, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256. The 126 clips include 68 from ten WebSDR recordings and 58 from 33 channels extracted from Gqrx captures. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
+Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, receiver, UTC time, frequency, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256. The 145 clips include 68 from ten WebSDR recordings and 77 from 42 channels extracted from Gqrx captures. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
 
 ## Gqrx IQ and USB recordings
 
@@ -11,6 +11,11 @@ peak gain. The exported SQLite database includes this metadata in
 `recordings.channel_json`. The source frame bounds of a clip are on the
 full-duration, resampled channel's 8 kHz grid.
 [Per-capture results and reproduction instructions](../../docs/gqrx-recordings.md) · [Full machine copy](gqrx-decodes.json)
+
+The native 40 m IQ capture adds 19 clips from nine carriers. Its channel
+metadata preserves the original 132 MHz filename center, the upconverter
+correction, and the resulting HF center.
+[40 m native IQ results](../../docs/gqrx-recordings.md#40-m-native-iq-capture)
 
 ## W1AW bulletin and nearby interference
 

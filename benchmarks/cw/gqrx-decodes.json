@@ -569,5 +569,127 @@
         "benchmark_recording_id": "gqrx-20261123-001827-p166198"
       }
     ]
+  },
+  {
+    "path": "gqrx_20261123_014653_132062140_125000_fc.raw",
+    "mode": "iq",
+    "sample_rate": 125000,
+    "frames": 26468314,
+    "tuned_hz": 7058490,
+    "recorded_utc": "2026-11-23T01:46:53Z",
+    "filter_hz": null,
+    "gqrx_agc": null,
+    "sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+    "search_hz": [
+      -62500.0,
+      62500.0
+    ],
+    "candidate_count": 93,
+    "signals": [
+      {
+        "offset_hz": -30514.9,
+        "rf_hz": 7027975.1,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 21.666483022276946,
+        "text": "TE V G IV ETCQE<AR>K CQ CQ DE WA6 M E M WA6 M E M WA6 M E M K E I I CQECQ CQ CQ DE WA6 M EEDIWA6 M E M WA6 M E M K ES S Q CQ CQ CQ DE WA6 M E M WA6 M E M WA6EGEEM K E E E CQ",
+        "contrast_db": 25.6,
+        "benchmark_recording_id": "gqrx-20261123-014653-m305149"
+      },
+      {
+        "offset_hz": -29516.9,
+        "rf_hz": 7028973.1,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 17.971443706649577,
+        "text": "CIEAS? E E N EIEE EIT C SMTMETHIT EE IEU ESTD CEK KE9ALITN UE EM NE TA E EE CQ TNIEEE E T E IIEIH E D NQ CQ <AR>Q KE9AJC KEZAP E I 4 EE",
+        "contrast_db": 17.0,
+        "benchmark_recording_id": "gqrx-20261123-014653-m295169"
+      },
+      {
+        "offset_hz": -28014.5,
+        "rf_hz": 7030475.5,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 10.5525087398533,
+        "text": "TRQ CTEA MEQ <SN>MA IE T TNTT CQ CQ CQ CQECQ EE EA T N EE MMTE T WI C MA ETRTTA IEE I E I N TT T M E N2E ETWI ARK E I MT EA SE T E T S E E I TI NMADI IE IEWTE MTWA K KE CQ K MM K MR TEE EEA T EN MH TTI T E TE E WA ARTT E E E E",
+        "contrast_db": 18.7,
+        "benchmark_recording_id": "gqrx-20261123-014653-m280145"
+      },
+      {
+        "offset_hz": -26518.8,
+        "rf_hz": 7031971.2,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 37.51066089047581,
+        "text": "<BT><BT> NST I E 5 CCQCQCQCQCQCGEE ACQCQCQC1DEKAWE H<CT>1BSZIT",
+        "contrast_db": 18.3,
+        "benchmark_recording_id": "gqrx-20261123-014653-m265188"
+      },
+      {
+        "offset_hz": -25953.6,
+        "rf_hz": 7032536.4,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 9.330300667806965,
+        "text": "TN AOO TT TNTEIE E E N T M OATETE TETIA T SI TC A 5 6 ZC EEE E E E S MI E E E 1 EE 0 U EI EET T EW OAE TT E DEETT EET S EI EE E E T TT TT K TT TIE M TT I E O PE I UO EI EE S EE T CQ 4 DUX E OS EEE EAEWME KN I IE HIEEIE TT TEA TM AE EE E E S NEE VEVNUEE E W IT T TT IE X 7VT TT MTTEE T TT Q NEE <SK> 4 NU TR IT",
+        "contrast_db": 15.1,
+        "benchmark_recording_id": "gqrx-20261123-014653-m259536"
+      },
+      {
+        "offset_hz": -14521.5,
+        "rf_hz": 7043968.5,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 12.638855722552552,
+        "text": "E E TEQ S55E E RL AI E E E AK K MT 5T CQ DE E IN EIT NQXIIEE E Q CQ V EE PE NQT B NQ6<AS> K E I TB CQ CQE CQ DE R",
+        "contrast_db": 15.2,
+        "benchmark_recording_id": "gqrx-20261123-014653-m145215"
+      },
+      {
+        "offset_hz": -3512.5,
+        "rf_hz": 7054977.5,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 22.439276587741116,
+        "text": "EI E E M TTE MIYI TTEDEK K4T EMTI ONT MOI E M EES <AS>T QRM ON B TEED<BT> UE QTIE ZEBK E E HK SRI MT E EE EXY TE TDN T <BT> ALY EIGT QTH EW ZK E EE HK OTT TT X<BT> ETU BETTER SATT TNIT EBR QSTEEES HW ETTM K UL EZ M 7JG E /M N ICIEWT ETEI TTDEK TT4D M",
+        "contrast_db": 20.7,
+        "benchmark_recording_id": "gqrx-20261123-014653-m35125"
+      },
+      {
+        "offset_hz": 485.7,
+        "rf_hz": 7058975.7,
+        "sample_rate": 8000,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 13.833531318065036,
+        "text": "EWG EMINZJ FEZ EKEE IS SE N ON JFZ LE PE9 DWR SAV EE EN G UD WENK E TH OUG H T I WAS G OING TO HAIH EEI H AVE U L OT OF P OTA EE5E UNTING ON HATURDAY B4T ERD EDEENI I<SN> MATC H I N G GRAND KIIEA IEKIDI S GAMES ALL DAY <BT> HE N O OYED THE NA SPRINT WI TH 1I3 CONTACTS <BT> TE<AR>O NGRATULATI OE",
+        "contrast_db": 30.9,
+        "benchmark_recording_id": "gqrx-20261123-014653-p4857"
+      },
+      {
+        "offset_hz": 43984.9,
+        "rf_hz": 7102474.9,
+        "sample_rate": 8000,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 12.445694330724287,
+        "text": "E T E E EE EE W2JMUE E E E",
+        "contrast_db": 14.5,
+        "benchmark_recording_id": "gqrx-20261123-014653-p439849"
+      }
+    ],
+    "file_center_hz": 132062140,
+    "upconverter_correction_hz": -125003650,
+    "input_sample_rate_hz": 2000000,
+    "input_decimation": 16,
+    "confirmed_cw_count": 9
   }
 ]

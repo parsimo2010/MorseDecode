@@ -1936,6 +1936,427 @@
           "text": "WA6MOW AR"
         }
       ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m305149",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7027.9751,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -30514.9,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 21.666483022276946
+      },
+      "file": "gqrx-20261123-014653-m305149.wav",
+      "sha256": "938937baf018e9b66c56ed0d9758f492c33ac513c1a209b5a248336c1c7fa987",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m305149-648320",
+          "start_frame": 648320,
+          "end_frame": 819840,
+          "pcm_sha256": "dbd3ae6e464b3ff49b58270d621173cd16ecdf74e48a5ec7aff7c3ff643d987a",
+          "text": "CQ CQ DE WA6 M E M WA6 M E M WA6 M E M K"
+        },
+        {
+          "id": "gqrx-20261123-014653-m305149-958720",
+          "start_frame": 958720,
+          "end_frame": 1021520,
+          "pcm_sha256": "d695fb241b58002f83ae2de66ac32c2a1f707fac16f9d1d18056823bf2a15d22",
+          "text": "CQ CQ CQ DE"
+        },
+        {
+          "id": "gqrx-20261123-014653-m305149-1059920",
+          "start_frame": 1059920,
+          "end_frame": 1148320,
+          "pcm_sha256": "8fb1dc777499f38a874b3d998e05ace0cce36155336db9013ef5f4ba6fd0fbb8",
+          "text": "WA6 M E M WA6 M E M K"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m295169",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7028.973099999999,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -29516.9,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 17.971443706649577
+      },
+      "file": "gqrx-20261123-014653-m295169.wav",
+      "sha256": "31c933d61088032c5a0bb4886b2afac97b69ec65ce60b66b673e5de85be64d7d",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m295169-1506000",
+          "start_frame": 1506000,
+          "end_frame": 1524880,
+          "pcm_sha256": "655bb24380a1c1c1a7750987c24c7346f9060e9f4a2c2856bfe3dd2d4d9da1ea",
+          "text": "CQ"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m280145",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7030.4755,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -28014.5,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 10.5525087398533
+      },
+      "file": "gqrx-20261123-014653-m280145.wav",
+      "sha256": "eaa628043a99f55e1f1f62edb91be487c21fc45aec127b7fe43ae8607010e080",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m280145-156640",
+          "start_frame": 156640,
+          "end_frame": 184720,
+          "pcm_sha256": "9c797212c4fa3631d9dd435362cba76afd2e7884bbe288babc2f923d6c05c3e0",
+          "text": "CQ CQ"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m265188",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7031.9712,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -26518.8,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 37.51066089047581
+      },
+      "file": "gqrx-20261123-014653-m265188.wav",
+      "sha256": "635cc174217466c7cd52441a42b6de57e9502177301260579307e5684ff7ab99",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m265188-1071920",
+          "start_frame": 1071920,
+          "end_frame": 1118000,
+          "pcm_sha256": "a62354fbb96786b92219f4a8cc8ea745013a4ee21d808686984a9adb0d765f11",
+          "text": "CQCQCQ"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m259536",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7032.5364,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -25953.6,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 9.330300667806965
+      },
+      "file": "gqrx-20261123-014653-m259536.wav",
+      "sha256": "5695b643d52032e939bb772c90e94bf6818e9e4be9a9c7c301362ffe38369b5d",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m259536-608240",
+          "start_frame": 608240,
+          "end_frame": 620960,
+          "pcm_sha256": "a49cfe7a81f765b670510a362073b6b0aea3a1bf1f8eb53a80b080276ead382a",
+          "text": "CQ"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m145215",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7043.9685,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -14521.5,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 12.638855722552552
+      },
+      "file": "gqrx-20261123-014653-m145215.wav",
+      "sha256": "bfb51025bb7d6909f92e6929268ac31158b6d9bd2e7b8302206ae89c941640d2",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m145215-1623040",
+          "start_frame": 1623040,
+          "end_frame": 1657840,
+          "pcm_sha256": "9659036194e108637f545db978522d538ff0ed8649335831a68fd8e25a58e9e3",
+          "text": "CQ CQ"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-m35125",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7054.9775,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": -3512.5,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 22.439276587741116
+      },
+      "file": "gqrx-20261123-014653-m35125.wav",
+      "sha256": "0cb1d92d1f01a0f3c0656dc86c1862c4516e1787fb478b7bb794695654980e73",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-m35125-708880",
+          "start_frame": 708880,
+          "end_frame": 744400,
+          "pcm_sha256": "9b21be35097311c5f8bfc130ce17e6259c400ce5fdee209ce4e18353fe241cdb",
+          "text": "BK SRI"
+        },
+        {
+          "id": "gqrx-20261123-014653-m35125-1327280",
+          "start_frame": 1327280,
+          "end_frame": 1355360,
+          "pcm_sha256": "32f11ed6a623574a946485d84bb5e8e6eb4e36788e6cc8cefdb7698baf5674bf",
+          "text": "BETTER"
+        },
+        {
+          "id": "gqrx-20261123-014653-m35125-1531680",
+          "start_frame": 1531680,
+          "end_frame": 1553200,
+          "pcm_sha256": "41f42cbe5913572d1cdcfb9ec13e4c0621b36009ba8c10dbb5ef297b9cb1132d",
+          "text": "73"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-p4857",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7058.9757,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": 485.7,
+        "filter_hz": 130,
+        "tone_hz": 700,
+        "peak_gain": 13.833531318065036
+      },
+      "file": "gqrx-20261123-014653-p4857.wav",
+      "sha256": "273be735c1dcf8921fc3017d038f708de1bcd7a7a7516911b62b00b61caca4ce",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-p4857-522800",
+          "start_frame": 522800,
+          "end_frame": 610720,
+          "pcm_sha256": "33423bca8382f2b612ced7c1325b7c01eb53b9e3cf5756b945ffbfc2c7c0602b",
+          "text": "WAS GOING TO"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-715520",
+          "start_frame": 715520,
+          "end_frame": 773760,
+          "pcm_sha256": "ab61d369184ff8d6fb36dfeb11ddbb8ea8b5906e058ad7a3c62f6f4451fee65e",
+          "text": "OF POTA"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-859440",
+          "start_frame": 859440,
+          "end_frame": 943840,
+          "pcm_sha256": "6268819d137df2e110d57c609de40e5c89c3d111e5a2bd7d501adede8151d54a",
+          "text": "SATURDAY BUT"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-1002800",
+          "start_frame": 1002800,
+          "end_frame": 1110400,
+          "pcm_sha256": "4145ab83ef96482cb164086552c373622b31a6cc745126d905f9b8a9181a0986",
+          "text": "WATCHING GRAND"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-1142320",
+          "start_frame": 1142320,
+          "end_frame": 1282880,
+          "pcm_sha256": "b4f3e7c1bde1fbf5765982a4f71e8fce4f2c8b5e8849036933afef27a68a7fec",
+          "text": "KIDS GAMES ALL DAY <BT>"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-1368400",
+          "start_frame": 1368400,
+          "end_frame": 1468000,
+          "pcm_sha256": "f71eb452ae79986929b70688f1c7a6ebd10e075e98ae4afe11ab209d28518a01",
+          "text": "THE NA SPRINT WITH"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-1488800",
+          "start_frame": 1488800,
+          "end_frame": 1580080,
+          "pcm_sha256": "c997e8a6c9f585551b7e7d5197e4100f5ca28a69d7df22014ea7fd5f2167a596",
+          "text": "3 CONTACTS <BT>"
+        }
+      ]
+    },
+    {
+      "id": "gqrx-20261123-014653-p439849",
+      "source": "Gqrx native IQ with RTL-SDR, Ham It Up and attic EFHW",
+      "recorded_utc": "2026-11-23T01:46:53Z",
+      "frequency_khz": 7102.4749,
+      "usage": "development",
+      "channel": {
+        "method": "morsedecode-wideband-v1",
+        "capture_file": "gqrx_20261123_014653_132062140_125000_fc.raw",
+        "capture_sha256": "2f23e0560d6424f92e44539a26f1fef7c8b09f51276f7827f4e0fdea8015f2a6",
+        "capture_rate_hz": 125000,
+        "capture_frames": 26468314,
+        "capture_mode": "iq",
+        "tuned_hz": 7058490,
+        "capture_filter_hz": null,
+        "gqrx_agc": null,
+        "file_center_hz": 132062140,
+        "upconverter_correction_hz": -125003650,
+        "input_sample_rate_hz": 2000000,
+        "input_decimation": 16,
+        "offset_hz": 43984.9,
+        "filter_hz": 220,
+        "tone_hz": 700,
+        "peak_gain": 12.445694330724287
+      },
+      "file": "gqrx-20261123-014653-p439849.wav",
+      "sha256": "587210bdcde816025a0f1ca19a6380e93d5399540abf70f7730b2fb3133ff0fc",
+      "sample_rate": 8000,
+      "frames": 1693973,
+      "clips": [
+        {
+          "id": "gqrx-20261123-014653-p439849-985280",
+          "start_frame": 985280,
+          "end_frame": 993280,
+          "pcm_sha256": "5174403d0c9977914eaec4744d38caf356e6f3acc37984cc1a73935511292ad1",
+          "text": "MU"
+        }
+      ]
     }
   ]
 }
