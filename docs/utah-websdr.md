@@ -2,7 +2,7 @@
 
 At Git revision `3463ef4`, the shared JavaScript decoder made **8 character edits in 402 reference characters** on six labeled excerpts. The previous release made **109 edits** on the same samples. The excerpts cover 228.7 seconds of the 239.6 seconds recorded. These four recordings guided development. Their scores measure improvement on these operators and reception conditions.
 
-The public corpus now also includes three morning recordings. [New transcripts and seven-recording comparison](utah-morning.md)
+The public corpus has since expanded. [Morning transcripts and seven-recording comparison](utah-morning.md) · [Full-corpus results](decoder-benchmarks.md)
 
 ## Reading the recordings
 
@@ -92,7 +92,11 @@ Chrome resampled each complete WAV to 48 kHz and ran it through the bundled work
 
 ## Repeat the checks
 
-The seven-recording benchmark now reads the committed WAV clips. The corpus records source and clip hashes and exact sample bounds. Full original WAVs in `recordings/` can also be replayed in the Chrome check below. [Portable field corpus](../benchmarks/cw/README.md)
+To reproduce the six-excerpt table, run these commands from a checkout of
+`3463ef4` with the four original WAVs in `recordings/`. That revision uses
+the time labels in `tests/fixtures/utah-cw.json`. On current revisions,
+`--utah` instead scores the entire [portable field corpus](../benchmarks/cw/README.md).
+The Chrome check below replays full WAVs rather than individual excerpts.
 
 ```powershell
 python tests/recordings.py --utah --baseline 5c33295 --verbose

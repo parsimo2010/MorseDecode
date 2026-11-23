@@ -58,7 +58,7 @@ For a GUI, web service or streaming API, produce UTF-8 JSON Lines with one entry
 
 The primary metric is the total Levenshtein edits divided by the total number of reference characters. Scoring uppercases text, collapses whitespace, and accepts `=` for `<BT>` and `+` for `<AR>`. Spaces, punctuation and the printed prosign characters count. A second metric ignores spaces and treats each prosign as one keyed symbol. This lets you distinguish spacing errors from errors in the letters themselves. The JSON report includes the corpus fingerprint, denominators and per-clip counts.
 
-To generate predictions from this repository's shared decoder, run the following from the repository root.
+To generate predictions from this repository's shared decoder, run the following from the repository root. The historical `--utah` flag selects all reviewed field clips, including the WebSDR and Gqrx clips from outside Utah. The field runner prints literal character edits; the standalone scorer applies the normalization rules above, so the counts can differ. [Scoring follow-up](https://github.com/parsimo2010/MorseDecode/issues/18)
 
 ```sh
 python tests/recordings.py --utah --predictions predictions.jsonl

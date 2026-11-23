@@ -89,6 +89,10 @@ class Config:
     log: LogConfig = field(default_factory=LogConfig)
 
 
+class ConfigError(ValueError):
+    """A requested configuration file could not be read."""
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -118,10 +122,11 @@ def _apply_dict_to_dataclass(dc: Any, data: dict) -> None:
             # Coerce type to match the dataclass field default type
             try:
                 field_type = type(current)
-                if current is None:
-                    options = [option for option in get_args(field_types[key]) if option is not type(None)]
-                    if len(options) == 1:
-                        field_type = options[0]
+                options = [option for option in get_args(field_types[key]) if option is not type(None)]
+                if type(val) in options:
+                    field_type = type(val)
+                elif current is None and len(options) == 1:
+                    field_type = options[0]
                 if field_type is bool:
                     # bool("false") == True so handle explicitly
                     if isinstance(val, str):
@@ -135,12 +140,17 @@ def _apply_dict_to_dataclass(dc: Any, data: dict) -> None:
             setattr(dc, key, val)
 
 
-def _load_toml_file(path: Path) -> dict:
-    """Load a TOML file; return empty dict if it doesn't exist."""
-    if not path.exists():
-        return {}
-    with open(path, "rb") as fh:
-        return tomllib.load(fh)
+def _load_toml_file(path: Path, *, required: bool = False) -> dict:
+    """Load TOML; only an absent platform default is optional."""
+    try:
+        with path.open("rb") as fh:
+            return tomllib.load(fh)
+    except FileNotFoundError as exc:
+        if not required:
+            return {}
+        raise ConfigError(f"Configuration file not found: {path}") from exc
+    except (OSError, ValueError) as exc:
+        raise ConfigError(f"Could not read configuration file {path}: {exc}") from exc
 
 
 # ---------------------------------------------------------------------------
@@ -174,7 +184,7 @@ def load_config(
 
     # Layer 2: explicit config file
     if config_file is not None:
-        explicit_data = _load_toml_file(Path(config_file))
+        explicit_data = _load_toml_file(Path(config_file), required=True)
         for section, values in explicit_data.items():
             if isinstance(values, dict):
                 sub = getattr(cfg, section, None)

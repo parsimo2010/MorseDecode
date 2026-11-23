@@ -20,11 +20,12 @@ import datetime
 import json
 import os
 from contextlib import closing
+from pathlib import Path
 from typing import TextIO
 
 import click
 
-from .config import Config, load_config
+from .config import Config, ConfigError, load_config
 from .audio.source import create_source, list_devices
 from .receiver import DecoderError, Receiver
 from .output.display import Display, BinDisplayState
@@ -72,12 +73,19 @@ class ChannelLogger:
                 pass
 
     def _rotate(self) -> None:
-        if self._fh:
-            self._fh.close()
+        path = Path(self._path)
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        rotated = self._path.replace(".log", f"_{ts}.log")
-        os.rename(self._path, rotated)
-        self._open()
+        rotated = path.with_name(f"{path.stem}_{ts}{path.suffix}")
+        index = 1
+        while rotated.exists():
+            rotated = path.with_name(f"{path.stem}_{ts}_{index}{path.suffix}")
+            index += 1
+        self.close()
+        try:
+            os.rename(path, rotated)
+        finally:
+            # A failed rename must not leave the active logger closed.
+            self._open()
 
     def close(self) -> None:
         if self._fh:
@@ -219,25 +227,26 @@ def main(
         click.echo("Warning: --beam-width is retired. The shared decoder searches each word without beam pruning.", err=True)
 
     # Build config with CLI overrides
-    cfg = load_config(
-        config_file=config_file,
-        **{k: v for k, v in {
-            "input__device": device,
-            "input__file": audio_file,
-            "input__stdin": stdin or None,
-            "input__freq_min": freq_min,
-            "input__freq_max": freq_max,
-            "input__bin_width": bin_width,
-            "input__channel_width_hz": channel_width,
-            "audio__sample_rate": sample_rate,
-            "audio__on_db": on_db,
-            "audio__off_db": off_db,
-            "decoder__speed_min_wpm": speed_min,
-            "decoder__speed_max_wpm": speed_max,
-            "log__path": log_path,
-            "log__format": log_format,
-        }.items() if v is not None},
-    )
+    overrides = {
+        "input__device": device,
+        "input__file": audio_file,
+        "input__stdin": stdin or None,
+        "input__freq_min": freq_min,
+        "input__freq_max": freq_max,
+        "input__bin_width": bin_width,
+        "input__channel_width_hz": channel_width,
+        "audio__sample_rate": sample_rate,
+        "audio__on_db": on_db,
+        "audio__off_db": off_db,
+        "decoder__speed_min_wpm": speed_min,
+        "decoder__speed_max_wpm": speed_max,
+        "log__path": log_path,
+        "log__format": log_format,
+    }
+    try:
+        cfg = load_config(config_file=config_file, **overrides)
+    except ConfigError as exc:
+        raise click.ClickException(str(exc)) from exc
 
     # If --log flag given, enable logging
     if log_path:

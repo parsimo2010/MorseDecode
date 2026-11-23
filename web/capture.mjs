@@ -3,9 +3,11 @@ class Capture extends AudioWorkletProcessor {
     super();
     this.block = new Float32Array(2048);
     this.offset = 0;
-    this.port.onmessage = () => {
-      this.send(this.block.slice(0, this.offset));
-      this.offset = 0;
+    this.finished = false;
+    this.port.onmessage = ({data}) => {
+      if (data !== 'flush' || this.finished) return;
+      this.finished = true;
+      if (this.offset) this.send(this.block.slice(0, this.offset));
       this.port.postMessage(null);
     };
   }
@@ -15,6 +17,7 @@ class Capture extends AudioWorkletProcessor {
   }
 
   process(inputs) {
+    if (this.finished) return false;
     const channel = inputs[0]?.[0];
     if (!channel) return true;
     let start = 0;

@@ -10,6 +10,7 @@
 device = "default"   # use the system default or a name from --list-devices
 # If a name is ambiguous, append the host API shown in the selection error.
 # device = "Microphone (Senary Audio), MME"
+# device = 3           # unquoted index from --list-devices
 # file = "recording.wav"
 # stdin = true         # pipe raw audio from rtl_fm, gqrx, etc.
 

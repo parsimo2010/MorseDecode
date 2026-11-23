@@ -5,12 +5,12 @@
 Two independent readers transcribed the 145 existing clips before seeing their
 labels. Acoustic review corrected five references. A search of all 22 original
 recordings added 91 scored excerpts, including weak stations and incomplete
-contacts. Both versions below used the same 236 WAVs, corrected labels, default
+contacts. Revisions `f5f635e` and `05dcbaa` used the same 236 WAVs, corrected labels, default
 400–1000 Hz search band and a fresh decoder per clip. Accuracy is one minus
 character error rate, including word spaces, punctuation and prosigns.
 [Audit, independent reads and source coverage](../benchmarks/cw/review/README.md)
 
-| Field audio | Clips | Characters | Edits at `f5f635e` | Current edits | Accuracy before → after |
+| Field audio | Clips | Characters | Edits at `f5f635e` | Edits at `05dcbaa` | Accuracy before → after |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Earlier clips, reviewed labels | 145 | 3,644 | 140 | 116 | 96.2% → 96.8% |
 | Newly scored excerpts | 91 | 790 | 134 | 80 | 83.0% → 89.9% |
@@ -40,7 +40,7 @@ interference. A measured clock on a weak coherent carrier can bridge a fade
 for up to 1.2 seconds. The timing estimator also learns stretched letter gaps
 from the sender before a clear word space arrives.
 
-| Controlled signal condition | Accuracy at `f5f635e` | Current accuracy |
+| Controlled signal condition | Accuracy at `f5f635e` | Accuracy at `05dcbaa` |
 | --- | ---: | ---: |
 | Clean 23 or 46 WPM | 100% | 100% |
 | Uneven Farnsworth spacing | 74.7% | 97.0% |
@@ -73,7 +73,7 @@ labeled complete capture.
 
 On this Windows machine, Chrome's decoder worker took 1.2 ms and 1.4 ms at
 the 95th percentile per 20 ms block on the new native IQ `KE9AJC` clip and
-the weak DC `IS THE CQ` excerpt, respectively. The default 48 kHz passband
+the weak DC `IN THE CQ WORLD` excerpt, respectively. The default 48 kHz passband
 took 1.4 ms and the wide 100–3000 Hz passband took 4.6 ms. The wide passband
 exceeded the block duration with Chrome's simulated 6× CPU slowdown.
 
@@ -85,12 +85,18 @@ foreach ($seed in 7121, 20261123, 405731) {
   node tests/accuracy.mjs --holdout "--seed=$seed" --baseline=f5f635e
 }
 node tests/realtime.mjs --baseline=f5f635e
+$chrome = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+node tests/realtime.mjs "--browser=$chrome" `
+  --wav=benchmarks/cw/audio/gqrx-20261123-014653-m295169-1526536.wav `
+  --wav=benchmarks/cw/audio/na5b-20261120-010303-1667120.wav
 ```
 
-## Gqrx and WebSDR evaluation
+## Earlier Gqrx and WebSDR evaluation
 
-The shared streaming decoder reduced character edits from **166 to 145** across
-the 145 off-air clips at `561bc5e`. Eleven clips improved, six regressed and
+From `561bc5e` to `f5f635e`, the shared streaming decoder reduced character edits
+from **166 to 145** across the 145 then-available off-air clips. To reproduce
+this comparison with the original labels, run the commands below from a
+checkout of `f5f635e`. Eleven clips improved, six regressed and
 128 kept their previous score. Both decoders started fresh on each WAV with
 the default 400–1000 Hz passband and no speed, pitch or transcript hints.
 Accuracy below means one minus character error rate and includes spaces,
@@ -182,7 +188,7 @@ node tests/realtime.mjs --baseline=561bc5e
 
 The Northern Utah WebSDR evaluation reduced character edits from 109 to 8
 on 402 labeled off-air characters. It includes the manual copy, receiver-noise
-and handoff tests, and current Chrome timings. [Northern Utah field results](utah-websdr.md)
+and handoff tests, and Chrome timings from that revision. [Northern Utah field results](utah-websdr.md)
 
 ## DC and Texas WebSDR recordings
 
@@ -190,7 +196,7 @@ The 35 reviewed clips from three recordings were used to develop weak-mark
 recovery. When the sender maintains a steady cadence, the decoder can check
 the middle of a predicted dit for energy at the carrier frequency. This
 recovers some marks that fall below the usual threshold during a fade.
-The table compares character edits against the decoder at `64793a7` on
+The table compares `636f0ff` against the decoder at `64793a7` on
 the same labeled WAVs. [Recordings and scoring](../benchmarks/cw/README.md)
 
 | Recording | Clips | Reference characters | Before | After |
@@ -281,10 +287,10 @@ across the two splits. [Open measurements and follow-up](https://github.com/pars
 The recording benchmark uses the published W1AW audio and transcripts. It
 downloads the source files to a local cache and scores the first labeled
 excerpt. A second run applies repeatable fading and Gaussian noise to that
-same audio. The recordings are machine-keyed practice material. The Utah
-benchmark now includes public WAV clips from seven off-air recordings with
-manually reviewed transcripts and a decoder-independent scorer. The latest
-comparison reduced field edits from 55 to 31 on 1,476 characters.
+same audio. The recordings in the historical table below are machine-keyed
+practice material. The separate seven-recording Utah comparison
+reduced field edits from 55 to 31 on 1,476 characters. The current full-corpus
+comparison is at the top of this document.
 [Public corpus](../benchmarks/cw/README.md) · [Field results](utah-morning.md)
 [15 WPM archive](https://www.arrl.org/15-wpm-code-archive) · [20 WPM archive](https://www.arrl.org/20-wpm-code-archive) · [Field recording issue](https://github.com/parsimo2010/MorseDecode/issues/5)
 

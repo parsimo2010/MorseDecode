@@ -60,6 +60,30 @@ function stop() {
   active.capture.port.postMessage('flush');
 }
 
+function startCapture(session) {
+  const source = session.context.createMediaStreamSource(session.stream);
+  const capture = new AudioWorkletNode(session.context, 'morse-capture', {channelCount: 1, channelCountMode: 'explicit'});
+  session.capture = capture;
+  capture.addEventListener('processorerror', () => cleanup(session, 'The audio capture processor failed.'));
+  capture.port.onmessage = ({data: samples}) => {
+    if (active !== session) return;
+    if (samples === null) {
+      capture.port.close();
+      source.disconnect();
+      capture.disconnect();
+      session.worker.postMessage({type: 'stop'});
+    } else {
+      session.worker.postMessage({type: 'audio', samples}, [samples.buffer]);
+    }
+  };
+  source.connect(capture);
+  // The worklet writes zeros to its output, keeping the capture graph
+  // active without feeding the microphone back through the speakers.
+  capture.connect(session.context.destination);
+  field('stop').disabled = false;
+  status.textContent = 'Listening for a keyed carrier…';
+}
+
 field('start').onclick = async () => {
   if (active) return;
   const low = field('low').valueAsNumber;
@@ -130,23 +154,11 @@ field('start').onclick = async () => {
     session.worker.onmessage = ({data}) => {
       if (active !== session) return;
       if (data.type === 'ready') {
-        const source = session.context.createMediaStreamSource(session.stream);
-        session.capture = new AudioWorkletNode(session.context, 'morse-capture', {channelCount: 1, channelCountMode: 'explicit'});
-        session.capture.port.onmessage = ({data: samples}) => {
-          if (samples === null) {
-            source.disconnect();
-            session.capture.disconnect();
-            session.worker.postMessage({type: 'stop'});
-          } else {
-            session.worker.postMessage({type: 'audio', samples}, [samples.buffer]);
-          }
-        };
-        source.connect(session.capture);
-        // The worklet writes zeros to its output, keeping the capture graph
-        // active without feeding the microphone back through the speakers.
-        session.capture.connect(session.context.destination);
-        field('stop').disabled = false;
-        status.textContent = 'Listening for a keyed carrier…';
+        try {
+          startCapture(session);
+        } catch (error) {
+          cleanup(session, 'Could not start audio capture. ' + error.message);
+        }
       } else if (data.type === 'error') {
         cleanup(session, data.message);
       } else {

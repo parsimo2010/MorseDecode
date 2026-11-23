@@ -78,6 +78,10 @@ morsedecode --stdin --sample-rate 44100 < recording.pcm
 morsedecode --file recording.wav --log decode.log --log-format jsonl
 ```
 
+When logging is enabled, files rotate at 10 MiB by default. Archives sit next
+to the active log and retain its extension; a timestamp and, if needed, a
+sequence number distinguish them. Set `[log].rotate_mb` to 0 to disable rotation.
+
 Use a device name from `--list-devices`. If several devices match the name,
 append the host API shown in the error, as in the example above.
 
@@ -109,9 +113,11 @@ Use [morsedecode.example.toml](morsedecode.example.toml) as a reference. The
 terminal loads `%APPDATA%\morsedecode\config.toml` on Windows. On macOS and
 Linux it loads `$XDG_CONFIG_HOME/morsedecode/config.toml` when
 `XDG_CONFIG_HOME` is set and `~/.morsedecode.toml` otherwise. An explicit
-`--config` file overrides the default file, and CLI flags override the
+`--config` file must exist and overrides the default file. CLI flags override the
 corresponding settings. If multiple input sources are configured, file input
 takes precedence over stdin, followed by live device input.
+In TOML, set `[input].device` to a name or to the unquoted integer index
+shown by `--list-devices`. The `--device` flag takes a name.
 
 The shared core supplies defaults for both interfaces. It searches for carriers
 with a 50 ms Hann window, a 5 ms hop, and search-tone spacing of at most 12 Hz.
@@ -162,10 +168,12 @@ rerun the Pages workflow to update a published site.
 python -m pip install -e ".[dev]"
 python -m pytest
 node tests/performance.mjs
-node tests/accuracy.mjs --holdout --baseline=6b2ba41
-python tests/recordings.py --baseline 6b2ba41
-node tests/realtime.mjs --baseline=6b2ba41
+node --test tests/browser.test.mjs
+node web/build.mjs
 ```
+
+[GitHub Actions](.github/workflows/checks.yml) runs these checks on pushes and
+pull requests using Windows and Linux, Python 3.10 and 3.14, and Node.js 24.
 
 The terminal integration tests exercise file and stdin input, multiple
 simultaneous carriers, final transcript logging, and exact parity with the
@@ -176,9 +184,11 @@ downloads public W1AW practice recordings and their transcripts. See the
 [benchmark results and methodology](docs/decoder-benchmarks.md) for accuracy,
 real-time costs, and how to repeat the browser measurement.
 
-The repository includes 68 reviewed WAV clips from ten WebSDR recordings
-in northern Utah, the Washington DC area and Crowley, Texas. Run `python tests/recordings.py --utah --baseline 3463ef4`
-to compare the shared decoder with the preceding release. The public corpus
+The repository includes 236 reviewed WAV clips: 95 from WebSDR recordings and
+141 from isolated Gqrx channels. Run
+`python tests/recordings.py --utah --baseline f5f635e` to compare the shared
+decoder with the pre-audit decoder on the same clips and references. Despite
+its name, `--utah` runs the entire field corpus. The public corpus
 also has a standalone scorer for other CW decoders, an importer for reviewed
 recordings and a portable SQLite export.
 [Benchmark another decoder](benchmarks/cw/README.md) · [Morning transcripts and results](docs/utah-morning.md) · [Earlier transcripts](docs/utah-websdr.md)

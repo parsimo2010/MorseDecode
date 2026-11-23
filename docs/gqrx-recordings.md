@@ -137,7 +137,8 @@ development excerpts from reviewed CW, so their error rate measures
 transcript accuracy on those passages. The report's counts describe the
 separate search and review step. [Corpus commands](../benchmarks/cw/README.md)
 
-On the 58 new excerpts, both the current shared decoder and `636f0ff`
+In the original 126-clip evaluation at `620349c`, both that decoder and `636f0ff`
 made 28 character edits on 601 reference characters (4.66% CER).
 The two runs each made 134 edits on 3,434 characters across all 126
-clips in that benchmark run.
+clips in that benchmark run. See [decoder benchmarks](decoder-benchmarks.md)
+for the updated full-corpus results.

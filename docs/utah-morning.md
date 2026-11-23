@@ -60,7 +60,7 @@ Some other passages sound like OPERATING, THIS RIG and DRY JOINT IN THE VFO. I l
 
 ## Decoder comparison
 
-Every clip starts with a fresh decoder. Both versions receive the same audio in 20 ms blocks with automatic tuning between 400 and 1000 Hz. The earlier version is Git revision `3463ef4`. These recordings were used during development.
+Every clip starts with a fresh decoder. Both versions receive the same audio in 20 ms blocks with automatic tuning between 400 and 1000 Hz. This historical comparison uses Git revisions `3463ef4` and `3fcd192` and the original seven-recording labels. These recordings were used during development. See [decoder benchmarks](decoder-benchmarks.md) for the expanded corpus.
 
 | Source | Characters | Previous edits | Updated edits | Previous keyed symbol edits | Updated keyed symbol edits |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -72,6 +72,6 @@ Every clip starts with a fresh decoder. Both versions receive the same audio in 
 
 The updated decoder recovers a weak mark when its timing fits the sender and a narrower filter confirms energy at the carrier. It also uses rising edges to resolve a startup speed ambiguity and learns unusually wide word spacing. Across the morning clips, 21 of the remaining 23 edits are spaces. The two keyed symbol substitutions occur in DID (copied as N ID) and SHOPPING (copied as SHQPPING). The original audio SNR is unknown.
 
-The complete database covers 759.8 seconds, including 531.2 seconds of the three morning recordings. With an additional receiver-output gain variation, the full-corpus score improved from 79 to 52 character edits. On an independently generated synthetic case with short deep fades before receiver AGC, development errors fell from 71 to 32 per 144 characters and validation errors from 102 to 42 per 145. The earlier synthetic validation aggregate stayed at 466 edits per 2,710 characters. W1AW scored 0/315 on original practice audio and 16/315 with added fade and noise in both versions.
+The seven labeled recordings cover 759.8 seconds, including 531.2 seconds of the three morning recordings. With an additional receiver-output gain variation, the score on those excerpts improved from 79 to 52 character edits. On an independently generated synthetic case with short deep fades before receiver AGC, development errors fell from 71 to 32 per 144 characters and validation errors from 102 to 42 per 145. The earlier synthetic validation aggregate stayed at 466 edits per 2,710 characters. W1AW scored 0/315 on original practice audio and 16/315 with added fade and noise in both versions.
 
 Desktop Chrome processed each complete morning recording in its bundled worker at about 0.9% of playback time. With a 6× DevTools slowdown on the page thread, processing took 7.4–7.6% of real time and the 99th percentile was at most 9.4 ms per 20 ms audio block. A physical phone was not measured. [Corpus, SQLite export and scoring commands](../benchmarks/cw/README.md)
