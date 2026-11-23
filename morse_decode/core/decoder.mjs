@@ -734,6 +734,8 @@ class CWDecoder {
   }
 
   gainSample(sample) {
+    // Preserve the sample clock and keep malformed PCM out of persistent filters.
+    if (!Number.isFinite(sample)) sample = 0;
     const agc = this.agc;
     if (!agc) return sample;
     agc.meanSquare += agc.alpha * (sample ** 2 - agc.meanSquare);
@@ -748,7 +750,10 @@ class CWDecoder {
           this.audio[this.fill + i] = this.gainSample(samples[offset + i]);
         }
       } else {
-        this.audio.set(samples.subarray(offset, offset + n), this.fill);
+        for (let i = 0; i < n; i++) {
+          const sample = samples[offset + i];
+          this.audio[this.fill + i] = Number.isFinite(sample) ? sample : 0;
+        }
       }
       for (let i = 0; i < n; i++) {
         this.recording[this.writeIndex++] = this.audio[this.fill + i];

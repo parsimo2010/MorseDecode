@@ -123,6 +123,22 @@ def test_invalid_passband_returns_a_clear_error():
         Receiver(RATE, cfg)
 
 
+@pytest.mark.parametrize("rate", [8000, 48000])
+@pytest.mark.parametrize("agc", [False, True])
+def test_invalid_pcm_is_silence_and_does_not_poison_following_copy(rate, agc):
+    cfg = Config()
+    cfg.input.channel_width_hz = 600
+    cfg.audio.agc_enabled = agc
+    samples = np.repeat(synth(MESSAGE, 673), rate // RATE)
+    with Receiver(rate, cfg) as receiver:
+        receiver.push(np.array([float("nan"), float("inf"), -float("inf")], dtype=np.float32))
+        chunks = []
+        for start in range(0, len(samples), rate // 20):
+            chunks.append(receiver.push(samples[start:start + rate // 20])[0]["delta"])
+        chunks.append(receiver.finish()[0]["delta"])
+    assert "".join(chunks) == MESSAGE
+
+
 def test_filtered_receiver_noise_and_replies():
     subprocess.run(["node", "tests/accuracy.mjs", "--match=receiver", "--holdout", "--check"],
                    cwd=ROOT, check=True)
