@@ -50,6 +50,11 @@ def validate(data):
             if not re.fullmatch(r"[a-z0-9-]+", key) or key in seen:
                 raise ValueError(f"Invalid or duplicate ID: {key}")
             seen.add(key)
+            style = entry.get("sending_style", "unclassified")
+            tags = entry.get("conditions", ["unclassified"])
+            if (not isinstance(style, str) or not style.strip() or not isinstance(tags, list)
+                    or not tags or any(not isinstance(tag, str) or not tag.strip() for tag in tags)):
+                raise ValueError(f"Invalid sending style or reception conditions: {key}")
         for clip in recording["clips"]:
             if not all(type(clip[key]) is int for key in ("start_frame", "end_frame")):
                 raise ValueError(f"Clip bounds must be integer sample frames: {clip['id']}")
@@ -111,14 +116,21 @@ def add(catalog, original, review):
     r = {key: review[key] for key in ("id", "source", "recorded_utc", "frequency_khz", "usage")}
     if "channel" in review:
         r["channel"] = review["channel"]
+    for key in ("license", "source_url", "sending_style", "conditions", "audio_notes"):
+        if key in review:
+            r[key] = review[key]
     r.update(file=original.name, sha256=digest(original.read_bytes()), sample_rate=rate, frames=frames, clips=[])
     for label in review["clips"]:
         first, end = label["start_frame"], label["end_frame"]
         if type(first) is not int or type(end) is not int or not 0 <= first < end <= frames:
             raise ValueError(f"Invalid sample bounds: {first}, {end}")
         samples = pcm(original, rate, frames, first, end)
-        r["clips"].append(dict(id=f"{r['id']}-{first}", start_frame=first, end_frame=end,
-                               pcm_sha256=digest(samples), text=label["text"]))
+        clip = dict(id=f"{r['id']}-{first}", start_frame=first, end_frame=end,
+                    pcm_sha256=digest(samples), text=label["text"])
+        for key in ("sending_style", "conditions"):
+            if key in label:
+                clip[key] = label[key]
+        r["clips"].append(clip)
 
     lock = catalog.with_suffix(".lock")
     lock.mkdir()
@@ -232,19 +244,30 @@ def score(data, guesses):
         missing = sorted(expected - guesses.keys())
         extra = sorted(guesses.keys() - expected)
         raise ValueError(f"Prediction IDs differ. Missing {missing}. Unexpected {extra}")
-    totals = [0, 0, 0, 0]
+    totals = dict(edits=0, characters=0, symbol_edits=0, symbols=0)
+    groups = {"sending_style": {}, "condition": {}}
     rows = []
     for r in data["recordings"]:
         for c in r["clips"]:
             counts = score_text(c["text"], guesses[c["id"]])
-            totals = [a + b for a, b in zip(totals, counts.values())]
+            for metric, value in counts.items():
+                totals[metric] += value
+            style = c.get("sending_style", r.get("sending_style", "unclassified"))
+            conditions = c.get("conditions", r.get("conditions", ["unclassified"]))
+            for category, tags in (("sending_style", [style]), ("condition", set(conditions))):
+                for tag in sorted(tags):
+                    group = groups[category].setdefault(tag, dict(clips=0, **dict.fromkeys(totals, 0)))
+                    group["clips"] += 1
+                    for metric, value in counts.items():
+                        group[metric] += value
             rows.append(dict(id=c["id"], **counts))
     if not rows:
         raise ValueError("The corpus contains no scored clips")
-    edits, chars, key_edits, keys = totals
     fingerprint = digest(json.dumps(data, sort_keys=True, separators=(",", ":")).encode())
-    return dict(corpus_sha256=fingerprint, clips=rows, edits=edits, characters=chars,
-                cer=edits / chars, symbol_edits=key_edits, symbols=keys, symbol_error_rate=key_edits / keys)
+    for group in [totals, *(group for category in groups.values() for group in category.values())]:
+        group["cer"] = group["edits"] / group["characters"]
+        group["symbol_error_rate"] = group["symbol_edits"] / group["symbols"]
+    return dict(corpus_sha256=fingerprint, clips=rows, groups=groups, **totals)
 
 
 def main():
@@ -262,6 +285,7 @@ def main():
     scoring = commands.add_parser("score", help="Evaluate a decoder's JSONL transcripts")
     scoring.add_argument("predictions", type=Path)
     scoring.add_argument("--json", action="store_true")
+    scoring.add_argument("--groups", action="store_true", help="Print scores by sending style and condition")
     args = parser.parse_args()
     try:
         data = corpus(args.catalog)
@@ -282,6 +306,11 @@ def main():
                 print(f"{report['edits']}/{report['characters']} character edits ({report['cer']:.2%} CER)")
                 print(f"{report['symbol_edits']}/{report['symbols']} keyed symbol edits "
                       f"({report['symbol_error_rate']:.2%})")
+                if args.groups:
+                    for category, groups in report["groups"].items():
+                        for tag, group in sorted(groups.items()):
+                            print(f"{category} {tag} | {group['clips']} clips | "
+                                  f"{group['edits']}/{group['characters']} character edits ({group['cer']:.2%} CER)")
     except (ValueError, OSError, KeyError, wave.Error) as error:
         parser.exit(2, f"{error}\n")
 

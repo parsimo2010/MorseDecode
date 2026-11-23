@@ -1,6 +1,6 @@
 # CW recording benchmark
 
-Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, receiver, UTC time, frequency, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256. The 236 clips include 95 from ten WebSDR recordings and 141 from 42 channels extracted from Gqrx captures. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
+Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256, plus receiver, UTC time and frequency where available. The 242 clips include 95 from ten WebSDR recordings, 141 from 42 Gqrx channels, and six from CC0 practice and off-air sources. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [CC0 sources and review](public-audio.md) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
 
 ## Blind transcription audit
 
@@ -47,6 +47,7 @@ If your decoder takes a WAV path and prints the transcript to standard output, r
 ```sh
 python benchmark.py run predictions.jsonl my-decoder "{wav}"
 python benchmark.py score predictions.jsonl
+python benchmark.py score predictions.jsonl --groups
 python benchmark.py score predictions.jsonl --json
 ```
 
@@ -57,6 +58,12 @@ For a GUI, web service or streaming API, produce UTF-8 JSON Lines with one entry
 ```
 
 The primary metric is the total Levenshtein edits divided by the total number of reference characters. Scoring uppercases text, collapses whitespace, and accepts `=` for `<BT>` and `+` for `<AR>`. Spaces, punctuation and the printed prosign characters count. A second metric ignores spaces and treats each prosign as one keyed symbol. This lets you distinguish spacing errors from errors in the letters themselves. The JSON report includes the corpus fingerprint, denominators and per-clip counts.
+
+The group report uses the catalog's sending style and reception tags. A clip
+can belong to several reception groups, so those rows overlap. Untagged
+material appears as unclassified. The `qrn-added` group contains a controlled
+static test on genuine off-air audio. QRM and QSB tags identify observed
+interference and faded marks in the field excerpts.
 
 To generate predictions from this repository's shared decoder, run the following from the repository root. The historical `--utah` flag selects all reviewed field clips, including the WebSDR and Gqrx clips from outside Utah. The field runner, per-clip regression budgets and standalone scorer all apply the same normalization. The separate synthetic and W1AW developer checks in `tests/accuracy.mjs` score literal text. The published 236-clip field baseline remains 196 edits across 4,434 reference characters.
 

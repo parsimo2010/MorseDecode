@@ -444,7 +444,12 @@
           "start_frame": 330480,
           "end_frame": 356240,
           "pcm_sha256": "3310d8d426e769d442a59381a38f06e7500433b74a51500c085aa7bd8a51dfb0",
-          "text": "USING"
+          "text": "USING",
+          "sending_style": "machine",
+          "conditions": [
+            "off-air",
+            "qsb"
+          ]
         },
         {
           "id": "na5b-20261120-010303-356240",
@@ -584,7 +589,12 @@
           "start_frame": 2235760,
           "end_frame": 2336640,
           "pcm_sha256": "d98b97f397f300b38cbe2ce22cd5b5c2cd024d134b45ccdbda724c1aa0b4ad75",
-          "text": "ISLAND, IOTA OC DASH"
+          "text": "ISLAND, IOTA OC DASH",
+          "sending_style": "machine",
+          "conditions": [
+            "off-air",
+            "qrm"
+          ]
         },
         {
           "id": "na5b-20261120-010303-2336640",
@@ -674,7 +684,12 @@
           "start_frame": 1737360,
           "end_frame": 1975200,
           "pcm_sha256": "abdcaafc7ad4d322e4f194ddaa9abafaa4fcc69410247be6f36895d2bc972ac3",
-          "text": "PARTICIPATION IN THE CQ WORLD WIDE DX CW CONTEST."
+          "text": "PARTICIPATION IN THE CQ WORLD WIDE DX CW CONTEST.",
+          "sending_style": "machine",
+          "conditions": [
+            "off-air",
+            "qrm"
+          ]
         },
         {
           "id": "w2db-20261120-010928-1975200",
@@ -2992,6 +3007,129 @@
           "end_frame": 993280,
           "pcm_sha256": "5174403d0c9977914eaec4744d38caf356e6f3acc37984cc1a73935511292ad1",
           "text": "MU"
+        }
+      ]
+    },
+    {
+      "id": "freesound-347147-paddle",
+      "source": "Mediaman57, SOS-MorseCode.wav (Freesound)",
+      "recorded_utc": null,
+      "frequency_khz": null,
+      "usage": "holdout",
+      "license": "CC0-1.0",
+      "source_url": "https://freesound.org/people/Mediaman57/sounds/347147/",
+      "sending_style": "paddle",
+      "conditions": [
+        "sidetone"
+      ],
+      "audio_notes": "MFJ electronic keyer paddle recorded indoors to MiniDisc, mono downmix and -1400 Hz shift to about 702 Hz; original filter undocumented.",
+      "file": "freesound-347147-paddle.wav",
+      "sha256": "f58d6512307c8d54e2dd0beca975a24ffa4b04ebb44edd0b5913d7762a470435",
+      "sample_rate": 8000,
+      "frames": 131003,
+      "clips": [
+        {
+          "id": "freesound-347147-paddle-4000",
+          "start_frame": 4000,
+          "end_frame": 57600,
+          "pcm_sha256": "379c4c263286547d71b7d63d27f207cb25e244539258bf34dc945c92a0cfbfbe",
+          "text": "SOS SOS SOS"
+        }
+      ]
+    },
+    {
+      "id": "freesound-165450-offair",
+      "source": "ok1has, S57LC/OK1HAS off-air QSO (Freesound)",
+      "recorded_utc": "2012-09-14T11:05:00Z",
+      "frequency_khz": 7013.31,
+      "usage": "holdout",
+      "license": "CC0-1.0",
+      "source_url": "https://freesound.org/people/ok1has/sounds/165450/",
+      "sending_style": "unclassified",
+      "conditions": [
+        "off-air",
+        "chirp"
+      ],
+      "audio_notes": "Transceiver speaker recorded by Nokia 6230i in JN79ND; +250 Hz shift to about 631 Hz, approximately 22 WPM; original filter undocumented.",
+      "file": "freesound-165450-offair.wav",
+      "sha256": "741467325596d0a187e4a7d0ac6167cb206b3f68814a1212948818bedf2ed9ba",
+      "sample_rate": 8000,
+      "frames": 1395840,
+      "clips": [
+        {
+          "id": "freesound-165450-offair-402000",
+          "start_frame": 402000,
+          "end_frame": 475040,
+          "pcm_sha256": "2276de9145459da1912af2413276cef16298c823e77cf0eff4a07890146dfc1f",
+          "text": "PWR SUPPLY SEEMS"
+        }
+      ]
+    },
+    {
+      "id": "freesound-165450-offair-qrn",
+      "source": "ok1has, S57LC/OK1HAS off-air QSO (Freesound)",
+      "recorded_utc": "2012-09-14T11:05:00Z",
+      "frequency_khz": 7013.31,
+      "usage": "holdout",
+      "license": "CC0-1.0",
+      "source_url": "https://freesound.org/people/ok1has/sounds/165450/",
+      "sending_style": "unclassified",
+      "conditions": [
+        "qrn-added"
+      ],
+      "audio_notes": "Transceiver speaker recorded by Nokia 6230i in JN79ND; +250 Hz shift to about 631 Hz, approximately 22 WPM; original filter undocumented. Seeded simulated broadband static crashes.",
+      "file": "freesound-165450-offair-qrn.wav",
+      "sha256": "fff2549403279e20e8340cfa354a7e1baff1551bdf41cdab5e4e37747197ec51",
+      "sample_rate": 8000,
+      "frames": 1395840,
+      "clips": [
+        {
+          "id": "freesound-165450-offair-qrn-402000",
+          "start_frame": 402000,
+          "end_frame": 475040,
+          "pcm_sha256": "a7b75970ef6daa577886eaaa0968fd69bfe17427c8ac33333737acc901d23e32",
+          "text": "PWR SUPPLY SEEMS"
+        }
+      ]
+    },
+    {
+      "id": "dod-23735-hand-key",
+      "source": "US Department of Defense, Technique of Hand Sending (1944)",
+      "recorded_utc": null,
+      "frequency_khz": null,
+      "usage": "holdout",
+      "license": "CC0-1.0",
+      "source_url": "https://archive.org/details/gov.dod.dimoc.23735",
+      "sending_style": "straight-key",
+      "conditions": [
+        "training-audio"
+      ],
+      "audio_notes": "Film soundtrack, mono 8 kHz; keyed pitch about 783 Hz, approximately 20 WPM; original filter undocumented.",
+      "file": "dod-23735-audio.wav",
+      "sha256": "48fe64e8da94f53cf481960c248049927343ada5fa8f372108a97424bd6fbb62",
+      "sample_rate": 8000,
+      "frames": 5842774,
+      "clips": [
+        {
+          "id": "dod-23735-hand-key-456000",
+          "start_frame": 456000,
+          "end_frame": 479840,
+          "pcm_sha256": "273a6e101a8651bd170484772a1f2fed22f670a3aff0d927569947644b435b30",
+          "text": "GXYP"
+        },
+        {
+          "id": "dod-23735-hand-key-487520",
+          "start_frame": 487520,
+          "end_frame": 515200,
+          "pcm_sha256": "e65f98e313211c5921b24fc0936c9a41a653f943258d963b6ee009c3314290cb",
+          "text": "GLMYK"
+        },
+        {
+          "id": "dod-23735-hand-key-515200",
+          "start_frame": 515200,
+          "end_frame": 528000,
+          "pcm_sha256": "7d305b9ae843d28cb0052dcc5f492f2a3dc593586eea0a012766d1f5bd1d6c64",
+          "text": "LJ"
         }
       ]
     }

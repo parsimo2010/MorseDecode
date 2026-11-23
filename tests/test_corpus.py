@@ -36,10 +36,15 @@ def test_portable_export_and_external_predictions(tmp_path):
 
 
 def test_empty_copy_and_spacing_metrics():
-    data = {"recordings": [{"clips": [{"id": "a", "text": "I <BT>"}, {"id": "b", "text": "ES"}]}]}
+    data = {"recordings": [{"sending_style": "paddle", "conditions": ["qrm"],
+                            "clips": [{"id": "a", "text": "I <BT>", "conditions": ["qrm", "qsb"]},
+                                      {"id": "b", "text": "ES"}]}]}
     result = benchmark.score(data, {"a": "i=", "b": ""})
     assert (result["edits"], result["characters"]) == (3, 8)
     assert (result["symbol_edits"], result["symbols"]) == (2, 4)
+    assert result["groups"]["sending_style"]["paddle"]["edits"] == 3
+    assert result["groups"]["condition"]["qrm"]["clips"] == 2
+    assert result["groups"]["condition"]["qsb"]["clips"] == 1
 
 def test_add_extract_and_run_external_command(tmp_path):
     catalog = tmp_path / "corpus.json"
