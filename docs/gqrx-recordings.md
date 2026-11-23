@@ -22,8 +22,9 @@ capture times below use the filename dates and times as UTC.
 
 The JSON report has each confirmed carrier's signed offset, estimated RF
 frequency where known, chosen filter, 700 Hz output pitch and full machine
-transcript. Machine copy includes noise and partial characters. The catalog
-contains 58 excerpts checked against the keying, including repeated calls,
+transcript. Machine copy includes noise and partial characters. The first
+review selected 58 excerpts from these captures. The blind review brought
+that total to 108, including repeated calls,
 names, locations and exchanges. The partial CQ around 14022 kHz was real CW
 with a weak or incomplete callsign. At 00:12:21, the +4173 Hz candidate
 repeated the +4107 Hz carrier's marks at the same times. Other rejected peaks
@@ -41,11 +42,11 @@ The file contains 211.75 seconds of complex float32 IQ.
 | Estimated RF (kHz) | Reviewed copy |
 | ---: | --- |
 | 7027.975 | `CQ CQ DE WA6 M E M WA6 M E M WA6 M E M K` |
-| 7028.973 | `CQ` |
+| 7028.973 | `CQ CQ KE9AJC KE9AJC` |
 | 7030.476 | `CQ CQ` |
-| 7031.971 | `CQCQCQ` |
-| 7032.536 | `CQ` |
-| 7043.969 | `CQ CQ` |
+| 7031.971 | `CQCQCQ`, `CQCQCQCQCQ` |
+| 7032.536 | `HAD`, `CQ` |
+| 7043.969 | `NQ6B NQ6B K`, `CQ DE` |
 | 7054.978 | `BK SRI`, `BETTER`, `73` |
 | 7058.976 | `SATURDAY BUT`, `KIDS GAMES ALL DAY <BT>`, `THE NA SPRINT WITH` |
 | 7102.475 | Brief callsign-like transmission with a clear `MU` ending |
@@ -55,10 +56,10 @@ The six-worker run extracted and decoded 93 spectral candidates in about
 identical frequencies and contrast scores. Both scans took about 18
 seconds on this machine. I reviewed the weaker candidates with narrower
 filters and shorter-time spectrograms to distinguish fixed-frequency Morse
-marks from steady tones and digital bursts. The corpus contains 19 reviewed
-excerpts from the nine confirmed carriers. The shared decoder made 32
-character edits on 209 reference characters in those excerpts.
-[Machine transcripts and extraction settings](../benchmarks/cw/gqrx-decodes.json) · [Benchmark catalog](../benchmarks/cw/corpus.json)
+marks from steady tones and digital bursts. The blind review searched 101
+candidate tracks and added 14 excerpts from these same nine carriers. The
+current corpus contains 33 native IQ excerpts with 323 reference characters.
+[Independent source review](../benchmarks/cw/review/README.md) · [Decoder accuracy](decoder-benchmarks.md) · [Machine transcripts and extraction settings](../benchmarks/cw/gqrx-decodes.json)
 
 ```powershell
 python -m morse_decode.wideband recordings/gqrx_20261123_014653_132062140_125000_fc.raw --tuned-hz 7058490 --output raw-40m-output --workers 6

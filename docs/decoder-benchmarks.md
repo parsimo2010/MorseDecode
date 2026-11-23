@@ -1,5 +1,92 @@
 # Decoder accuracy and real-time benchmarks
 
+## Blind-reviewed corpus and difficult source excerpts
+
+Two independent readers transcribed the 145 existing clips before seeing their
+labels. Acoustic review corrected five references. A search of all 22 original
+recordings added 91 scored excerpts, including weak stations and incomplete
+contacts. Both versions below used the same 236 WAVs, corrected labels, default
+400–1000 Hz search band and a fresh decoder per clip. Accuracy is one minus
+character error rate, including word spaces, punctuation and prosigns.
+[Audit, independent reads and source coverage](../benchmarks/cw/review/README.md)
+
+| Field audio | Clips | Characters | Edits at `f5f635e` | Current edits | Accuracy before → after |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Earlier clips, reviewed labels | 145 | 3,644 | 140 | 116 | 96.2% → 96.8% |
+| Newly scored excerpts | 91 | 790 | 134 | 80 | 83.0% → 89.9% |
+| **Entire corpus** | **236** | **4,434** | **274** | **196** | **93.8% → 95.6%** |
+| Native 40 m IQ | 33 | 323 | 36 | 15 | 88.9% → 95.4% |
+| Other Gqrx captures | 108 | 1,039 | 94 | 58 | 91.0% → 94.4% |
+| DC bulletin | 24 | 446 | 75 | 54 | 83.2% → 87.9% |
+| Texas recordings | 24 | 1,058 | 30 | 32 | 97.2% → 97.0% |
+| Utah recordings | 47 | 1,568 | 39 | 37 | 97.5% → 97.6% |
+
+Of the 236 clips, 34 improved, 195 kept their score and seven regressed.
+The decoder copied 147 verbatim. The public scorer counted 75 keyed-symbol
+edits across 3,515 symbols. The scored corpus fingerprint is
+`ca5985402735fb51a18f1b2ac461f99799ca990a1e19562b774d47ba9071b2ec`.
+The 14 new native IQ excerpts improved from 19
+edits to three on 114 characters. The 11 newly recovered DC excerpts improved
+from 39 to 32 on 126 characters. With an artificial gain fade over all 236 WAVs,
+edits fell from 392 to 313 (91.2% to 92.9% accuracy). On the independent W1AW
+15 and 20 WPM reference passages both versions copied all 315 characters, or
+311 of 315 with added noise and fading.
+
+The streaming detector now estimates local carrier phase inside a narrow
+receiver filter and uses the perpendicular component to measure noise. When
+neighboring frequencies show a common change in gain it adjusts the samples
+before measuring phase. A regular keying clock can recover a mark obscured by
+interference. A measured clock on a weak coherent carrier can bridge a fade
+for up to 1.2 seconds. The timing estimator also learns stretched letter gaps
+from the sender before a clear word space arrives.
+
+| Controlled signal condition | Accuracy at `f5f635e` | Current accuracy |
+| --- | ---: | ---: |
+| Clean 23 or 46 WPM | 100% | 100% |
+| Uneven Farnsworth spacing | 74.7% | 97.0% |
+| Straight key | 91.7% | 91.7% |
+| Narrow receiver, 0 dB in its passband | 33.6% | 69.4% |
+| Same receiver, changing output gain | 9.6% | 69.4% |
+| −6 dB in 500 Hz noise | 89.5% | 90.4% |
+| −12 dB broadband white noise | 87.9% | 90.9% |
+| −15 dB broadband white noise | 49.0% | 54.8% |
+| 38 WPM, −10 dB broadband white noise | 51.5% | 59.0% |
+| Deep signal fading | 66.4% | 66.4% |
+
+These rates pool four validation messages across seeds 7121, 20261123 and
+405731. The last seed was first scored after selecting the carrier and
+timing changes. Each row
+has 363 reference characters per condition. The three cold-start idle controls
+produced zero characters across all seeds. Across all validation conditions
+there were 1,659 edits before and 1,161 after on 9,654 reference characters.
+
+Separate tests appended receiver noise after 60 weak transmissions. Requiring
+carrier energy over most of a dit when copy resumes after a long gap reduced
+the additional edits from 223 to 82, compared with the same decoder without
+that check. Across 204 trials with genuine weak terminal groups and gaps up to
+1.9 s, the check preserved all 91 previously correct endings and recovered one.
+
+The field corpus has repeated senders, uncalibrated SNR and deliberately
+selected excerpts. Its score measures copy on
+those excerpts. Contest-wide station or exchange recovery requires a separately
+labeled complete capture.
+
+On this Windows machine, Chrome's decoder worker took 1.2 ms and 1.4 ms at
+the 95th percentile per 20 ms block on the new native IQ `KE9AJC` clip and
+the weak DC `IS THE CQ` excerpt, respectively. The default 48 kHz passband
+took 1.4 ms and the wide 100–3000 Hz passband took 4.6 ms. The wide passband
+exceeded the block duration with Chrome's simulated 6× CPU slowdown.
+
+```powershell
+python tests/recordings.py --utah --baseline f5f635e
+python tests/recordings.py --utah --gain-fade --baseline f5f635e
+python tests/recordings.py --baseline f5f635e
+foreach ($seed in 7121, 20261123, 405731) {
+  node tests/accuracy.mjs --holdout "--seed=$seed" --baseline=f5f635e
+}
+node tests/realtime.mjs --baseline=f5f635e
+```
+
 ## Gqrx and WebSDR evaluation
 
 The shared streaming decoder reduced character edits from **166 to 145** across

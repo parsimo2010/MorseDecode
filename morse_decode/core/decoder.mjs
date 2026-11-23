@@ -162,6 +162,18 @@ function estimateTiming(runs, unit, signalDb) {
     element: cluster(false, 0.45, 1.69, unit)
   };
   const gaps = runs.filter(run => !run.on && run.length > 1.75 * unit && run.length < 22 * unit);
+
+  // Operators can stretch the space between letters before transmitting a
+  // single clear word space. Infer that timing from several clustered gaps.
+  if (gaps.length >= 3) {
+    const lengths = gaps.map(run => run.length).sort((a, b) => a - b);
+    const lower = quantile(lengths, 0.25);
+    const typical = quantile(lengths, 0.5);
+    const ordinary = lengths.filter(gap => Math.abs(gap / unit - 3) < 0.35).length;
+    if (ordinary < 2 && lower >= 4.1 * unit && typical <= 12 * unit && typical < 1.6 * lower) {
+      return {...timing, letter: typical, ready: true};
+    }
+  }
   if (gaps.length < 4) return {...timing, letter: unit * 3, ready: false};
   let best = 3;
   let bestCost = Infinity;
@@ -363,6 +375,87 @@ function projectCarrier(iq, phaseStep, dt, fine) {
   // spectral peak and still point away from the fitted phase during key-down.
   if (fine && (side > 0.46 * forward || reverse > 0.12 * forward)) return null;
   return {values: amplitude, sigma: fine ? select(quadrature, 0.5) / 0.6745 : 0};
+}
+
+function smoothAmplitude(values, radius) {
+  const amplitude = new Float64Array(values.length);
+  let sum = 0;
+  for (let j = 0; j < values.length + radius; j++) {
+    if (j < values.length) sum += values[j];
+    if (j > 2 * radius) sum -= values[j - 2 * radius - 1];
+    if (j >= radius) {
+      const count = Math.min(values.length - 1, j) - Math.max(0, j - 2 * radius) + 1;
+      amplitude[j - radius] = sum / count;
+    }
+  }
+  return amplitude;
+}
+
+function localCarrier(iq, step, dt, contrast) {
+  // A drifting oscillator can stay coherent over several dits while its
+  // phase wanders across the whole acquisition window. Estimate its residual
+  // rotation from pairs separated by 30 ms, then follow its local direction.
+  const length = iq.length / 2;
+  const real = new Float64Array(length);
+  const imag = new Float64Array(length);
+  const lag = Math.max(1, Math.round(0.030 / dt));
+  let crossReal = 0;
+  let crossImag = 0;
+  let mass = 0;
+  for (let i = 0; i < length; i++) {
+    const c = Math.cos(i * step);
+    const s = Math.sin(i * step);
+    real[i] = iq[2 * i] * c + iq[2 * i + 1] * s;
+    imag[i] = iq[2 * i + 1] * c - iq[2 * i] * s;
+    if (i < lag) continue;
+    const x = real[i] * real[i - lag] + imag[i] * imag[i - lag];
+    const y = imag[i] * real[i - lag] - real[i] * imag[i - lag];
+    crossReal += x;
+    crossImag += y;
+    mass += Math.hypot(x, y);
+  }
+  if (!mass || Math.hypot(crossReal, crossImag) < 0.45 * mass) return null;
+
+  const residual = Math.atan2(crossImag, crossReal) / lag;
+  const sumReal = new Float64Array(length + 1);
+  const sumImag = new Float64Array(length + 1);
+  for (let i = 0; i < length; i++) {
+    const c = Math.cos(i * residual);
+    const s = Math.sin(i * residual);
+    const x = real[i] * c + imag[i] * s;
+    imag[i] = imag[i] * c - real[i] * s;
+    real[i] = x;
+    sumReal[i + 1] = sumReal[i] + x;
+    sumImag[i + 1] = sumImag[i] + imag[i];
+  }
+
+  // Project on the local phase. The perpendicular component measures noise
+  // at the station's own pitch, inside the receiver filter.
+  const radius = Math.max(1, Math.round(0.12 / dt));
+  const projected = new Float64Array(length);
+  const side = new Float64Array(length);
+  for (let i = 0; i < length; i++) {
+    const left = Math.max(0, i - radius);
+    const right = Math.min(length, i + radius + 1);
+    const x = sumReal[right] - sumReal[left];
+    const y = sumImag[right] - sumImag[left];
+    const norm = Math.max(1e-15, Math.hypot(x, y));
+    projected[i] = (real[i] * x + imag[i] * y) / norm;
+    side[i] = Math.abs(imag[i] * x - real[i] * y) / norm;
+  }
+
+  // Average across a short part of a mark. Weaker carriers benefit from
+  // slightly longer integration without joining successive fast elements.
+  const seconds = Math.max(0.008, Math.min(0.014, 0.014 * Math.sqrt(50 / contrast)));
+  const half = Math.max(1, Math.round(seconds / dt));
+  const amplitude = smoothAmplitude(projected, half);
+  const sigma = select(side, 0.50) / 0.6745;
+  const levels = amplitude.slice();
+  const low = select(levels, 0.14);
+  const high = select(levels, 0.88);
+  if (high <= 0 || high < 2.1 * sigma || low > 0.5 * high) return null;
+  const fraction = Math.min(0.46, 0.40 + 2.5 / contrast);
+  return {amplitude, through: length - radius, threshold: Math.max(1.55 * sigma, low + fraction * (high - low))};
 }
 
 function variableMarkPeaks(history, {floor, peak}) {
@@ -602,6 +695,7 @@ class CWDecoder {
     this.unit = null;
     this.timing = null;
     this.clockUnit = null;
+    this.lastKeyingGrid = null;
     this.previousGuess = null;
     this.text = '';
     this.runs = [];
@@ -830,6 +924,7 @@ class CWDecoder {
         this.unit = null;
         this.timing = null;
         this.clockUnit = null;
+        this.lastKeyingGrid = null;
         this.previousGuess = null;
         this.runs = [];
         this.pending = 0;
@@ -900,6 +995,60 @@ class CWDecoder {
     return select(scratch, 0.5);
   }
 
+  normalizeReceiverGain(iq, flanks, from) {
+    // A change in receiver gain scales both the signal and nearby noise.
+    // Measure that common change away from the carrier before fitting its phase.
+    const length = iq.length / 2;
+    const cumulative = new Float64Array(length + 1);
+    const scratch = new Float64Array(flanks.length);
+    for (let i = 0; i < length; i++) {
+      cumulative[i + 1] = cumulative[i] + this.flankNoise(flanks, from + i, scratch);
+    }
+    const radius = Math.max(1, Math.round(0.11 / this.dt));
+    const noise = new Float64Array(length);
+    for (let i = 0; i < length; i++) {
+      const left = Math.max(0, i - radius);
+      const right = Math.min(length, i + radius + 1);
+      noise[i] = (cumulative[right] - cumulative[left]) / (right - left);
+    }
+    const ordered = noise.slice().sort();
+    if (quantile(ordered, 0.85) <= 2.8 * Math.max(1e-13, quantile(ordered, 0.15))) return;
+    const reference = quantile(ordered, 0.5);
+    for (let i = 0; i < length; i++) {
+      const scale = Math.max(0.24, Math.min(4, Math.sqrt(reference / Math.max(1e-13, noise[i]))));
+      iq[2 * i] *= scale;
+      iq[2 * i + 1] *= scale;
+    }
+  }
+
+  receiverClock(tone, flanks, levels, startFrame, start, length) {
+    const from = Math.max(0, length - Math.round(3.2 / this.dt), this.tunedAt - startFrame);
+    // A sideband noise estimate is meaningful only when the receiver passes noise beyond the keyed signal.
+    if (from > start || flanks.length < 3) return null;
+    const skirts = levels.filter((_, index) => {
+      const distance = Math.abs(this.tones[index].hz - tone.hz);
+      return distance > 6 * this.lobeWidth && distance < 10 * this.lobeWidth;
+    }).map(level => level.floor);
+    if (skirts.length < 3 ||
+        select(skirts, 0.6) < Math.max(1e-13, 0.005 * levels[this.selected].floor)) return null;
+    const amplitude = new Float64Array(length - from);
+    for (let j = 0; j < amplitude.length; j++) {
+      amplitude[j] = Math.sqrt(tone.history[from + j]);
+    }
+    const grid = keyingGrid(amplitude, this.minUnit, this.maxUnit);
+    if (!grid || (this.unit && (grid.period < 0.65 * this.unit || grid.period > 1.5 * this.unit))) return null;
+    const crest = select(amplitude.slice(), 0.84);
+    const scratch = new Float64Array(flanks.length);
+    const weight = Math.sqrt(this.onGain / 4);
+    for (let j = 0; j < amplitude.length; j++) {
+      const flank = Math.sqrt(Math.max(1e-13, this.flankNoise(flanks, from + j, scratch)));
+      const threshold = Math.max(0.17 * crest, 5 * weight * flank);
+      amplitude[j] = Math.max(-2, Math.min(2, Math.log(Math.max(1e-6, amplitude[j] / threshold))));
+    }
+    const keyed = clockedMarks(amplitude, 0, start - from, grid);
+    return i => keyed(i - from);
+  }
+
   coherentKeying(tone, startFrame, start, length, followFade) {
     const from = Math.max(0, length - Math.round(3.2 / this.dt), this.tunedAt - startFrame);
     if (from > start) return null;
@@ -910,16 +1059,7 @@ class CWDecoder {
     if (!phase) return null;
     const {values, sigma} = phase;
     const radius = Math.min(6, Math.round((this.unit || 0.05 / this.dt) * 0.12));
-    const amplitude = new Float64Array(values.length);
-    let sum = 0;
-    for (let j = 0; j < values.length + radius; j++) {
-      if (j < values.length) sum += values[j];
-      if (j > 2 * radius) sum -= values[j - 2 * radius - 1];
-      if (j >= radius) {
-        const count = Math.min(values.length - 1, j) - Math.max(0, j - 2 * radius) + 1;
-        amplitude[j - radius] = sum / count;
-      }
-    }
+    const amplitude = smoothAmplitude(values, radius);
     const samples = amplitude.slice();
     const peak = select(samples, 0.84);
     const threshold = Math.max(1.2 * sigma, 0.5 * peak);
@@ -940,9 +1080,21 @@ class CWDecoder {
       }
       return i => amplitude[i - from] > limits[i - from] * (this.state ? off : on);
     }
-    const grid = keyingGrid(amplitude, this.minUnit, this.maxUnit);
-    if (!grid || (this.unit && this.runs.length > 16 && Math.abs(Math.log(grid.period / this.unit)) > 0.32)) return null;
-    const marks = clockedMarks(amplitude, threshold * Math.sqrt(on * off), start - from, grid);
+    let grid = keyingGrid(amplitude, this.minUnit, this.maxUnit);
+    const firstFrame = startFrame + from;
+    if (grid) {
+      if (this.unit && this.runs.length > 16 && Math.abs(Math.log(grid.period / this.unit)) > 0.32) return null;
+      this.lastKeyingGrid = {tone, frame: this.frame, period: grid.period, origin: firstFrame + grid.origin};
+    } else {
+      const last = this.lastKeyingGrid;
+      // A short fade can hide the keying edges while the carrier phase remains measurable.
+      if (!last || last.tone !== tone || last.frame < this.tunedAt || (this.frame - last.frame) * this.dt > 1.2) return null;
+      grid = {period: last.period, origin: last.origin - firstFrame};
+    }
+    // The clock sums multiple signed measurements within each dit. Keep a lower
+    // noise threshold here than for individual frames in an unclocked fade.
+    const cellThreshold = Math.max(0.85 * sigma, 0.46 * peak);
+    const marks = clockedMarks(amplitude, cellThreshold * Math.sqrt(on * off), start - from, grid);
     return i => marks(i - from);
   }
 
@@ -980,16 +1132,28 @@ class CWDecoder {
     const window = (carrierScore > 150 && isolated) || shortReceiverWindow
       ? this.shortWindow : carrierScore < 10 ? this.longWindow : null;
     const coherent = !filtered && (carrierScore < 35 || isolated && carrierScore < 150) && withinBand;
+    const flanks = filtered ? this.flankIndices(this.selected) : [];
+    // A steep receiver filter leaves a much higher noise floor beside the
+    // station than the broad search-band floor. Inspect local phase there.
+    const probeLocal = strong && carrierScore < 100 && flanks.length >= 3 &&
+      select(flanks.map(index => levels[index].floor), 0.5) > 30 * background;
+    let localFit = null;
+    let localFrom = 0;
     let fadePhase = null;
     let phaseStart = 0;
     const checkPhase = filtered && isolated && strong && carrierScore > 220;
-    if (window || coherent || checkPhase) {
+    if (window || coherent || checkPhase || probeLocal) {
       const from = Math.max(0, Math.min(start - Math.ceil(0.45 / this.dt), length - this.acquisitionFrames));
       const measured = new Float64Array(length);
-      const iq = coherent || checkPhase ? new Float64Array(2 * (length - from)) : null;
+      const iq = coherent || checkPhase || probeLocal ? new Float64Array(2 * (length - from)) : null;
       const filter = window || this.window;
       for (let i = from; i < length; i++) {
         measured[i] = this.tonePower(startFrame + i, tone.coeff, filter, iq, 2 * (i - from));
+      }
+      if (probeLocal) {
+        this.normalizeReceiverGain(iq, flanks, from);
+        localFit = localCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, carrierScore);
+        localFrom = from;
       }
       if (checkPhase) {
         fadePhase = projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, true);
@@ -1005,7 +1169,7 @@ class CWDecoder {
         noiseBackground *= filter.length / this.window.length * (projected ? 1.9 : 1);
       }
     }
-    const flanks = filtered ? this.flankIndices(this.selected) : [];
+
     const flankPowers = new Float64Array(flanks.length);
     if (filtered) {
       // A returning station can be much stronger than the noise-only history
@@ -1058,9 +1222,19 @@ class CWDecoder {
     const grid = filtered && isolated && strong && !checkFades && flanks.length >= 3 && this.unit && startFrame >= this.tunedAt
       ? fadedKeyingGrid(tone.history, levels[this.selected], this.runs, this.unit) : null;
     const fading = !filtered && withinBand && carrierScore >= 50 && isolated && variableMarkPeaks(tone.history, levels[this.selected]);
+    const receiverMarks = filtered && strong
+      ? this.receiverClock(tone, flanks, levels, startFrame, start, length) : null;
     const coherentMarks = !filtered && withinBand && carrierScore > 2.8 && (carrierScore < 16 || fading)
       ? this.coherentKeying(tone, startFrame, start, length, fading) : null;
     if (coherentMarks) this.active = true;
+    // A carrier can disappear while its earlier marks still dominate the history.
+    let recentCarrier = true;
+    if (!filtered && this.unit && this.frame - this.tunedAt > this.acquisitionFrames) {
+      const powers = tone.history.slice(-Math.max(1, Math.round(0.72 / this.dt)));
+      const low = select(powers, 0.20);
+      const high = select(powers, 0.86);
+      recentCarrier = high - low > 4.2 * (low + 2 * background);
+    }
     let previousCell;
     let focusedMark = false;
     for (let i = start; i < endFrame - startFrame; i++) {
@@ -1108,6 +1282,9 @@ class CWDecoder {
         }
       }
       let gate = floor + Math.max(gain * noise, keyThreshold);
+      // A faded dit can fall below the envelope threshold while its integrated
+      // energy and neighboring marks still follow the transmitter's clock.
+      if (receiverMarks?.(i)) gate *= 0.34;
       // Recover a faded mark when energy along the carrier phase exceeds
       // the measured quadrature noise, even if its absolute power is low.
       if (fadePhase && localPeak[i] < 0.48 * range && fadePhase.values[i - phaseStart] > 3 * fadePhase.sigma) {
@@ -1129,7 +1306,25 @@ class CWDecoder {
           }
         }
       }
-      const on = coherentMarks ? coherentMarks(i) : (this.state || strong) && (envelope[i] > gate || focusedMark);
+      let on = coherentMarks ? coherentMarks(i) : (this.state || strong) && (envelope[i] > gate || focusedMark);
+      // At end of input a complete two-sided phase reference is unavailable.
+      if (localFit && i - localFrom < localFit.through) {
+        const hysteresis = this.state ? 0.92 * Math.sqrt(this.offGain / 2.8) : 1.04 * Math.sqrt(this.onGain / 4);
+        on = localFit.amplitude[i - localFrom] > localFit.threshold * hysteresis;
+      }
+      if (on && !recentCarrier && !this.state &&
+          this.keyClock - this.markEnd > Math.max(9 * this.unit, this.acquisitionFrames)) {
+        // A single returning dit can be too brief to lift the recent percentile.
+        // Integrate at its pitch for most of one dit before reopening the gate.
+        const size = Math.max(3, Math.min(this.recording.length, Math.round(0.85 * this.unit * this.hop)));
+        if (this.ditWindow?.length !== size) this.ditWindow = new Float64Array(size).fill(1);
+        const center = Math.min(this.frame - 1, startFrame + i + Math.round(0.40 * this.unit));
+        const power = this.tonePower(center, tone.coeff, this.ditWindow);
+        // Convert a 20th-percentile Hann noise power to mean rectangular-window
+        // power. At equal length the factor is 1 / (-log(0.8) * 3/8).
+        const noisePower = 12 * background * size / this.window.length;
+        on = power > 7 * noisePower;
+      }
       this.keyFrame(on,
         (envelope[i] - floor) / Math.max(1e-13, noise * this.onGain), adaptToFade, carrierScore < 9.5);
     }

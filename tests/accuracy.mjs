@@ -12,20 +12,20 @@ function random(seed) {
   };
 }
 
-function keying(text, {wpm, jitter = 0, dah = 3, element = 1, letter = 3, word = 7, swing = 0}, rng) {
+function keying(text, {wpm, jitter = 0, dah = 3, element = 1, letter = 3, word = 7, swing = 0, spaceJitter = jitter}, rng) {
   const dit = 1.2 / wpm;
   const runs = [];
   let time = 0.25;
-  const add = (units, on) => {
+  const add = (units, on, variation = jitter) => {
     const pace = 1 + swing * Math.sin(2 * Math.PI * time / 3.1);
-    const end = time + dit * units * pace * (1 + jitter * (2 * rng() - 1));
+    const end = time + dit * units * pace * (1 + variation * (2 * rng() - 1));
     if (on) runs.push([time, end]);
     time = end;
   };
   text.split(' ').forEach((token, w) => {
-    if (w) add(word, false);
+    if (w) add(word, false, spaceJitter);
     Array.from(token.matchAll(/<[^>]+>|./g), match => match[0]).forEach((char, i) => {
-      if (i) add(letter, false);
+      if (i) add(letter, false, spaceJitter);
       Array.from(codes.get(char)).forEach((mark, j) => {
         if (j) add(element, false);
         add(mark === '.' ? 1 : dah, true);
@@ -87,6 +87,34 @@ function synth(text, options, seed) {
   return {samples, rate, reference: quiet ? '' : text};
 }
 
+function narrowReceiver(text, {quiet = false, gainFade = false}, seed) {
+  const rate = 8000;
+  const hz = 585 + seed % 240;
+  const halfWidth = 115;
+  const radius = 160;
+  // A Hann-windowed bandpass models a 230 Hz audio filter with steep skirts.
+  // Integrate its noise gain so the keyed sinusoid and in-band noise have
+  // equal RMS power before the small oscillator drift.
+  const taps = Float64Array.from({length: 2 * radius + 1}, (_, i) => {
+    const n = i - radius;
+    const sinc = n ? Math.sin(2 * Math.PI * halfWidth * n / rate) / (Math.PI * n) : 2 * halfWidth / rate;
+    return (1 + Math.cos(Math.PI * n / radius)) * sinc * Math.cos(2 * Math.PI * hz * n / rate);
+  });
+  const noiseGain = taps.reduce((sum, tap) => sum + tap * tap, 0);
+  const fixture = synth(text, {rate, hz, wpm: 17 + seed % 8, quiet, jitter: 0.05,
+                               drift: 4, noiseDb: 10 * Math.log10(noiseGain)}, seed);
+  const samples = new Float32Array(fixture.samples.length);
+  for (let i = 0; i < samples.length; i++) {
+    let value = 0;
+    const end = Math.min(i, taps.length - 1);
+    for (let j = 0; j <= end; j++) value += taps[j] * fixture.samples[i - j];
+    // A receiver gain change after filtering moves the station and noise together.
+    const gain = gainFade ? 0.22 + 0.78 * (1 + Math.cos(2 * Math.PI * 0.31 * i / rate)) / 2 : 1;
+    samples[i] = value * gain;
+  }
+  return {...fixture, samples};
+}
+
 function edits(a, b) {
   let row = Array.from({length: b.length + 1}, (_, i) => i);
   for (let i = 0; i < a.length; i++) {
@@ -141,6 +169,9 @@ function receiverExchange(text, {idle = false, competing = false, fastFade = fal
 }
 
 const cases = [
+  ['Narrow receiver, 0 dB', {}, narrowReceiver, 0.50],
+  ['Narrow receiver, changing output gain', {gainFade: true}, narrowReceiver],
+  ['Narrow receiver, idle noise', {quiet: true}, narrowReceiver, 0],
   ['Clean', {}],
   ['Clean, high speed', {wpm: 46, hz: 945}],
   ['30 dB in 500 Hz noise', {noiseDb: 30, bandwidth: 500}],
@@ -160,6 +191,7 @@ const cases = [
   ['QRN crashes', {qrn: 7, noiseDb: -5}],
   ['Straight key', {jitter: 0.27, swing: 0.16, dah: 2.55, element: 1.29, letter: 3.7}],
   ['Bug', {jitter: 0.20, swing: 0.13, dah: 4, element: 0.86, letter: 2.7}],
+  ['Uneven Farnsworth spacing', {wpm: 18, letter: 7.5, word: 15.5, jitter: 0.05, spaceJitter: 0.23}, synth, 0.16],
   ['Farnsworth', {wpm: 25, letter: 6.2, word: 13.7}],
   ['Idle noise and steady tone', {quiet: true, noiseDb: -4, qrn: 4, blocker: 2}],
   ['Receiver filter, AGC and station replies', {}, receiverExchange, 0.20],

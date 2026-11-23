@@ -112,6 +112,12 @@ assert.deepEqual(decode(messages[0], {hz: 721, wpm: 26}, 128), reference);
 const weak = {hz: 673, wpm: 18, snr: -15, seed: 103};
 assert.deepEqual(decode(messages[0], weak, 128), decode(messages[0], weak, 731));
 
+// Keep the final two dits of I, then let the same receiver run in pure noise.
+const afterContact = new CWDecoder(8000);
+afterContact.push(synth('CQ TEST 599 I', {wpm: 28, snr: -12, seed: 38913}));
+afterContact.push(synth('VVV TEST DE W1AW', {wpm: 21, snr: -12, seed: 39010, silence: true}));
+assert.equal(afterContact.finish().text, 'CQ TEST 599 I');
+
 const cut = new CWDecoder(8000);
 cut.push(synth(messages[2], {wpm: 40}).subarray(0, -7999));
 assert.equal(cut.finish().text, messages[2]);
