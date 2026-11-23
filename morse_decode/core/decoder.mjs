@@ -148,12 +148,15 @@ const patterns = Object.entries(MORSE);
 
 function estimateTiming(runs, unit, signalDb) {
   const cluster = (on, low, high, expected) => {
-    if (signalDb < 20) return expected;
+    if (signalDb < 12) return expected;
     const lengths = runs.filter(run => run.on === on && run.length >= unit * low && run.length <= unit * high)
       .map(run => run.length).sort((a, b) => a - b);
     return lengths.length < 6 ? expected : 0.44 * expected + 0.56 * quantile(lengths, 0.5);
   };
   const timing = {
+    // At high contrast each edge is already well resolved. In noise,
+    // give extra weight to the interval between successive rising edges.
+    onsetWeight: signalDb < 27 ? 2 : 0,
     dot: cluster(true, 0.60, 1.66, unit),
     dash: cluster(true, 1.84, 5.30, 3 * unit),
     element: cluster(false, 0.45, 1.69, unit)
@@ -258,6 +261,14 @@ function fadedKeyingGrid(history, {floor, peak}, runs, unit) {
 function wordBoundary(runs, unit, letter) {
   const standard = 1.57 * letter;
   const gaps = runs.filter(run => !run.on).map(run => run.length);
+  // A hand-keyed dah and the pauses between letters can both run long.
+  // A three-dit letter reference would split callsigns and single words.
+  const dashes = runs.filter(run => run.on && run.length > 1.8 * unit).map(run => run.length);
+  const spaces = gaps.filter(gap => gap > 1.8 * unit && gap < 16 * unit);
+  if (spaces.length >= 3 && dashes.length >= 3 && select(dashes, 0.5) > 3.4 * unit) {
+    const usual = select(spaces, 0.45);
+    if (usual > 3.15 * unit) return Math.max(standard, Math.min(7 * unit, 1.65 * usual));
+  }
   const letters = gaps.filter(gap => gap > 1.9 * unit && gap < standard);
   const words = gaps.filter(gap => gap >= standard && gap < 6 * letter);
   if (letters.length < 3 || words.length < 2) return standard;
@@ -285,49 +296,194 @@ function hann(length) {
   return Float64Array.from({length}, (_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (length - 1)));
 }
 
-function coherentPowers(iq, phaseStep, dt) {
-  // A keyed oscillator can hold phase across silences. Fit its offset from
-  // the search bin and project onto that phasor to reject quadrature noise.
+function projectCarrier(iq, phaseStep, dt, fine) {
+  // Remove the search-bin frequency, then fit the residual rotation. The
+  // longer fit needs finer frequency resolution to keep its ends in phase.
   const length = iq.length / 2;
-  const phasors = new Float64Array(iq.length);
-  let energy = 0;
+  const baseband = new Float64Array(iq.length);
+  const stride = fine ? Math.max(1, Math.min(3, Math.floor(1 / (20 * dt)))) : 1;
+  let mass = 0;
   for (let i = 0; i < length; i++) {
-    const cos = Math.cos(i * phaseStep);
-    const sin = Math.sin(i * phaseStep);
-    const real = iq[2 * i];
-    const imag = iq[2 * i + 1];
-    phasors[2 * i] = real * cos + imag * sin;
-    phasors[2 * i + 1] = imag * cos - real * sin;
-    energy += Math.hypot(real, imag);
+    const angle = i * phaseStep;
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    const re = iq[2 * i];
+    const im = iq[2 * i + 1];
+    baseband[2 * i] = re * c + im * s;
+    baseband[2 * i + 1] = im * c - re * s;
+    if (i % stride === 0) mass += Math.hypot(re, im);
   }
-  let fit = {strength: 0};
-  for (let hz = -9; hz <= 9; hz += 1.5) {
+  const limit = fine ? 10 : 9;
+  const resolution = fine ? 0.16 : 1.5;
+  let best = ((fine ? 0.45 : 0.51) * mass) ** 2;
+  let fit = null;
+  for (let hz = -limit; hz <= limit; hz += resolution) {
     const step = 2 * Math.PI * hz * dt;
-    let real = 0;
-    let imag = 0;
-    for (let i = 0; i < length; i++) {
-      const cos = Math.cos(i * step);
-      const sin = Math.sin(i * step);
-      real += phasors[2 * i] * cos + phasors[2 * i + 1] * sin;
-      imag += phasors[2 * i + 1] * cos - phasors[2 * i] * sin;
+    const c = Math.cos(stride * step);
+    const s = Math.sin(stride * step);
+    let x = 1;
+    let y = 0;
+    let re = 0;
+    let im = 0;
+    for (let i = 0; i < length; i += stride) {
+      re += baseband[2 * i] * x + baseband[2 * i + 1] * y;
+      im += baseband[2 * i + 1] * x - baseband[2 * i] * y;
+      const next = x * c - y * s;
+      y = y * c + x * s;
+      x = next;
     }
-    const strength = Math.hypot(real, imag);
-    if (strength > fit.strength) fit = {strength, step, phase: Math.atan2(imag, real)};
+    const power = re * re + im * im;
+    if (power > best) {
+      best = power;
+      fit = {step, phase: Math.atan2(im, re)};
+    }
   }
-  // Fall back to ordinary power for phase resets and unstable fits.
-  if (fit.strength <= 0.51 * energy) return null;
-  return Float64Array.from({length}, (_, i) => {
+  if (!fit) return null;
+  const amplitude = new Float64Array(length);
+  const quadrature = fine ? new Float64Array(length) : null;
+  let forward = 0;
+  let reverse = 0;
+  let side = 0;
+  for (let i = 0; i < length; i++) {
     const angle = fit.phase + i * fit.step;
-    const real = phasors[2 * i];
-    const imag = phasors[2 * i + 1];
-    const projected = Math.max(0, real * Math.cos(angle) + imag * Math.sin(angle));
-    return 0.15 * (real * real + imag * imag) + 0.85 * projected * projected;
-  });
+    const re = baseband[2 * i];
+    const im = baseband[2 * i + 1];
+    const projected = re * Math.cos(angle) + im * Math.sin(angle);
+    if (fine) {
+      amplitude[i] = projected;
+      quadrature[i] = Math.abs(im * Math.cos(angle) - re * Math.sin(angle));
+      side += quadrature[i] ** 2;
+      if (projected > 0) forward += projected ** 2;
+      else reverse += projected ** 2;
+    } else {
+      amplitude[i] = 0.15 * (re * re + im * im) + 0.85 * Math.max(0, projected) ** 2;
+    }
+  }
+  // A drifting carrier or one which restarts on each mark can have a
+  // spectral peak and still point away from the fitted phase during key-down.
+  if (fine && (side > 0.46 * forward || reverse > 0.12 * forward)) return null;
+  return {values: amplitude, sigma: fine ? select(quadrature, 0.5) / 0.6745 : 0};
+}
+
+function variableMarkPeaks(history, {floor, peak}) {
+  const range = peak - floor;
+  // Count complete weak and strong marks. A word space alone also has
+  // low power and should not switch a clean station into fade tracking.
+  let crest = 0;
+  let weak = 0;
+  let strong = 0;
+  for (const power of history) {
+    const above = power - floor;
+    if (above > 0.025 * range) crest = Math.max(crest, above);
+    else if (crest) {
+      if (crest > 0.7 * range) strong++;
+      else if (crest > 0.045 * range && crest < 0.40 * range) weak++;
+      crest = 0;
+    }
+    if (weak >= 2 && strong >= 2) return true;
+  }
+  return false;
+}
+
+function keyingGrid(amplitude, minUnit, maxUnit) {
+  // Rising edges recur at even dit counts and falling edges at odd ones.
+  // Correlate signed slopes with that cycle. A weak peak leaves the decoder
+  // free to follow an irregular sender's individual threshold crossings.
+  const edges = [];
+  let mass = 0;
+  for (let i = 2; i < amplitude.length - 2; i += 2) {
+    const slope = amplitude[i + 2] - amplitude[i - 2];
+    edges.push(slope);
+    mass += Math.abs(slope);
+  }
+  let best = 0.3 * mass;
+  let grid = null;
+  for (let cycles = Math.max(4, edges.length / maxUnit); cycles < edges.length / Math.max(2, minUnit); cycles += 0.14) {
+    const step = 2 * Math.PI * cycles / edges.length;
+    const c = Math.cos(step);
+    const s = Math.sin(step);
+    let x = 1;
+    let y = 0;
+    let re = 0;
+    let im = 0;
+    for (const edge of edges) {
+      re += x * edge;
+      im += y * edge;
+      const next = x * c - y * s;
+      y = y * c + x * s;
+      x = next;
+    }
+    const strength = Math.hypot(re, im);
+    if (strength > best) {
+      best = strength;
+      grid = {period: edges.length / cycles, origin: 2 + 2 * Math.atan2(im, re) / step};
+    }
+  }
+  if (!grid) return null;
+  const angle = Math.PI / grid.period;
+  // One regularly keyed group is insufficient if the sender changes pace.
+  const section = Math.ceil(edges.length / 3);
+  for (let begin = 0; begin < edges.length; begin += section) {
+    const end = Math.min(edges.length, begin + section);
+    let re = 0;
+    let im = 0;
+    let weight = 0;
+    for (let i = begin; i < end; i++) {
+      const a = angle * (2 + 2 * i - grid.origin);
+      re += edges[i] * Math.cos(a);
+      im += edges[i] * Math.sin(a);
+      weight += Math.abs(edges[i]);
+    }
+    if (re < 0.12 * weight || Math.abs(im) > 0.52 * re) return null;
+  }
+  return grid;
+}
+
+function clockedMarks(amplitude, threshold, start, {period, origin}) {
+  // Each two-dit interval can be silent, contain a dit, or begin a dah.
+  // A dah also occupies the first half of the next interval. Compare these
+  // possibilities by summing the signed evidence in the middle of each dit.
+  const first = Math.floor((start - origin) / (2 * period)) - 2;
+  const offset = origin + 2 * first * period;
+  const pairs = Math.ceil((amplitude.length - offset) / (2 * period));
+  const evidence = new Float64Array(2 * pairs);
+  for (let cell = 0; cell < evidence.length; cell++) {
+    const begin = offset + cell * period;
+    const low = Math.max(0, Math.ceil(begin + 0.15 * period));
+    const high = Math.min(amplitude.length, Math.ceil(begin + 0.85 * period));
+    for (let i = low; i < high; i++) evidence[cell] += amplitude[i] - threshold;
+    if (high > low) evidence[cell] /= high - low;
+  }
+  const score = new Float64Array(pairs + 2);
+  const marks = new Uint8Array(pairs);
+  for (let i = pairs - 1; i >= 0; i--) {
+    const dit = evidence[2 * i];
+    score[i] = score[i + 1] + Math.max(0, dit);
+    if (dit > 0) marks[i] = 1;
+    if (i + 1 < pairs) {
+      const dah = dit + evidence[2 * i + 1] + evidence[2 * i + 2] + score[i + 2];
+      if (dah > score[i]) {
+        score[i] = dah;
+        marks[i] = 3;
+      }
+    }
+  }
+  const cells = new Uint8Array(2 * pairs);
+  for (let i = 0; i < pairs; i++) {
+    cells.fill(1, 2 * i, 2 * i + marks[i]);
+    if (marks[i] === 3) i++;
+  }
+  return i => cells[Math.floor((i - offset) / period)] === 1;
 }
 
 function decodeWord(marks, timing) {
-  const costs = marks.map(({length, gap}) => [durationCost(length, timing.dot), durationCost(length, timing.dash),
-    durationCost(gap, timing.element), durationCost(gap, timing.letter)]);
+  // Mark length and the following silence share a threshold crossing.
+  // Their sum gives a second timing measurement between successive onsets.
+  const costs = marks.map(({length, gap}) => [timing.dot, timing.dash].map(mark => {
+    const gapCost = space => durationCost(gap, space) +
+      (timing.onsetWeight || 0) * durationCost(length + gap, mark + space);
+    return {mark: durationCost(length, mark), element: gapCost(timing.element), letter: gapCost(timing.letter)};
+  }));
   const paths = [{cost: 0, text: ''}];
   for (let i = 0; i < marks.length; i++) {
     for (const [pattern, char] of patterns) {
@@ -335,8 +491,9 @@ function decodeWord(marks, timing) {
       if (end > marks.length) continue;
       let cost = paths[i].cost;
       for (let j = i; j < end; j++) {
-        cost += costs[j][pattern[j - i] === '.' ? 0 : 1];
-        if (j < marks.length - 1) cost += costs[j][j === end - 1 ? 3 : 2];
+        const choice = costs[j][pattern[j - i] === '.' ? 0 : 1];
+        cost += choice.mark;
+        if (j < marks.length - 1) cost += j === end - 1 ? choice.letter : choice.element;
       }
       if (!paths[end] || cost < paths[end].cost) paths[end] = {cost, text: paths[i].text + char};
     }
@@ -743,6 +900,52 @@ class CWDecoder {
     return select(scratch, 0.5);
   }
 
+  coherentKeying(tone, startFrame, start, length, followFade) {
+    const from = Math.max(0, length - Math.round(3.2 / this.dt), this.tunedAt - startFrame);
+    if (from > start) return null;
+    const iq = new Float64Array(2 * (length - from));
+    const window = this.unit && this.unit * this.hop < 0.8 * this.window.length ? this.shortWindow : this.window;
+    for (let i = from; i < length; i++) this.tonePower(startFrame + i, tone.coeff, window, iq, 2 * (i - from));
+    const phase = projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, true);
+    if (!phase) return null;
+    const {values, sigma} = phase;
+    const radius = Math.min(6, Math.round((this.unit || 0.05 / this.dt) * 0.12));
+    const amplitude = new Float64Array(values.length);
+    let sum = 0;
+    for (let j = 0; j < values.length + radius; j++) {
+      if (j < values.length) sum += values[j];
+      if (j > 2 * radius) sum -= values[j - 2 * radius - 1];
+      if (j >= radius) {
+        const count = Math.min(values.length - 1, j) - Math.max(0, j - 2 * radius) + 1;
+        amplitude[j - radius] = sum / count;
+      }
+    }
+    const samples = amplitude.slice();
+    const peak = select(samples, 0.84);
+    const threshold = Math.max(1.2 * sigma, 0.5 * peak);
+    if (threshold <= 0 || select(samples, 0.20) >= 0.85 * threshold) return null;
+    const on = 1.04 * Math.sqrt(this.onGain / 4);
+    const off = 0.94 * Math.sqrt(this.offGain / 2.8);
+    if (followFade) {
+      // Use the residual quadrature noise to set a lower limit in the fade.
+      // A two-sided peak follows gain changes through the available lookahead.
+      const limits = new Float64Array(amplitude.length);
+      const decay = Math.exp(-this.dt / 0.085);
+      let crest = 0;
+      for (let i = 0; i < limits.length; i++) limits[i] = crest = Math.max(amplitude[i], crest * decay);
+      crest = 0;
+      for (let i = limits.length - 1; i >= 0; i--) {
+        crest = Math.max(amplitude[i], crest * decay);
+        limits[i] = Math.max(1.6 * sigma, 0.48 * Math.max(crest, limits[i]), 0.06 * threshold);
+      }
+      return i => amplitude[i - from] > limits[i - from] * (this.state ? off : on);
+    }
+    const grid = keyingGrid(amplitude, this.minUnit, this.maxUnit);
+    if (!grid || (this.unit && this.runs.length > 16 && Math.abs(Math.log(grid.period / this.unit)) > 0.32)) return null;
+    const marks = clockedMarks(amplitude, threshold * Math.sqrt(on * off), start - from, grid);
+    return i => marks(i - from);
+  }
+
   processKeying(levels, background, carrierScore, withinBand, startFrame, endFrame, filtered) {
     let {floor, peak} = levels[this.selected];
     const tone = this.tones[this.selected];
@@ -766,18 +969,33 @@ class CWDecoder {
     this.isolatedReceiver = filtered && isolated;
     // A short window preserves fast elements. A long one trades time
     // resolution for more rejection of noise near a weak carrier.
-    const window = (carrierScore > 150 && isolated) || (filtered && carrierScore > 35)
+    const fast = (this.unit || this.minUnit) * this.hop < 0.90 * this.window.length;
+    // A reply can have a different level from the previous station.
+    // During acquisition or a gain change use the shorter, locally calibrated window.
+    const recentPeak = filtered && !fast && carrierScore < 250
+      ? select(tone.history.slice(-this.acquisitionFrames), 0.86) : peak;
+    const varyingGain = recentPeak < 0.63 * peak || recentPeak > 1.6 * peak;
+    const acquiring = this.frame - this.tunedAt < this.historyFrames;
+    const shortReceiverWindow = filtered && carrierScore > 35 && (carrierScore > 250 || fast || acquiring || varyingGain);
+    const window = (carrierScore > 150 && isolated) || shortReceiverWindow
       ? this.shortWindow : carrierScore < 10 ? this.longWindow : null;
     const coherent = !filtered && (carrierScore < 35 || isolated && carrierScore < 150) && withinBand;
-    if (window || coherent) {
+    let fadePhase = null;
+    let phaseStart = 0;
+    const checkPhase = filtered && isolated && strong && carrierScore > 220;
+    if (window || coherent || checkPhase) {
       const from = Math.max(0, Math.min(start - Math.ceil(0.45 / this.dt), length - this.acquisitionFrames));
       const measured = new Float64Array(length);
-      const iq = coherent ? new Float64Array(2 * (length - from)) : null;
+      const iq = coherent || checkPhase ? new Float64Array(2 * (length - from)) : null;
       const filter = window || this.window;
       for (let i = from; i < length; i++) {
         measured[i] = this.tonePower(startFrame + i, tone.coeff, filter, iq, 2 * (i - from));
       }
-      const projected = coherent && coherentPowers(iq, 2 * Math.PI * tone.hz * this.dt, this.dt);
+      if (checkPhase) {
+        fadePhase = projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, true);
+        phaseStart = from;
+      }
+      const projected = coherent && projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, false)?.values;
       if (window || projected) {
         if (projected) measured.set(projected, from);
         history = measured;
@@ -839,6 +1057,10 @@ class CWDecoder {
     const focusScale = ((window || this.window).length / this.longWindow.length) ** 2;
     const grid = filtered && isolated && strong && !checkFades && flanks.length >= 3 && this.unit && startFrame >= this.tunedAt
       ? fadedKeyingGrid(tone.history, levels[this.selected], this.runs, this.unit) : null;
+    const fading = !filtered && withinBand && carrierScore >= 50 && isolated && variableMarkPeaks(tone.history, levels[this.selected]);
+    const coherentMarks = !filtered && withinBand && carrierScore > 2.8 && (carrierScore < 16 || fading)
+      ? this.coherentKeying(tone, startFrame, start, length, fading) : null;
+    if (coherentMarks) this.active = true;
     let previousCell;
     let focusedMark = false;
     for (let i = start; i < endFrame - startFrame; i++) {
@@ -885,7 +1107,12 @@ class CWDecoder {
           keyThreshold = Math.max(keyThreshold, multiple * sideNoise);
         }
       }
-      const gate = floor + Math.max(gain * noise, keyThreshold);
+      let gate = floor + Math.max(gain * noise, keyThreshold);
+      // Recover a faded mark when energy along the carrier phase exceeds
+      // the measured quadrature noise, even if its absolute power is low.
+      if (fadePhase && localPeak[i] < 0.48 * range && fadePhase.values[i - phaseStart] > 3 * fadePhase.sigma) {
+        gate = floor + Math.max(0.55 * gain * noise, 0.45 * keyThreshold);
+      }
       if (grid) {
         const cell = Math.floor((i - grid.origin) / grid.period);
         if (cell !== previousCell) {
@@ -902,7 +1129,8 @@ class CWDecoder {
           }
         }
       }
-      this.keyFrame((this.state || strong) && (envelope[i] > gate || focusedMark),
+      const on = coherentMarks ? coherentMarks(i) : (this.state || strong) && (envelope[i] > gate || focusedMark);
+      this.keyFrame(on,
         (envelope[i] - floor) / Math.max(1e-13, noise * this.onGain), adaptToFade, carrierScore < 9.5);
     }
   }
@@ -945,7 +1173,9 @@ class CWDecoder {
       this.marks.at(-1).gap = gap;
       this.remember(false, gap);
       this.updateTiming();
-      if ((this.timing?.ready && gap > this.timing.word) || this.marks.length >= 120) this.commitWord();
+      // The first few marks can fit two different sending speeds. Keep
+      // them in the preview until later onsets settle the word boundary.
+      if ((this.runs.length >= 24 && this.timing?.ready && gap > this.timing.word) || this.marks.length >= 120) this.commitWord();
     }
     this.marks.push({length, gap: 0});
     this.markEnd = end;

@@ -1,5 +1,98 @@
 # Decoder accuracy and real-time benchmarks
 
+## Gqrx and WebSDR evaluation
+
+The shared streaming decoder reduced character edits from **166 to 145** across
+the 145 off-air clips at `561bc5e`. Eleven clips improved, six regressed and
+128 kept their previous score. Both decoders started fresh on each WAV with
+the default 400–1000 Hz passband and no speed, pitch or transcript hints.
+Accuracy below means one minus character error rate and includes spaces,
+punctuation and printed prosigns. [Recordings and scoring](../benchmarks/cw/README.md)
+
+| Off-air recordings | Clips | Characters | Previous edits | New edits | New accuracy |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Gqrx native 40 m IQ | 19 | 209 | 32 | 17 | 91.9% |
+| Other Gqrx captures | 58 | 601 | 28 | 27 | 95.5% |
+| DC W1AW bulletin | 13 | 320 | 45 | 36 | 88.8% |
+| Texas W1AW bulletin | 10 | 431 | 2 | 2 | 99.5% |
+| Texas conversation | 12 | 606 | 28 | 28 | 95.4% |
+| Utah recordings | 33 | 1,476 | 31 | 35 | 97.6% |
+| **All recordings** | **145** | **3,643** | **166** | **145** | **96.0%** |
+
+These are development recordings. The Gqrx references were reviewed with
+decoder assistance and cover selected excerpts from isolated channels. The
+40 m accuracy therefore measures copy on those excerpts. Measuring the
+fraction of contest contacts recovered would also require independent labels
+for stations and exchanges across an entire capture.
+
+With a repeatable gain fade applied to all 145 WAVs, edits fell from 222 to
+219. On the two archived 15 and 20 WPM W1AW practice excerpts, both decoders
+copied all 315 characters correctly. Adding fade and noise to those same
+excerpts reduced accuracy to 94.9% on the previous decoder and 98.7% on
+the new one.
+
+### Measured accuracy by signal condition
+
+The table pools the four synthetic validation messages across three starting
+seeds (`7121`, `20261123`, `915907`). Each ordinary condition has 363
+reference characters. Receiver exchanges have 435 because they include a
+reply. The messages repeat across seeds, so the rates describe sensitivity
+to noise and keying variation within these fixtures. The final seed was run
+after the decoder changes were fixed. Field recordings have no calibrated
+SNR labels. See the synthetic tests below for the noise bandwidth convention.
+
+| Synthetic condition | Previous accuracy | New accuracy |
+| --- | ---: | ---: |
+| Clean at 23 or 46 WPM, or +15 / +30 dB in 500 Hz noise | 100% | 100% |
+| 0 dB in 500 Hz noise | 96.1% | 95.9% |
+| −6 dB in 500 Hz noise | 74.4% | 88.4% |
+| −12 dB broadband white noise | 75.5% | 89.5% |
+| −15 dB broadband white noise | 11.3% | 53.7% |
+| 38 WPM in −10 dB broadband white noise | 46.6% | 48.5% |
+| +15 dB with fading and variable keying | 63.6% | 79.1% |
+| Deep fading at +2 dB broadband SNR | 60.3% | 64.7% |
+| Receiver AGC with fast selective fading | 74.9% | 87.1% |
+| Straight key | 92.6% | 92.6% |
+| Bug or Farnsworth spacing | 100% | 100% |
+| Carrier drift | 87.9% | 89.5% |
+| Impulsive static | 89.8% | 89.3% |
+| **All synthetic validation conditions** | **83.8%** | **88.4%** |
+
+The pooled totals were 1,385 and 991 edits on 8,565 characters. Both
+decoders produced zero insertions on both idle controls across all three
+seeds. At −18 dB broadband SNR the separate regression suite still had
+92 edits on 103 characters with the new decoder.
+
+### What changed and what it costs
+
+On a weak carrier that holds phase, the decoder measures energy along the
+carrier phase and uses the perpendicular component to estimate noise.
+When rising and falling edges maintain a dit clock across three sections
+of recent audio, it sums the evidence inside each dit and compares silence,
+dit and dah sequences. An isolated carrier with fading can use a local
+amplitude threshold. At startup the decoder keeps early groups in the
+preview longer, giving later marks a chance to resolve the sending speed.
+It also uses onset-to-onset timing in noisy audio and accounts for long
+letter gaps from operators who send unusually long dahs.
+
+On the same Windows machine with Node 24, default-passband processing used
+0.9% of real time on both revisions. Weak CW rose from 1.0% to 1.3%.
+Its 99th-percentile processing time per 20 ms block rose from 1.43 to
+2.09 ms. The Chrome worker measured 2.00 ms for weak CW and 1.10 ms for
+the DC interference excerpt at the 99th percentile.
+
+```powershell
+python tests/recordings.py --utah --baseline 561bc5e
+python tests/recordings.py --utah --gain-fade --baseline 561bc5e
+python tests/recordings.py --baseline 561bc5e
+foreach ($seed in 7121, 20261123, 915907) {
+  node tests/accuracy.mjs --holdout "--seed=$seed" --baseline=561bc5e
+}
+node tests/realtime.mjs --baseline=561bc5e
+```
+
+## Earlier Utah evaluation
+
 The Northern Utah WebSDR evaluation reduced character edits from 109 to 8
 on 402 labeled off-air characters. It includes the manual copy, receiver-noise
 and handoff tests, and current Chrome timings. [Northern Utah field results](utah-websdr.md)

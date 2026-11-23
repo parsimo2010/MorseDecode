@@ -109,6 +109,8 @@ assert.equal(reference.text, messages[0]);
 assert.ok(Math.abs(reference.frequency - 721) < 15, JSON.stringify(reference));
 assert.ok(Math.abs(reference.wpm - 26) < 3, JSON.stringify(reference));
 assert.deepEqual(decode(messages[0], {hz: 721, wpm: 26}, 128), reference);
+const weak = {hz: 673, wpm: 18, snr: -15, seed: 103};
+assert.deepEqual(decode(messages[0], weak, 128), decode(messages[0], weak, 731));
 
 const cut = new CWDecoder(8000);
 cut.push(synth(messages[2], {wpm: 40}).subarray(0, -7999));

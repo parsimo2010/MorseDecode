@@ -149,7 +149,7 @@ const cases = [
   ['0 dB in 500 Hz noise', {noiseDb: 0, bandwidth: 500, wpm: 19}],
   ['−6 dB in 500 Hz noise', {noiseDb: -6, bandwidth: 500, wpm: 17}],
   ['−12 dB white noise', {noiseDb: -12, wpm: 22}],
-  ['−15 dB white noise', {noiseDb: -15, wpm: 18}],
+  ['−15 dB white noise', {noiseDb: -15, wpm: 18}, synth, 0.65],
   ['Fast CW in white noise', {noiseDb: -10, wpm: 38, hz: 732}],
   ['Carrier restarts each mark', {noiseDb: -9, phaseResets: true}],
   ['48 kHz with strong out-of-band CW', {rate: 48000, aliasInterferer: true}],
@@ -164,7 +164,7 @@ const cases = [
   ['Idle noise and steady tone', {quiet: true, noiseDb: -4, qrn: 4, blocker: 2}],
   ['Receiver filter, AGC and station replies', {}, receiverExchange, 0.20],
   ['Receiver with a competing keyed station', {competing: true}, receiverExchange, 0.15],
-  ['Receiver with fast selective fading', {fastFade: true}, receiverExchange, 0.30],
+  ['Receiver with fast selective fading', {fastFade: true}, receiverExchange, 0.20],
   ['Receiver filter and idle AGC noise', {idle: true}, receiverExchange, 0]
 ];
 
@@ -212,12 +212,14 @@ if (fixture) {
   }
 } else {
   const holdout = args.includes('--holdout');
+  const firstSeed = Number(flag('seed') ?? (holdout ? 7121 : 47));
+  if (!Number.isSafeInteger(firstSeed)) throw new Error('--seed requires an integer.');
   const selected = holdout ? messages.slice(4) : messages.slice(0, 4);
   const totals = versions.map(() => ({edits: 0, chars: 0, ms: 0}));
   for (const [label, options, generate = synth, limit] of cases) {
     if (flag('match') && !label.toLowerCase().includes(flag('match').toLowerCase())) continue;
     const fixtures = selected.map((message, i) => {
-      const seed = (holdout ? 7121 : 47) + i * 81;
+      const seed = firstSeed + i * 81;
       return generate(message, options, seed);
     });
     const chars = fixtures.reduce((n, fixture) => n + fixture.reference.length, 0);
