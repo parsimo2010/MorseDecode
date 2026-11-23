@@ -613,21 +613,23 @@ class CWDecoder {
     guard = false, includeHigh = true
   } = {}) {
     if (!(Number.isFinite(sampleRate) && low >= 0 && high > low && high < sampleRate / 2 &&
-        minWpm > 0 && Number.isFinite(maxWpm) && minWpm < maxWpm &&
+        minWpm >= 1 && maxWpm <= 120 && minWpm < maxWpm &&
         Number.isFinite(binWidth) && binWidth >= 1)) {
-      throw new RangeError('Choose a passband below half the sample rate, a positive bin width, and a valid WPM range.');
+      throw new RangeError('Choose a passband below half the sample rate, a positive bin width, and a WPM range within 1–120.');
+    }
+    if (sampleRate > 384000) {
+      throw new RangeError('The input sample rate cannot exceed 384 kHz.');
     }
     // Leave transition bandwidth above the highest search and guard tone.
     const highestTone = high + (guard ? Math.max(48, binWidth) : 0);
     const factor = Math.max(1, Math.floor(sampleRate / Math.max(4000, 3.2 * highestTone)));
     const analysisRate = sampleRate / factor;
-    if (factor > 1) this.decimator = makeDecimator(factor);
     this.hop = Math.round(analysisRate * hopMs / 1000);
     const windowLength = Math.round(analysisRate * windowMs / 1000);
-    if (!(this.hop > 0 && Number.isFinite(windowLength) && windowLength > this.hop &&
-        Number.isFinite(debounceMs) && debounceMs >= 0 && Number.isFinite(offDb) &&
+    if (!(hopMs >= 2.5 && this.hop > 0 && windowMs <= 250 && windowLength > this.hop &&
+        Number.isFinite(debounceMs) && debounceMs >= 0 && debounceMs <= 250 && Number.isFinite(offDb) &&
         Number.isFinite(onDb) && offDb < onDb)) {
-      throw new RangeError('Check the analysis window, hop, debounce, and detection thresholds.');
+      throw new RangeError('Use a hop of at least 2.5 ms, a longer window up to 250 ms, and debounce within 0–250 ms.');
     }
     this.dt = this.hop / analysisRate;
     this.lobeWidth = analysisRate / windowLength;
@@ -643,9 +645,27 @@ class CWDecoder {
     this.offGain = 2.8 * (4 / 2.8) ** ((offDb - 20) / 4);
     this.minUnit = 1.2 / maxWpm / this.dt;
     this.maxUnit = 1.2 / minWpm / this.dt;
-    if (!Number.isFinite(this.maxUnit) || this.minUnit === 0) {
-      throw new RangeError('The WPM range is too wide for the analysis hop.');
+    const bins = Math.ceil((high - low) / binWidth);
+    if (bins >= 512) throw new RangeError('Too many search tones. Narrow the passband or increase the bin width.');
+    const step = (high - low) / bins;
+    const frequencies = Array.from({length: bins + 1}, (_, i) => low + i * step);
+    this.bandSize = bins + Number(includeHigh);
+    this.guard = guard;
+    // Inspect neighbouring frequencies to avoid decoding the skirts of a
+    // stronger carrier outside this passband as another station.
+    if (guard) {
+      const guardStep = Math.max(6, step);
+      for (let offset = guardStep; offset <= Math.max(48, guardStep); offset += guardStep) {
+        if (low - offset >= 0) frequencies.push(low - offset);
+        if (high + offset < sampleRate / 2) frequencies.push(high + offset);
+      }
     }
+    // Bound the Goertzel work both per frame and per second of input.
+    const frameWork = windowLength * frequencies.length;
+    if (frequencies.length > 512 || frameWork > 120000 || frameWork / this.dt > 24000000) {
+      throw new RangeError('Analysis exceeds the real-time work limit. Narrow the passband, shorten the window, or increase the hop.');
+    }
+    if (factor > 1) this.decimator = makeDecimator(factor);
     this.unitGrid = [];
     for (let unit = this.minUnit; unit <= this.maxUnit * 1.001; unit *= 1.025) {
       this.unitGrid.push({unit, logUnit: Math.log(unit)});
@@ -670,20 +690,6 @@ class CWDecoder {
       };
     }
     this.fill = 0;
-    const bins = Math.ceil((high - low) / binWidth);
-    const step = (high - low) / bins;
-    const frequencies = Array.from({length: bins + 1}, (_, i) => low + i * step);
-    this.bandSize = bins + Number(includeHigh);
-    this.guard = guard;
-    // Inspect neighbouring frequencies to avoid decoding the skirts of a
-    // stronger carrier outside this passband as another station.
-    if (guard) {
-      const guardStep = Math.max(6, step);
-      for (let offset = guardStep; offset <= Math.max(48, guardStep); offset += guardStep) {
-        if (low - offset >= 0) frequencies.push(low - offset);
-        if (high + offset < sampleRate / 2) frequencies.push(high + offset);
-      }
-    }
     this.tones = frequencies.map(hz => ({hz, coeff: 2 * Math.cos(2 * Math.PI * hz / analysisRate), history: []}));
     this.frame = 0;
     this.cursor = 0;

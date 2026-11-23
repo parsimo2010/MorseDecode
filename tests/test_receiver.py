@@ -123,6 +123,33 @@ def test_invalid_passband_returns_a_clear_error():
         Receiver(RATE, cfg)
 
 
+@pytest.mark.parametrize(("options", "message"), [
+    ({"minWpm": 8e-309}, "WPM range"),
+    ({"hopMs": 0.1}, "hop"),
+    ({"windowMs": 1e9}, "window"),
+    ({"low": 100, "high": 3000, "binWidth": 1}, "Too many search tones"),
+    ({"low": 100, "high": 3000, "windowMs": 150}, "real-time work limit"),
+])
+def test_pathological_core_options_fail_promptly(options, message):
+    result = subprocess.run(
+        ["node", "--input-type=module", "-e",
+         "import {CWDecoder} from './morse_decode/core/decoder.mjs';"
+         "new CWDecoder(48000, JSON.parse(process.argv[1]));", json.dumps(options)],
+        cwd=ROOT, capture_output=True, text=True, timeout=5,
+    )
+    assert result.returncode != 0
+    assert message in result.stderr
+
+
+def test_core_still_accepts_wide_passband():
+    subprocess.run(
+        ["node", "--input-type=module", "-e",
+         "import {CWDecoder} from './morse_decode/core/decoder.mjs';"
+         "new CWDecoder(48000, {low: 100, high: 3000});"],
+        cwd=ROOT, check=True, timeout=5,
+    )
+
+
 @pytest.mark.parametrize("rate", [8000, 48000])
 @pytest.mark.parametrize("agc", [False, True])
 def test_invalid_pcm_is_silence_and_does_not_poison_following_copy(rate, agc):
