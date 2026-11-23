@@ -6,22 +6,49 @@ inside the selected passband. The terminal can run several passbands in parallel
 
 ## How decoding works
 
-1. **Find and track the CW tone.** The decoder uses a bank of Goertzel
-   filters on overlapping Hann-windowed audio frames to find a keyed tone
-   above the noise floor. It downsamples with an anti-alias filter when the
-   passband allows and follows the carrier as its pitch drifts.
-2. **Measure marks and gaps.** Separate key-down and key-up thresholds
-   adapt to noise and fading. Shorter windows preserve fast dits, while
-   longer windows help isolate weak tones. The decoder can check noise on
-   either side of the tone in filtered receiver audio, use coherent detection
-   when carrier phase is stable, and integrate over a dit-length grid when
-   the sending is regular.
-3. **Decode each word.** The decoder estimates the dit length from recent
-   marks and gaps and learns letter spacing separately, including the longer
-   gaps used in Farnsworth sending. Long gaps mark word boundaries. Within
-   each word, dynamic programming finds the sequence of valid Morse
-   characters whose dot, dash, and gap durations best fit the learned timing.
-   The decoder can revise the current word as more audio arrives.
+MorseDecode follows the station's pitch, checks for weak marks inside fades,
+and scores whole sequences of Morse characters. It updates its estimates as
+audio arrives, so an ambiguous mark can be resolved by later timing evidence.
+
+- **Carrier acquisition and tracking.** A bank of Goertzel filters measures
+  overlapping Hann-windowed frames. The default search uses 50 ms windows and
+  5 ms hops. The decoder ranks tones by how much their power changes as the
+  key goes up and down, relative to the noise floor. That helps it reject
+  steady tones. It follows pitch drift and can acquire a reply at a different
+  pitch in filtered receiver audio, checking for overlap to avoid switching
+  to a competing station. It downsamples with an anti-alias filter when the
+  passband allows.
+- **Adaptive keying detection.** The decoder uses separate thresholds for
+  key-down and key-up and rejects brief spikes. It uses shorter measurement
+  windows to resolve fast dits and longer ones to isolate weak tones. On
+  filtered receiver audio it measures noise on both sides of the carrier
+  and can recheck ambiguous bursts with a longer window for finer frequency
+  resolution to tell broadband hiss from a keyed tone.
+- **Carrier phase tracking and fade recovery.** The decoder can fit the
+  carrier's residual frequency and phase from the complex Goertzel output.
+  When that fit holds, it can use energy aligned with the carrier phase as
+  signal evidence and the perpendicular component as a noise estimate. It
+  can also track phase locally as it drifts. When coherence is poor, such
+  as when phase restarts on each mark, the decoder can use magnitude. A
+  short lookahead lets the keying threshold follow fades. For regular
+  sending, the decoder can fit a dit clock from keying edges and combine
+  evidence over each dit to recover a mark that falls below the ordinary
+  threshold, such as the middle dit of an S.
+- **Adaptive timing.** The decoder tracks sending speed from recent marks
+  and gaps. It estimates dit, dah, and intra-character gap durations, and
+  learns letter spacing separately to handle longer Farnsworth gaps. In
+  noise it gives extra weight to the time from one mark's start to the next.
+  That measurement is less sensitive to a threshold shift that lengthens a
+  mark and shortens the following gap.
+- **Minimum-cost search over Morse sequences.** After splitting the stream
+  at long gaps, the decoder tries every valid Morse pattern at each possible
+  character boundary. Dynamic programming keeps the lowest-cost path to
+  each mark boundary and finds the exact minimum under the timing model.
+  This lets it decide dot versus dash and element versus letter gap together.
+  The current word can be revised as more timing evidence arrives.
+
+See the [decoder benchmarks](docs/decoder-benchmarks.md) for tests covering
+weak CW, fading, phase resets, interference, and field recordings.
 
 ## Browser app
 
