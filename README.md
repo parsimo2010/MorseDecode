@@ -4,6 +4,25 @@ MorseDecode decodes keyed Morse code (CW) in real time. The browser app and
 terminal UI use the same JavaScript decoder. The browser follows one carrier
 inside the selected passband. The terminal can run several passbands in parallel.
 
+## How decoding works
+
+1. **Find and track the CW tone.** The decoder uses a bank of Goertzel
+   filters on overlapping Hann-windowed audio frames to find a keyed tone
+   above the noise floor. It downsamples with an anti-alias filter when the
+   passband allows and follows the carrier as its pitch drifts.
+2. **Measure marks and gaps.** Separate key-down and key-up thresholds
+   adapt to noise and fading. Shorter windows preserve fast dits, while
+   longer windows help isolate weak tones. The decoder can check noise on
+   either side of the tone in filtered receiver audio, use coherent detection
+   when carrier phase is stable, and integrate over a dit-length grid when
+   the sending is regular.
+3. **Decode each word.** The decoder estimates the dit length from recent
+   marks and gaps and learns letter spacing separately, including the longer
+   gaps used in Farnsworth sending. Long gaps mark word boundaries. Within
+   each word, dynamic programming finds the sequence of valid Morse
+   characters whose dot, dash, and gap durations best fit the learned timing.
+   The decoder can revise the current word as more audio arrives.
+
 ## Browser app
 
 Open the [live MorseDecode web app](https://parsimo2010.github.io/MorseDecode/)
@@ -208,16 +227,9 @@ also accepts native Gqrx IQ `.raw` files. [Capture settings, results and benchma
 ## Shared decoder
 
 [`morse_decode/core/decoder.mjs`](morse_decode/core/decoder.mjs) is the
-reference implementation. It downsamples with an anti-alias filter where the
-passband permits, follows the carrier as its pitch drifts, and adapts detection
-to fades and bursts of noise. On filtered receiver audio it checks noise on
-both sides of the signal and can acquire a reply on a different pitch. It can use carrier phase when it remains stable
-through keying gaps. It tracks dot and dash timing separately from character
-spacing and scores possible Morse sequences by their timing. A compact history
-lets the browser revise the current word until it is ready to commit. The
-terminal routes PCM to the core through a persistent Node.js process. The web
-build embeds the same module in a dedicated worker. An AudioWorklet captures
-and forwards browser audio.
+reference implementation. The terminal routes PCM to the core through a
+persistent Node.js process. The web build embeds the same module in a dedicated
+worker. An AudioWorklet captures and forwards browser audio.
 
 Changes to gain control, detection, timing, or Morse decoding belong in that
 module. Rebuild the static HTML with `node web/build.mjs` after changing it and
