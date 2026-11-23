@@ -23,7 +23,7 @@ import os
 import signal
 import threading
 import time
-from contextlib import closing
+from contextlib import ExitStack, closing
 from pathlib import Path
 from typing import TextIO
 
@@ -34,6 +34,7 @@ from .audio.source import create_source, list_devices
 from .receiver import DecoderError, Receiver
 from .qso import qso_timeline
 from .output.display import Display, BinDisplayState
+from .output.monitor import Monitor
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +104,9 @@ class ChannelLogger:
 # Main processing loop
 # ---------------------------------------------------------------------------
 
-def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
+def run_decoder(
+    cfg: Config, logger: ChannelLogger | None = None, monitor_port: int | None = None,
+) -> None:
     def report_audio_status(message: str) -> None:
         display.print_status(message)
 
@@ -117,7 +120,13 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
         network=cfg.input.network,
     )
     sample_rate = source.sample_rate
-    with Receiver(sample_rate, cfg) as receiver:
+    with Receiver(sample_rate, cfg) as receiver, ExitStack() as stack:
+        monitor = None
+        if monitor_port is not None:
+            try:
+                monitor = stack.enter_context(Monitor(monitor_port))
+            except OSError as exc:
+                raise DecoderError(f"Could not open the receiver monitor: {exc}") from exc
         rows = [
             BinDisplayState(freq_hz=(band["low"] + band["high"]) // 2)
             for band in receiver.passbands
@@ -147,6 +156,12 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
                     row.mark_inactive()
                 if logger is not None and delta:
                     logger.log(row.freq_hz, delta, row.snr_db, row.speed_wpm)
+            if monitor is not None:
+                monitor.publish([
+                    dict(freq_hz=row.freq_hz, signal_db=row.snr_db, speed_wpm=row.speed_wpm,
+                         callsign=row.last_callsign, active=result["active"], text=row.text[-4096:])
+                    for row, result in zip(rows, results, strict=True)
+                ])
             display.refresh()
 
         reading = False
@@ -164,6 +179,8 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
                 f"{cfg.input.freq_min}-{cfg.input.freq_max} Hz | "
                 f"SR {sample_rate} Hz | Ctrl-C to quit"
             )
+            if monitor is not None:
+                display.print_status(f"Receiver monitor: {monitor.url}")
             previous_handler = None
             if threading.current_thread() is threading.main_thread():
                 previous_handler = signal.signal(signal.SIGINT, interrupt)
@@ -233,6 +250,8 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
               help="Enable file logging to FILE.")
 @click.option("--log-format", default=None, type=click.Choice(["text", "jsonl"]),
               help="Log format: text (default) or jsonl.")
+@click.option("--monitor-port", type=click.IntRange(1, 65535), metavar="PORT",
+              help="Serve read-only receiver status to a browser via loopback.")
 @click.option("--replay", type=click.Path(exists=True, dir_okay=False, path_type=Path),
               help="Print the timestamped events from a QSO JSONL log.")
 @click.option("--tx-events", type=click.Path(exists=True, dir_okay=False, path_type=Path),
@@ -259,6 +278,7 @@ def main(
     speed_max: float | None,
     log_path: str | None,
     log_format: str | None,
+    monitor_port: int | None,
     replay: Path | None,
     tx_events: Path | None,
     replay_speed: float | None,
@@ -341,7 +361,7 @@ def main(
         )
 
     try:
-        run_decoder(cfg, logger=logger)
+        run_decoder(cfg, logger=logger, monitor_port=monitor_port)
     except DecoderError as exc:
         raise click.ClickException(str(exc)) from exc
     except (ValueError, OSError) as exc:

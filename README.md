@@ -152,6 +152,22 @@ results regardless of input chunk size. For the same behavior, match the
 passband and leave terminal decoder overrides unset. Both interfaces inherit
 the core's defaults, including automatic gain control (AGC) off.
 
+### Monitor a receiver from another computer
+
+Launch the terminal receiver with `morsedecode --monitor-port 8765`. It prints
+a browser URL with a per-session viewer token after the `#`. The page refreshes
+carrier, signal contrast, speed and the latest decoded text twice a second.
+From another computer, forward the receiver's loopback port over SSH.
+
+```bash
+ssh -N -L 127.0.0.1:8765:127.0.0.1:8765 USER@RECEIVER
+```
+
+Open the printed URL in the viewer's browser while the tunnel is running.
+Give SSH access and the printed token only to authorized viewers. Start a new
+receiver session to replace its token. The monitor serves the receiver's
+latest snapshot and closes when the terminal receiver exits.
+
 ### Configuration
 
 Use [morsedecode.example.toml](morsedecode.example.toml) as a reference. The
