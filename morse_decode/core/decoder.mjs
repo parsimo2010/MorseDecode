@@ -308,7 +308,7 @@ function hann(length) {
   return Float64Array.from({length}, (_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (length - 1)));
 }
 
-function projectCarrier(iq, phaseStep, dt, fine) {
+function projectCarrier(iq, phaseStep, dt, fine, coarseFitMinimum = 0.51) {
   // Remove the search-bin frequency, then fit the residual rotation. The
   // longer fit needs finer frequency resolution to keep its ends in phase.
   const length = iq.length / 2;
@@ -327,7 +327,8 @@ function projectCarrier(iq, phaseStep, dt, fine) {
   }
   const limit = fine ? 10 : 9;
   const resolution = fine ? 0.16 : 1.5;
-  let best = ((fine ? 0.45 : 0.51) * mass) ** 2;
+  const minCoherence = fine ? 0.45 : coarseFitMinimum;
+  let best = (minCoherence * mass) ** 2;
   let fit = null;
   for (let hz = -limit; hz <= limit; hz += resolution) {
     const step = 2 * Math.PI * hz * dt;
@@ -1140,7 +1141,11 @@ class CWDecoder {
     const varyingGain = recentPeak < 0.63 * peak || recentPeak > 1.6 * peak;
     const acquiring = this.frame - this.tunedAt < this.historyFrames;
     const shortReceiverWindow = filtered && carrierScore > 35 && (carrierScore > 250 || fast || acquiring || varyingGain);
-    const window = (carrierScore > 150 && isolated) || shortReceiverWindow
+    // A learned fast dit and sufficient contrast justify a narrow time
+    // window. During weak acquisition keep the standard or long window.
+    const shortFastWindow = !filtered && carrierScore > 8 &&
+      this.unit !== null && this.unit * this.hop < 0.76 * this.window.length;
+    const window = (carrierScore > 150 && isolated) || shortReceiverWindow || shortFastWindow
       ? this.shortWindow : carrierScore < 10 ? this.longWindow : null;
     const coherent = !filtered && (carrierScore < 35 || isolated && carrierScore < 150) && withinBand;
     const flanks = filtered ? this.flankIndices(this.selected) : [];
@@ -1170,7 +1175,12 @@ class CWDecoder {
         fadePhase = projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, true);
         phaseStart = from;
       }
-      const projected = coherent && projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, false)?.values;
+      // Independent mark phases can make a coarse phase fit erase genuine
+      // dits. For a stronger signal, require better coherence before
+      // preferring phase projection over the measured magnitude.
+      const coarseFitMinimum = carrierScore > 11 ? 0.56 : 0.51;
+      const projected = coherent &&
+        projectCarrier(iq, 2 * Math.PI * tone.hz * this.dt, this.dt, false, coarseFitMinimum)?.values;
       if (window || projected) {
         if (projected) measured.set(projected, from);
         history = measured;

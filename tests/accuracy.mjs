@@ -53,7 +53,9 @@ function synth(text, options, seed) {
   };
   const signal = makeEnvelope(marks);
   const other = makeEnvelope(interferer);
-  const offsets = phaseResets ? marks.map(() => 2 * Math.PI * rng()) : [];
+  const offsets = phaseResets
+    ? marks.map((_, index) => phaseResets === 'alternate' ? (index % 2) * Math.PI : 2 * Math.PI * rng())
+    : [];
   let phaseIndex = 0;
   const samples = new Float32Array(Math.round(rate * duration));
   const noiseRms = Math.SQRT1_2 * 10 ** (-noiseDb / 20);
@@ -172,8 +174,8 @@ const cases = [
   ['Narrow receiver, 0 dB', {}, narrowReceiver, 0.50],
   ['Narrow receiver, changing output gain', {gainFade: true}, narrowReceiver],
   ['Narrow receiver, idle noise', {quiet: true}, narrowReceiver, 0],
-  ['Clean', {}],
-  ['Clean, high speed', {wpm: 46, hz: 945}],
+  ['Clean', {}, synth, 0],
+  ['Clean, high speed', {wpm: 46, hz: 945}, synth, 0],
   ['30 dB in 500 Hz noise', {noiseDb: 30, bandwidth: 500}],
   ['15 dB in 500 Hz noise', {noiseDb: 15, bandwidth: 500}],
   ['15 dB with QSB and variable keying', {noiseDb: 15, bandwidth: 500, fade: 0.94, jitter: 0.19}],
@@ -182,7 +184,9 @@ const cases = [
   ['−12 dB white noise', {noiseDb: -12, wpm: 22}],
   ['−15 dB white noise', {noiseDb: -15, wpm: 18}, synth, 0.65],
   ['Fast CW in white noise', {noiseDb: -10, wpm: 38, hz: 732}],
-  ['Carrier restarts each mark', {noiseDb: -9, phaseResets: true}],
+  ['Carrier restarts each mark', {noiseDb: -9, phaseResets: true}, synth, 0.29],
+  ['Fast carrier restarts each mark', {noiseDb: -8, wpm: 38, hz: 732, phaseResets: true}, synth, 0.29],
+  ['Carrier alternates phase each mark', {noiseDb: -9, phaseResets: 'alternate'}, synth, 0.32],
   ['48 kHz with strong out-of-band CW', {rate: 48000, aliasInterferer: true}],
   ['Deep QSB', {fade: 0.94, fadeHz: 0.39, noiseDb: 2}],
   ['Near steady tone', {blocker: 1.55, noiseDb: -2}],
@@ -205,6 +209,10 @@ const messages = [
   'THE EAST WIND HAS LOWERED THE TEMPERATURE', 'Q8NZ 42V6 T9X5 7JPR 022',
   'VVV DE GB3RS LOC IO91 RU QSL', 'UR RIG SOUNDS GREAT TOM HW CPY <KN>',
   'BRING THE SMALL BATTERY ON FRIDAY', 'M9R2 VK8/ZZ 8FX1 73QK 606'
+];
+const freshMessages = [
+  'W3AZ K7QE UR 579 QSB <KN>', 'CHECK THE COAX AT THE SHACK',
+  '4HZA QB66 R3NV K0CJ 271', 'HW COPY NOW AFTER THE FADE'
 ];
 
 const args = process.argv.slice(2);
@@ -244,9 +252,11 @@ if (fixture) {
   }
 } else {
   const holdout = args.includes('--holdout');
-  const firstSeed = Number(flag('seed') ?? (holdout ? 7121 : 47));
+  const fresh = args.includes('--fresh');
+  if (holdout && fresh) throw new Error('Choose either --holdout or --fresh.');
+  const firstSeed = Number(flag('seed') ?? (fresh ? 87211 : holdout ? 7121 : 47));
   if (!Number.isSafeInteger(firstSeed)) throw new Error('--seed requires an integer.');
-  const selected = holdout ? messages.slice(4) : messages.slice(0, 4);
+  const selected = fresh ? freshMessages : holdout ? messages.slice(4) : messages.slice(0, 4);
   const totals = versions.map(() => ({edits: 0, chars: 0, ms: 0}));
   for (const [label, options, generate = synth, limit] of cases) {
     if (flag('match') && !label.toLowerCase().includes(flag('match').toLowerCase())) continue;

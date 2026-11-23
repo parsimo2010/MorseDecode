@@ -222,6 +222,11 @@ def test_filtered_receiver_noise_and_replies():
                    cwd=ROOT, check=True)
 
 
+def test_noisy_carrier_phase_resets():
+    subprocess.run(["node", "tests/accuracy.mjs", "--match=each mark", "--holdout", "--seed=405731", "--check"],
+                   cwd=ROOT, check=True)
+
+
 @pytest.mark.parametrize("recording", utah_labels(), ids=lambda recording: recording["file"])
 def test_utah_recording(recording, tmp_path):
     limits = json.loads((ROOT / "tests/fixtures/field-limits.json").read_text(encoding="utf-8"))

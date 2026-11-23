@@ -1,5 +1,40 @@
 # Decoder accuracy and real-time benchmarks
 
+## Fast CW and carrier phase resets
+
+A shorter window preserves fast elements once the decoder has learned the
+dit length and measured enough signal contrast. When a noisy carrier has
+enough contrast to be read from magnitude alone, a coarse phase estimate
+must show stronger coherence before it can override that magnitude.
+The receiver's weak-signal path retains its original coherent integration.
+
+| Condition | Four validation seeds, baseline → current | Fresh messages, baseline → current |
+| --- | ---: | ---: |
+| 38 WPM, −10 dB white noise | 192 → 190 / 484 | 36 → 33 / 101 |
+| Random phase restart on each mark | 139 → 99 / 484 | 19 → 15 / 101 |
+| 38 WPM with random phase restarts | 155 → 109 / 484 | 32 → 24 / 101 |
+| Alternating 180° phase on successive marks | 86 → 81 / 484 | 20 → 16 / 101 |
+| −15 dB white noise | 200 → 200 / 484 | 29 → 29 / 101 |
+| Clean, including 46 WPM | 0 → 0 / 968 | 0 → 0 / 202 |
+
+The alternating-phase case gained three edits on seed 7121 and improved
+across the pooled seeds. The more aggressive short-window candidate and
+multi-window energy candidates traded gains for regressions in deep noise
+or mixed fading. The selected decoder matched the `f4a82d1` score of
+206 edits across 4,488 characters on all 242 field excerpts and preserved
+every clip's regression budget. On this Windows machine the Node decoder's
+95th-percentile time per 20 ms block was 1.41 ms on the default passband
+and 4.90 ms on the wide passband, compared with 1.48 and 4.95 ms before.
+
+```powershell
+foreach ($seed in 7121, 20261123, 405731, 93941) {
+  node tests/accuracy.mjs --holdout "--seed=$seed" --baseline=f4a82d1 --check
+}
+node tests/accuracy.mjs --fresh --baseline=f4a82d1
+python tests/recordings.py --utah --baseline f4a82d1
+node tests/realtime.mjs --baseline=f4a82d1
+```
+
 ## Blind-reviewed corpus and difficult source excerpts
 
 Two independent readers transcribed the 145 existing clips before seeing their
