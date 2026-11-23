@@ -1,6 +1,10 @@
 # CW recording benchmark
 
-Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, receiver, UTC time, frequency, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256. The 145 clips include 68 from ten WebSDR recordings and 77 from 42 channels extracted from Gqrx captures. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
+Each WAV contains one reviewed passage in mono 8 kHz, 16-bit PCM audio. The catalog records its reference text, receiver, UTC time, frequency, sample rate, source-file SHA-256, sample bounds and clip PCM SHA-256. The 236 clips include 95 from ten WebSDR recordings and 141 from 42 channels extracted from Gqrx captures. The first 33 clips came from the Northern Utah WebSDR. [Catalog](corpus.json) · [WAV files](audio) · [Utah morning transcripts and exclusions](../../docs/utah-morning.md) · [Earlier Utah transcripts](../../docs/utah-websdr.md)
+
+## Blind transcription audit
+
+Two independent readers copied all 145 earlier WAVs before seeing the catalog. The audit corrected five references and added 91 clips from previously unscored intervals after searching all 22 original captures. Frozen reads, time-aligned evidence, adjudications and tentative source copies are available with the audit. [Audit and data files](review/README.md) · [Independent review skill](../../.agents/skills/review-cw/SKILL.md)
 
 ## Gqrx IQ and USB recordings
 
@@ -12,7 +16,7 @@ peak gain. The exported SQLite database includes this metadata in
 full-duration, resampled channel's 8 kHz grid.
 [Per-capture results and reproduction instructions](../../docs/gqrx-recordings.md) · [Full machine copy](gqrx-decodes.json)
 
-The native 40 m IQ capture adds 19 clips from nine carriers. Its channel
+The native 40 m IQ capture now contributes 33 clips from nine carriers. Its channel
 metadata preserves the original 132 MHz filename center, the upconverter
 correction, and the resulting HF center.
 [40 m native IQ results](../../docs/gqrx-recordings.md#40-m-native-iq-capture)

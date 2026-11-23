@@ -110,6 +110,13 @@
           "pcm_sha256": "430c9eef954e9ddce91d96f937c878d14ed68f3101f9b6cdcfaa894d08d3adda"
         },
         {
+          "id": "utah-20261119-123710-227464",
+          "start_frame": 227464,
+          "end_frame": 249400,
+          "pcm_sha256": "c3967f404120a3bae0b69d063255ded78e2c66bc1cd3d8e693b38d70790439b1",
+          "text": "N S V EE"
+        },
+        {
           "id": "utah-20261119-123710-250560",
           "start_frame": 250560,
           "end_frame": 370880,
@@ -138,11 +145,25 @@
           "pcm_sha256": "101327eae4dde5865ff06b135ef7f37bed48164df05cbb8000dd5d366c1b4b49"
         },
         {
+          "id": "utah-20261119-123710-702248",
+          "start_frame": 702248,
+          "end_frame": 728016,
+          "pcm_sha256": "a54e683491806a26f80edc88e7e6327b27a5ce1e0e6b1c62ac0cef451efc87d1",
+          "text": "<BT> PLE"
+        },
+        {
           "id": "utah-20261119-123710-733600",
           "start_frame": 733600,
           "end_frame": 993520,
           "text": "NO BIG PLANS HR FER TDA OTHER THAN GETTING TT RADIO ON THE AIR",
           "pcm_sha256": "4b3bef988aef2a7f006d25316616dbb16d47b6f0312951b4c6e02ed9d85080d3"
+        },
+        {
+          "id": "utah-20261119-123710-998344",
+          "start_frame": 998344,
+          "end_frame": 1056920,
+          "pcm_sha256": "5f77e2548b0ce16520409d8bde28a3fc85ed71ec63adb626b7da7e790b1d2604",
+          "text": "TV WHAB GG ON"
         },
         {
           "id": "utah-20261119-123710-1068080",
@@ -152,6 +173,13 @@
           "pcm_sha256": "ccc95d139118acd442df4a0bfc90b19dbf8657e17a501c839ca30a993718ab7e"
         },
         {
+          "id": "utah-20261119-123710-1243984",
+          "start_frame": 1243984,
+          "end_frame": 1278672,
+          "pcm_sha256": "44383a85cbda9d965ef386f444cae97a8ccd1b12234f00e7780a0baf59b4e3a7",
+          "text": "PLL WE"
+        },
+        {
           "id": "utah-20261119-123710-1291200",
           "start_frame": 1291200,
           "end_frame": 1357680,
@@ -159,11 +187,25 @@
           "pcm_sha256": "e318ac14c139e9f3ec255fafb1afa69fd24865fde97f431b095ff6b5887e7ae9"
         },
         {
+          "id": "utah-20261119-123710-1360392",
+          "start_frame": 1360392,
+          "end_frame": 1386808,
+          "pcm_sha256": "5df0dfc2deb0561cbcf44e0aa587c2fb6aadab31bdad80bcf45de06997792f29",
+          "text": "PLA ?"
+        },
+        {
           "id": "utah-20261119-123710-1387120",
           "start_frame": 1387120,
           "end_frame": 1419120,
           "text": "JUDYS",
           "pcm_sha256": "f33aeef84f01d1a90f6957a20f4c03bbd4b417af71957118b2b4b84008a14d6f"
+        },
+        {
+          "id": "utah-20261119-123710-1421064",
+          "start_frame": 1421064,
+          "end_frame": 1433656,
+          "pcm_sha256": "848852d2215079772446d063fe52c33400064a33a495f95752523a43596370f6",
+          "text": "SIST"
         }
       ],
       "recorded_utc": "2026-11-19T12:37:10Z",
@@ -200,6 +242,13 @@
           "pcm_sha256": "3c2f76a1f17813dcaf9749ab4d38b588d4323b527f873ea972de932c3d1c7bb7"
         },
         {
+          "id": "utah-20261119-124156-694536",
+          "start_frame": 694536,
+          "end_frame": 710192,
+          "pcm_sha256": "9e06cffb2ba18c470ef4ee2ad12875f1514eebbaf44213ff2e742fdda8b9ab2a",
+          "text": "BILE"
+        },
+        {
           "id": "utah-20261119-124156-714720",
           "start_frame": 714720,
           "end_frame": 1058720,
@@ -226,6 +275,13 @@
           "end_frame": 1622640,
           "text": "R HE SAID HE WISHES THE AZ EL ROTOR WORKED MORE SMOOTHLY BUT IT IS NOT A PRECISSION",
           "pcm_sha256": "38b771ef00e1f2155ac62ebb55f5d609c06c7fede60886777168b15f54e9fa38"
+        },
+        {
+          "id": "utah-20261119-124156-1649672",
+          "start_frame": 1649672,
+          "end_frame": 1689784,
+          "pcm_sha256": "946375f6e4dacd240ed8d3c2b89266a9bc20e6eee967eb6dc5ba182297a08797",
+          "text": ", NEUT IT W"
         },
         {
           "id": "utah-20261119-124156-1726080",
@@ -262,11 +318,25 @@
           "pcm_sha256": "d61ee340f8d7437a53057df15078115ec17db97f77028c4b9ab84d2baf690954"
         },
         {
+          "id": "utah-20261119-124625-274376",
+          "start_frame": 274376,
+          "end_frame": 302720,
+          "pcm_sha256": "5d6507018a49df8efa669e8e15037cf23bd781850ec48493a1a22905ccdca9ab",
+          "text": "COMMENT"
+        },
+        {
           "id": "utah-20261119-124625-306080",
           "start_frame": 306080,
           "end_frame": 473360,
           "text": "ON KNOBS HEE <BT> HERE MOSTLY RECENTLY I HAVE BEEN",
           "pcm_sha256": "3bb560c98b4b36df342634e34d2ce9b01e53e800bc21d8fb636d761535e8143a"
+        },
+        {
+          "id": "utah-20261119-124625-480192",
+          "start_frame": 480192,
+          "end_frame": 498880,
+          "pcm_sha256": "679045c6a47ad4fb54ab07239e234f78824d48baf90aa75f39b32cc6540ec51e",
+          "text": "PERAT"
         },
         {
           "id": "utah-20261119-124625-511280",
@@ -276,6 +346,13 @@
           "pcm_sha256": "daebd4abc60fea7e2eb76147bc6fd798186b61e2da1143b1ba488bc01678e7dd"
         },
         {
+          "id": "utah-20261119-124625-603328",
+          "start_frame": 603328,
+          "end_frame": 624952,
+          "pcm_sha256": "401d7a8be0ea14cef70270322ce05507c5ddf6a73bd362b1300eb4e26fea5958",
+          "text": "THIS RI"
+        },
+        {
           "id": "utah-20261119-124625-628960",
           "start_frame": 628960,
           "end_frame": 725760,
@@ -283,11 +360,25 @@
           "pcm_sha256": "6d9bf724da6c174d5674e49b79001ed28ab28503ee5ff0c635be90012ee95c06"
         },
         {
+          "id": "utah-20261119-124625-727208",
+          "start_frame": 727208,
+          "end_frame": 746672,
+          "pcm_sha256": "79264199616ddcb42bdf0d7fcf2131ab33673959f83b0c85c39bc16d7919bd44",
+          "text": "? HER"
+        },
+        {
           "id": "utah-20261119-124625-750160",
           "start_frame": 750160,
           "end_frame": 787280,
-          "text": "EEEE HEATHKIT",
+          "text": "EEEEHEATHKIT",
           "pcm_sha256": "d1605c322f686c07d8007323e44fce233572d0c5597d31f16dc7c07571c65f69"
+        },
+        {
+          "id": "utah-20261119-124625-809280",
+          "start_frame": 809280,
+          "end_frame": 830168,
+          "pcm_sha256": "abdcea79ad22206d05075e2fa7d1ef587eba888bedebe17bc7b3ff960aeb744a",
+          "text": "DX6"
         },
         {
           "id": "utah-20261119-124625-840480",
@@ -309,6 +400,13 @@
           "end_frame": 1186080,
           "text": "WORKING NOW. I EVEN MADE",
           "pcm_sha256": "00711fd33ab590adf3b87f3266c07efd44ab041298e8c81c2660cd6cc77a3d8e"
+        },
+        {
+          "id": "utah-20261119-124625-1187112",
+          "start_frame": 1187112,
+          "end_frame": 1210808,
+          "pcm_sha256": "360da4a30ea325b435af6d8fad9b17922fa4cb5a960e75369fb53e6187518545",
+          "text": "A FEW 2"
         },
         {
           "id": "utah-20261119-124625-1225120",
@@ -342,11 +440,25 @@
           "text": "4U1ITU FROM GENEVA FROM NOVEMBER 18 TO 26. ACTIVITY WILL BE ON HF"
         },
         {
+          "id": "na5b-20261120-010303-330480",
+          "start_frame": 330480,
+          "end_frame": 356240,
+          "pcm_sha256": "3310d8d426e769d442a59381a38f06e7500433b74a51500c085aa7bd8a51dfb0",
+          "text": "USING"
+        },
+        {
           "id": "na5b-20261120-010303-356240",
           "start_frame": 356240,
           "end_frame": 430880,
           "pcm_sha256": "0271e21e7b1535246cbdcc14ea8a5a0e5a79dc77e8e0e3f8cac293b3467f705d",
           "text": "VARIOUS MODES."
+        },
+        {
+          "id": "na5b-20261120-010303-448080",
+          "start_frame": 448080,
+          "end_frame": 520480,
+          "pcm_sha256": "b34eba7c313b97a4b61ec7b54e7b283fe051ca067b42a194460d9bffe23d1432",
+          "text": "5H, TANZANIA."
         },
         {
           "id": "na5b-20261120-010303-520480",
@@ -356,11 +468,25 @@
           "text": "CHARLES, NK8O, IS QRV AS 5H3DX FROM"
         },
         {
+          "id": "na5b-20261120-010303-715680",
+          "start_frame": 715680,
+          "end_frame": 773360,
+          "pcm_sha256": "bb182009d8e14aa43a239cdb3d7341eb05303fd1b5999985255880ad46d93807",
+          "text": "CHICHONI."
+        },
+        {
           "id": "na5b-20261120-010303-773360",
           "start_frame": 773360,
           "end_frame": 838560,
           "pcm_sha256": "33886fe479163d8c5382a98362632c3d00fe43bf75802f317241bc5dfd23e77d",
           "text": "ACTIVITY IS ON"
+        },
+        {
+          "id": "na5b-20261120-010303-838560",
+          "start_frame": 838560,
+          "end_frame": 852160,
+          "pcm_sha256": "c4173ef754950ef6cc766f68f0e1ba6483457a9775e8e6648fc776453b3cb5fa",
+          "text": "HS"
         },
         {
           "id": "na5b-20261120-010303-852160",
@@ -377,11 +503,25 @@
           "text": "MALDIVES."
         },
         {
+          "id": "na5b-20261120-010303-1049360",
+          "start_frame": 1049360,
+          "end_frame": 1134880,
+          "pcm_sha256": "31412ed3957d2f96efd6aa82e1116123fd9610af35b91f2df8c92f3a503e74a5",
+          "text": "ANDREAS, DK6AS,"
+        },
+        {
           "id": "na5b-20261120-010303-1134880",
           "start_frame": 1134880,
           "end_frame": 1311760,
           "pcm_sha256": "8ad1a3524d6478c497281af5c2bb8fb98e4388b076bbd7886f3c6f803cef9723",
           "text": "IS QRV AS 8Q7XX FROM THE MALDIVES."
+        },
+        {
+          "id": "na5b-20261120-010303-1311760",
+          "start_frame": 1311760,
+          "end_frame": 1378080,
+          "pcm_sha256": "69c8d1981dfbc090d5fbb955c9c45935b625da9c46407b1b187bd9418f391f98",
+          "text": "ACTIVITY IS ON"
         },
         {
           "id": "na5b-20261120-010303-1378080",
@@ -391,6 +531,13 @@
           "text": "80 TO 6 METERS USING"
         },
         {
+          "id": "na5b-20261120-010303-1474080",
+          "start_frame": 1474080,
+          "end_frame": 1550880,
+          "pcm_sha256": "c4821d22fba8c0872b5824bf646cf9b317b990b08357440b07e1230b975e4611",
+          "text": "VARIOUS MODES,"
+        },
+        {
           "id": "na5b-20261120-010303-1550880",
           "start_frame": 1550880,
           "end_frame": 1667120,
@@ -398,11 +545,32 @@
           "text": "INCLUDING PARTICIPATION"
         },
         {
+          "id": "na5b-20261120-010303-1667120",
+          "start_frame": 1667120,
+          "end_frame": 1740800,
+          "pcm_sha256": "219f47406bc2c0426eeb8dc9591a779f9663e7a8acf5475a8acabee72512b5a0",
+          "text": "IN THE CQ WORLD"
+        },
+        {
           "id": "na5b-20261120-010303-1740800",
           "start_frame": 1740800,
           "end_frame": 1790880,
           "pcm_sha256": "bde7719a31f6c44a7bc919b802e7531833cc7f9a7f951155cb20993a9691cf55",
           "text": "WIDE DX CW"
+        },
+        {
+          "id": "na5b-20261120-010303-1790880",
+          "start_frame": 1790880,
+          "end_frame": 1835680,
+          "pcm_sha256": "cc801f27615d0212bf8e2726291aa1063bc6dc8c6d392bb2d71059350329db2e",
+          "text": "CONTEST."
+        },
+        {
+          "id": "na5b-20261120-010303-1848000",
+          "start_frame": 1848000,
+          "end_frame": 1982720,
+          "pcm_sha256": "4030beba96b36bebb0955d2206f4d16eb22c13f89f28aeb9465c3b78e1c5725f",
+          "text": "QST DE W1AW <BT> A3, TONGA."
         },
         {
           "id": "na5b-20261120-010303-2069360",
@@ -417,6 +585,13 @@
           "end_frame": 2336640,
           "pcm_sha256": "d98b97f397f300b38cbe2ce22cd5b5c2cd024d134b45ccdbda724c1aa0b4ad75",
           "text": "ISLAND, IOTA OC DASH"
+        },
+        {
+          "id": "na5b-20261120-010303-2336640",
+          "start_frame": 2336640,
+          "end_frame": 2377600,
+          "pcm_sha256": "79167ebb6323e75126c6c10101a00d637ae2d7fa4e666e24ee29a14681b3c2b9",
+          "text": "024,"
         },
         {
           "id": "na5b-20261120-010303-2377600",
@@ -543,11 +718,18 @@
           "text": "W WAS ACTUALLY VERY NICI NICE"
         },
         {
+          "id": "w2db-20261120-011544-449480",
+          "start_frame": 449480,
+          "end_frame": 486168,
+          "pcm_sha256": "c602a709d8cc4452fd6b9ca9eddca0f67501741e955fc81b846ae97db5b6deea",
+          "text": "THIS AFTERNOON"
+        },
+        {
           "id": "w2db-20261120-011544-486880",
           "start_frame": 486880,
           "end_frame": 537200,
           "pcm_sha256": "78b8df26ec66dd53c7eaa6eb111f3cebc51270f2c624d2bd430c65d155202679",
-          "text": "MIKE, WIND CALMED"
+          "text": "MIKE,WIND CALMED"
         },
         {
           "id": "w2db-20261120-011544-554080",
@@ -569,6 +751,13 @@
           "end_frame": 953360,
           "pcm_sha256": "2755b27e36ace2b162f6dc233143c47fdc7a030a902dfe0a161148e5a2b3d5cb",
           "text": "<BT> W9RNY DE K1JD K R R K1JD <AS>"
+        },
+        {
+          "id": "w2db-20261120-011544-988000",
+          "start_frame": 988000,
+          "end_frame": 1006776,
+          "pcm_sha256": "453916fcfecffde46d11c60de9843c15c3581d52c06c6796c84ec4789d78460c",
+          "text": "OK <BT>S"
         },
         {
           "id": "w2db-20261120-011544-1013280",
@@ -641,6 +830,13 @@
           "text": "BAND GONE HI"
         },
         {
+          "id": "gqrx-20261122-235106-p5495-79304",
+          "start_frame": 79304,
+          "end_frame": 108952,
+          "pcm_sha256": "97f297cf78a34918dafd0da19326de998c8ac98ae8bedbb320e7c6694df475e3",
+          "text": "CUAGN"
+        },
+        {
           "id": "gqrx-20261122-235106-p5495-112800",
           "start_frame": 112800,
           "end_frame": 172400,
@@ -675,6 +871,13 @@
       "sample_rate": 8000,
       "frames": 94696,
       "clips": [
+        {
+          "id": "gqrx-20261122-235137-p5505-7592",
+          "start_frame": 7592,
+          "end_frame": 35672,
+          "pcm_sha256": "3c1dc19ce726466a101e45a596bd9b4b90744a5e65df6c8af0759daf7d4faa5b",
+          "text": "AW/7"
+        },
         {
           "id": "gqrx-20261122-235137-p5505-37600",
           "start_frame": 37600,
@@ -785,7 +988,7 @@
           "start_frame": 252400,
           "end_frame": 280400,
           "pcm_sha256": "a441b0ebd66492d3dbed2fd71b473a81ed97bef55e4576891080c970714e477c",
-          "text": "GUV?"
+          "text": "GUV ?"
         }
       ]
     },
@@ -886,11 +1089,25 @@
       "frames": 1337341,
       "clips": [
         {
+          "id": "gqrx-20261123-000841-m30861-123312",
+          "start_frame": 123312,
+          "end_frame": 165560,
+          "pcm_sha256": "1fa8b81ba2fad1556546c88b0ae8914d0ba81b8d6aece032cc130b3a0a38b68a",
+          "text": "SST NJ6"
+        },
+        {
           "id": "gqrx-20261123-000841-m30861-220160",
           "start_frame": 220160,
           "end_frame": 302240,
           "pcm_sha256": "bf45154a39d730859a298c768b0b7773f90d0313f63c86459b63ec6538a825fe",
           "text": "VE7CTE GE JER CA"
+        },
+        {
+          "id": "gqrx-20261123-000841-m30861-307016",
+          "start_frame": 307016,
+          "end_frame": 331352,
+          "pcm_sha256": "cb5e21cc9eac6c2a29571f9e8b8609772f196d89fa6d41720bbc0db676e0f1ea",
+          "text": "TU JER"
         },
         {
           "id": "gqrx-20261123-000841-m30861-424800",
@@ -900,11 +1117,32 @@
           "text": "SST NJ6Q"
         },
         {
+          "id": "gqrx-20261123-000841-m30861-516744",
+          "start_frame": 516744,
+          "end_frame": 559416,
+          "pcm_sha256": "a38e0ce480cf62a5f0a4940304b0a80e14b1a3571126523b2f01b66e19fbf4f1",
+          "text": "ST NJ6Q"
+        },
+        {
+          "id": "gqrx-20261123-000841-m30861-603656",
+          "start_frame": 603656,
+          "end_frame": 633720,
+          "pcm_sha256": "63149c3c8e430fa2fa420edcde72738299f499f4f7d8ec4c0ab0b60f47b09023",
+          "text": "SST NJ"
+        },
+        {
           "id": "gqrx-20261123-000841-m30861-737040",
           "start_frame": 737040,
           "end_frame": 832080,
           "pcm_sha256": "4a43a9ff98c9566380a48577eb0bf7647d0485707bd75a9753befbda69e7415b",
           "text": "KB0HP GE JER CA"
+        },
+        {
+          "id": "gqrx-20261123-000841-m30861-914760",
+          "start_frame": 914760,
+          "end_frame": 1002104,
+          "pcm_sha256": "5623b7bc941aa9738056f4b8c54dd3059e70aa846b684473af4098ef5a629759",
+          "text": "KB0HP JER"
         }
       ]
     },
@@ -954,6 +1192,13 @@
           "end_frame": 1189440,
           "pcm_sha256": "5f648b866d3105ecd009087eb2b4c8c190c6e393bb85b0dcc1da6013314b94a4",
           "text": "CQ SST DE NB7O"
+        },
+        {
+          "id": "gqrx-20261123-000841-p19111-1289864",
+          "start_frame": 1289864,
+          "end_frame": 1326904,
+          "pcm_sha256": "acdc7490cb8f573cbc1aaa05aa99234509e38cde568076eb09298ddd87394712",
+          "text": "SST DE NB"
         }
       ]
     },
@@ -988,7 +1233,7 @@
           "start_frame": 1126800,
           "end_frame": 1147520,
           "pcm_sha256": "ba7c02c40fffdf3ca225a6d834866bd1b3a4eb30c73b8f9fb8ecd8fe993de99c",
-          "text": "73"
+          "text": "73 EE"
         }
       ]
     },
@@ -1103,6 +1348,13 @@
       "frames": 1337341,
       "clips": [
         {
+          "id": "gqrx-20261123-000841-p64402-73640",
+          "start_frame": 73640,
+          "end_frame": 188760,
+          "pcm_sha256": "c717d63972b9c11bf69577dd2311f9c54ad574f9ba39df5988119a1b937ce5cd",
+          "text": "G7WYY TU MIKE CW"
+        },
+        {
           "id": "gqrx-20261123-000841-p64402-389440",
           "start_frame": 389440,
           "end_frame": 484640,
@@ -1115,6 +1367,34 @@
           "end_frame": 524400,
           "pcm_sha256": "9f57e8ffb892d9d1833ed789b210fbe08da354a75aa2d3ff1b564516749f8578",
           "text": "AB7MP"
+        },
+        {
+          "id": "gqrx-20261123-000841-p64402-593392",
+          "start_frame": 593392,
+          "end_frame": 626016,
+          "pcm_sha256": "4513149fca7a2e6a1b11161beefc8715ca90d94b6d2c97797c266aba4250f651",
+          "text": "AB7MP"
+        },
+        {
+          "id": "gqrx-20261123-000841-p64402-759920",
+          "start_frame": 759920,
+          "end_frame": 800088,
+          "pcm_sha256": "8825e64c303c224976c96ab182541ff4f51ffc2c6c29fec18b0e35e4928de6c1",
+          "text": "AB7MP"
+        },
+        {
+          "id": "gqrx-20261123-000841-p64402-820840",
+          "start_frame": 820840,
+          "end_frame": 893976,
+          "pcm_sha256": "e9430f83d50b900801bdaf9c0c1fc242d085d54067f0a49253b38997a2fef252",
+          "text": "MIKE CWA TU MA"
+        },
+        {
+          "id": "gqrx-20261123-000841-p64402-1187016",
+          "start_frame": 1187016,
+          "end_frame": 1268408,
+          "pcm_sha256": "88bde3c6b7f7d814e898c093136c5d2881ec8213e759bd27b37f0fb3d7de9564",
+          "text": "CQ CQ SST KN6YK"
         }
       ]
     },
@@ -1187,6 +1467,41 @@
       "frames": 1337341,
       "clips": [
         {
+          "id": "gqrx-20261123-000841-p164121-1992",
+          "start_frame": 1992,
+          "end_frame": 74072,
+          "pcm_sha256": "e13ecfbefcace312b8b9a77cb80ce49c973982835bf193ddd76a743009b68661",
+          "text": "A DE WA6MOW WA6M"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-82696",
+          "start_frame": 82696,
+          "end_frame": 98080,
+          "pcm_sha256": "44a2349018a513db985c56018bdc1a766701015e9d51f11b62bf3f1511f7b492",
+          "text": "W AR"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-198632",
+          "start_frame": 198632,
+          "end_frame": 220888,
+          "pcm_sha256": "440616d686d4f8efd468ea7c6e7d01bc2e60264e69c5632136a50684caca48ce",
+          "text": "POTA"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-237640",
+          "start_frame": 237640,
+          "end_frame": 266040,
+          "pcm_sha256": "acc1c4eb5877714b6be0d9ad319dd37a3e5e06a2b5cc0d7be1933458c3beac46",
+          "text": "A6MOW"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-414984",
+          "start_frame": 414984,
+          "end_frame": 482328,
+          "pcm_sha256": "d6e4ae2de523d88b3abacf9a6d19892511465f69804418d6a46a4e082ec4626b",
+          "text": "POTA DE WA6MOW"
+        },
+        {
           "id": "gqrx-20261123-000841-p164121-483920",
           "start_frame": 483920,
           "end_frame": 531920,
@@ -1198,7 +1513,35 @@
           "start_frame": 573600,
           "end_frame": 756720,
           "pcm_sha256": "63fe0ff09124150a5ed9522d02b1d1e7986a326f8141c254a1daa415700107ab",
-          "text": "CQ CQ POTA CQ POTA DE WA6MOW WA6MOW AR"
+          "text": "CQ CQ POTA CQ POTA DE WA6MOW WA6MOW A"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-803848",
+          "start_frame": 803848,
+          "end_frame": 891320,
+          "pcm_sha256": "32b9fddc1c4518307af66455f14391878fa64a261c0bc0a6031c47564ccee1b6",
+          "text": "CQ POTA CQ POTA DE"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-915336",
+          "start_frame": 915336,
+          "end_frame": 975064,
+          "pcm_sha256": "585a9d74664df4351b91cd8580e2745143afde2c51259f13cac66406ffe30144",
+          "text": "OW WA6MOW AR"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-1001504",
+          "start_frame": 1001504,
+          "end_frame": 1023640,
+          "pcm_sha256": "7c4dd8491630182638e653db4bee240e93202050230ff37fb50c1fe8a3743f14",
+          "text": "CQ C"
+        },
+        {
+          "id": "gqrx-20261123-000841-p164121-1033672",
+          "start_frame": 1033672,
+          "end_frame": 1135136,
+          "pcm_sha256": "13f7c515c4e6a57963a518b463d111a6606a75ae601b5c76435ca2be9df71674",
+          "text": "POTA CQ POTA DE WA6MO"
         }
       ]
     },
@@ -1234,6 +1577,13 @@
           "end_frame": 744640,
           "pcm_sha256": "4c38266072ef953480eb53ec884713cd2b64971443b74c9d5f44425593928f25",
           "text": "CQ KI6OY SST"
+        },
+        {
+          "id": "gqrx-20261123-001221-p8061-770408",
+          "start_frame": 770408,
+          "end_frame": 828728,
+          "pcm_sha256": "3c0c30a4c5988915a1c91bb7afab690631b01bc3077f2a20818d0c5554e91ff1",
+          "text": "CQ KI6OY S"
         },
         {
           "id": "gqrx-20261123-001221-p8061-881280",
@@ -1283,6 +1633,13 @@
           "end_frame": 319840,
           "pcm_sha256": "a215519dff76001215077ef8ed69da3094bbde9cdaa0c5c1d6e6e750235d2b9f",
           "text": "GE JER CA"
+        },
+        {
+          "id": "gqrx-20261123-001221-p41072-781704",
+          "start_frame": 781704,
+          "end_frame": 824464,
+          "pcm_sha256": "d6b584b6294139f921d03d48f9dd369ec9838f056677e56642f876bd4dad9846",
+          "text": "ODD 73"
         },
         {
           "id": "gqrx-20261123-001221-p41072-843840",
@@ -1362,6 +1719,13 @@
       "frames": 1246887,
       "clips": [
         {
+          "id": "gqrx-20261123-001221-p136350-4072",
+          "start_frame": 4072,
+          "end_frame": 57944,
+          "pcm_sha256": "2f6e7ee7e96940db70066690d29f7b3b4d53d048bd528c4ecde8374aece67200",
+          "text": "CWA AGN?"
+        },
+        {
           "id": "gqrx-20261123-001221-p136350-153520",
           "start_frame": 153520,
           "end_frame": 198160,
@@ -1369,11 +1733,25 @@
           "text": "TU BOB WA"
         },
         {
+          "id": "gqrx-20261123-001221-p136350-209992",
+          "start_frame": 209992,
+          "end_frame": 250456,
+          "pcm_sha256": "5e844af4d3e4d58a81fbc49c427b47ce074afdf852db18e53e99ffc61ffb2779",
+          "text": "RR TU 7"
+        },
+        {
           "id": "gqrx-20261123-001221-p136350-452160",
           "start_frame": 452160,
           "end_frame": 507120,
           "pcm_sha256": "097645fe246b53196643787c14265a67ee2ada54cab80d5d648e87cf9046eabb",
           "text": "SST KN6YKN"
+        },
+        {
+          "id": "gqrx-20261123-001221-p136350-777152",
+          "start_frame": 777152,
+          "end_frame": 892312,
+          "pcm_sha256": "cfc4b6c61eb93c3c226375a1fc866f7feec7c840d9920ed9de847f151aac820f",
+          "text": "6VOX RR TU MIKE CW"
         }
       ]
     },
@@ -1439,11 +1817,25 @@
       "frames": 1246887,
       "clips": [
         {
+          "id": "gqrx-20261123-001221-p236049-265416",
+          "start_frame": 265416,
+          "end_frame": 319776,
+          "pcm_sha256": "4720e910e5ad797c92c4de33bfd75b97b50b1c48edc41940afbbb204f997f65d",
+          "text": "Q POTA CQ P"
+        },
+        {
           "id": "gqrx-20261123-001221-p236049-383120",
           "start_frame": 383120,
           "end_frame": 431120,
           "pcm_sha256": "017761d17338c99c7dba198fde8a6d54560e7c77bd550a63217a578dac646954",
           "text": "WA6MOW AR"
+        },
+        {
+          "id": "gqrx-20261123-001221-p236049-523944",
+          "start_frame": 523944,
+          "end_frame": 634072,
+          "pcm_sha256": "97a232d66875c704870ddc20d4884ca24d05f154eb6a9256d80c838ce4b90cb7",
+          "text": "POTA DE WA6MOW WA6MOW A"
         }
       ]
     },
@@ -1481,6 +1873,13 @@
           "text": "CQ SST N6CHU"
         },
         {
+          "id": "gqrx-20261123-001614-p27092-227264",
+          "start_frame": 227264,
+          "end_frame": 242712,
+          "pcm_sha256": "9903841c6a2467dd3385efe1bfe7ddac5b037dae30ebb34547e59e720a2ca286",
+          "text": "I6O"
+        },
+        {
           "id": "gqrx-20261123-001614-p27092-268240",
           "start_frame": 268240,
           "end_frame": 346880,
@@ -1516,6 +1915,13 @@
       "frames": 593916,
       "clips": [
         {
+          "id": "gqrx-20261123-001614-p41212-173632",
+          "start_frame": 173632,
+          "end_frame": 199736,
+          "pcm_sha256": "3fd0166bf367773924b008568b308d71cd6258274a41780304e5e1ae26814319",
+          "text": "W7FV"
+        },
+        {
           "id": "gqrx-20261123-001614-p41212-210400",
           "start_frame": 210400,
           "end_frame": 290320,
@@ -1523,11 +1929,25 @@
           "text": "W7FV GE JER CA"
         },
         {
+          "id": "gqrx-20261123-001614-p41212-305896",
+          "start_frame": 305896,
+          "end_frame": 315504,
+          "pcm_sha256": "a855f783b1c5152ffd2bd4974cc43084a07c6bac1809e51ff8cefd7a25b3c39b",
+          "text": "GE"
+        },
+        {
           "id": "gqrx-20261123-001614-p41212-353200",
           "start_frame": 353200,
           "end_frame": 394240,
           "pcm_sha256": "995b43e36f593e9b67b378095b4fb9931c4ff89fe236ff27e5ffed1c37afda4a",
           "text": "DAN 73"
+        },
+        {
+          "id": "gqrx-20261123-001614-p41212-418016",
+          "start_frame": 418016,
+          "end_frame": 440696,
+          "pcm_sha256": "06e38431190dfdf875b3f21f894b77ecfe1b74d957deec57127b4e61cdecc4b9",
+          "text": "SE SST"
         },
         {
           "id": "gqrx-20261123-001614-p41212-520480",
@@ -1570,6 +1990,20 @@
           "end_frame": 418880,
           "pcm_sha256": "be6cf7229c3af84311f08d8d36a819a52a8816b27ac87b23d620f67af9d05327",
           "text": "CQ SST DE W7LHT"
+        },
+        {
+          "id": "gqrx-20261123-001614-p106359-516840",
+          "start_frame": 516840,
+          "end_frame": 532344,
+          "pcm_sha256": "41fbadd0d8bf60b056f687a1f572b768571ddcf381fd1a42ac5c5c9620986609",
+          "text": "ST DE"
+        },
+        {
+          "id": "gqrx-20261123-001614-p106359-553832",
+          "start_frame": 553832,
+          "end_frame": 589080,
+          "pcm_sha256": "c2b88c83897eb682fdfb01416b007bfe91be10b11b42e88bcc085fe27775947e",
+          "text": "HT W7LHT"
         }
       ]
     },
@@ -1712,6 +2146,20 @@
       "frames": 973820,
       "clips": [
         {
+          "id": "gqrx-20261123-001827-m42897-459912",
+          "start_frame": 459912,
+          "end_frame": 533240,
+          "pcm_sha256": "d389038f542a2852a217892824c562890144b30f9676cff86a34e5787c32f862",
+          "text": "SST N6CHU K6NT"
+        },
+        {
+          "id": "gqrx-20261123-001827-m42897-550184",
+          "start_frame": 550184,
+          "end_frame": 570136,
+          "pcm_sha256": "733645ab8f15aa217fcc54523577ed5677d1542f7da3e2b49bda44796c2e81f8",
+          "text": "K6NT"
+        },
+        {
           "id": "gqrx-20261123-001827-m42897-571600",
           "start_frame": 571600,
           "end_frame": 615440,
@@ -1719,11 +2167,25 @@
           "text": "TU BOB WA"
         },
         {
+          "id": "gqrx-20261123-001827-m42897-660400",
+          "start_frame": 660400,
+          "end_frame": 701848,
+          "pcm_sha256": "b8ddc105a4397f11ae53142f17e3c83f83c9bb2114f91545423cb0f5e0418257",
+          "text": "TU N6CHU"
+        },
+        {
           "id": "gqrx-20261123-001827-m42897-726320",
           "start_frame": 726320,
           "end_frame": 788560,
           "pcm_sha256": "03b91dda28d184dca6e0f12295890d4542e0c1ec3459f44e1307e17d8c1c187f",
           "text": "CQ SST N6CHU"
+        },
+        {
+          "id": "gqrx-20261123-001827-m42897-901512",
+          "start_frame": 901512,
+          "end_frame": 949784,
+          "pcm_sha256": "f7d8eb831d091de987290d8840d344337cba1edb2dccdcb5492ac3da14c78176",
+          "text": "6JE TU BOB"
         }
       ]
     },
@@ -1761,6 +2223,34 @@
           "text": "CQ SST NJ6Q"
         },
         {
+          "id": "gqrx-20261123-001827-m28765-96104",
+          "start_frame": 96104,
+          "end_frame": 132952,
+          "pcm_sha256": "44435bce6a6874583500a3ac81d210c38008c5c27d87c9f353859ec09467232f",
+          "text": "KN6YKN"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-143880",
+          "start_frame": 143880,
+          "end_frame": 234456,
+          "pcm_sha256": "c02f095592d14876a58571f16a56207684c25732d5a631f30a4bae0d94d271f3",
+          "text": "SST NJ6Q KN6YKN"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-265448",
+          "start_frame": 265448,
+          "end_frame": 295448,
+          "pcm_sha256": "9ec78aa15317a8e96063bdd99b5ea3a14cc637f92879472fa61702e70f76010b",
+          "text": "N6YKN"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-335048",
+          "start_frame": 335048,
+          "end_frame": 383032,
+          "pcm_sha256": "bf8e458e4e1f71726430282a628161bcfbd24d9b6b0f9847f147d77d639ae529",
+          "text": "N6YKN R"
+        },
+        {
           "id": "gqrx-20261123-001827-m28765-386560",
           "start_frame": 386560,
           "end_frame": 435360,
@@ -1768,11 +2258,39 @@
           "text": "GA JER CA"
         },
         {
+          "id": "gqrx-20261123-001827-m28765-490224",
+          "start_frame": 490224,
+          "end_frame": 543480,
+          "pcm_sha256": "b7835a49fa3e61f725678d079e35491f59a44ae41d48ebf8a8c6f6d51d3fdd44",
+          "text": "MIKE CWA"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-648904",
+          "start_frame": 648904,
+          "end_frame": 691192,
+          "pcm_sha256": "1406e6bcab2a008abedb43add85bfe37db71b1aab02ab6a74d26217bd06053ec",
+          "text": "ST NJ6Q"
+        },
+        {
           "id": "gqrx-20261123-001827-m28765-712880",
           "start_frame": 712880,
           "end_frame": 782640,
           "pcm_sha256": "01afe12cde5e6cecfef6895e405c4e5675e2da0a9e0c227d09123b4ba38bad49",
           "text": "CQ SST NJ6Q"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-841928",
+          "start_frame": 841928,
+          "end_frame": 873144,
+          "pcm_sha256": "b090a305052afaf86ae4ca005a544fb940b348f40a626d507154ec7b4bc71066",
+          "text": "NJ6Q"
+        },
+        {
+          "id": "gqrx-20261123-001827-m28765-899560",
+          "start_frame": 899560,
+          "end_frame": 955960,
+          "pcm_sha256": "6576c6e65ab53a00c58c0d099d66e181ce8ea97bbabefb01641f1d1accc321af",
+          "text": "CQ SST NJ6"
         }
       ]
     },
@@ -1929,6 +2447,27 @@
       "frames": 973820,
       "clips": [
         {
+          "id": "gqrx-20261123-001827-p166198-84136",
+          "start_frame": 84136,
+          "end_frame": 138072,
+          "pcm_sha256": "f860cff1204fc32c267f85a28c5d291269bfea73d736ab9f104399c90af07933",
+          "text": "CQ CQ POTA"
+        },
+        {
+          "id": "gqrx-20261123-001827-p166198-187072",
+          "start_frame": 187072,
+          "end_frame": 204856,
+          "pcm_sha256": "2c82f2dc5e9b7117e0a433ad830cf955b68855fe0bb8cb8a9ae075fc84d9c7d1",
+          "text": "E WA6"
+        },
+        {
+          "id": "gqrx-20261123-001827-p166198-218728",
+          "start_frame": 218728,
+          "end_frame": 242360,
+          "pcm_sha256": "4380c806e32f89241e53846bae04477bcf4c68b54b8cfb6ab793b1134a799359",
+          "text": "W WA6"
+        },
+        {
           "id": "gqrx-20261123-001827-p166198-763600",
           "start_frame": 763600,
           "end_frame": 811680,
@@ -1982,11 +2521,25 @@
           "text": "CQ CQ CQ DE"
         },
         {
+          "id": "gqrx-20261123-014653-m305149-1022824",
+          "start_frame": 1022824,
+          "end_frame": 1051128,
+          "pcm_sha256": "80445a0e38d7787e48896b9ca5bb2deba6d13ea6e521857032a00a8fe3aea040",
+          "text": "WA6 M E"
+        },
+        {
           "id": "gqrx-20261123-014653-m305149-1059920",
           "start_frame": 1059920,
           "end_frame": 1148320,
           "pcm_sha256": "8fb1dc777499f38a874b3d998e05ace0cce36155336db9013ef5f4ba6fd0fbb8",
           "text": "WA6 M E M WA6 M E M K"
+        },
+        {
+          "id": "gqrx-20261123-014653-m305149-1461696",
+          "start_frame": 1461696,
+          "end_frame": 1504536,
+          "pcm_sha256": "6e12ab7c25320215ffa3c1229942520ef2ca51a5f4d106f41c4e9dcd3fb11a1f",
+          "text": "M E M WA6 M"
         }
       ]
     },
@@ -2021,11 +2574,25 @@
       "frames": 1693973,
       "clips": [
         {
+          "id": "gqrx-20261123-014653-m295169-54800",
+          "start_frame": 54800,
+          "end_frame": 86264,
+          "pcm_sha256": "009211eb689fee844274b323e2b3283b77e22b46b81a8dc260330afe292c91e9",
+          "text": "CIVS?"
+        },
+        {
           "id": "gqrx-20261123-014653-m295169-1506000",
           "start_frame": 1506000,
           "end_frame": 1524880,
           "pcm_sha256": "655bb24380a1c1c1a7750987c24c7346f9060e9f4a2c2856bfe3dd2d4d9da1ea",
           "text": "CQ"
+        },
+        {
+          "id": "gqrx-20261123-014653-m295169-1526536",
+          "start_frame": 1526536,
+          "end_frame": 1648872,
+          "pcm_sha256": "c9868409b74bf770124327b5920d6f84133e6b0ceb292c5c6c209e344e6f36bd",
+          "text": "CQ CQ KE9AJC KE9AJC"
         }
       ]
     },
@@ -2099,6 +2666,20 @@
       "frames": 1693973,
       "clips": [
         {
+          "id": "gqrx-20261123-014653-m265188-891728",
+          "start_frame": 891728,
+          "end_frame": 925936,
+          "pcm_sha256": "d665e2577aeab578842757f686759da6a0008c696270c62509a20f4fa67a2120",
+          "text": "<BT><BT> NST"
+        },
+        {
+          "id": "gqrx-20261123-014653-m265188-965464",
+          "start_frame": 965464,
+          "end_frame": 1041128,
+          "pcm_sha256": "9a8b983abcd5589360cce99194954cef3f0befb97926d5b61be4e21421981283",
+          "text": "CQCQCQCQCQ"
+        },
+        {
           "id": "gqrx-20261123-014653-m265188-1071920",
           "start_frame": 1071920,
           "end_frame": 1118000,
@@ -2137,6 +2718,13 @@
       "sample_rate": 8000,
       "frames": 1693973,
       "clips": [
+        {
+          "id": "gqrx-20261123-014653-m259536-162352",
+          "start_frame": 162352,
+          "end_frame": 173696,
+          "pcm_sha256": "90afb8f5633edbf0419f1bed462fae986489ae9e73cd55727baa84452bfd2397",
+          "text": "HAD"
+        },
         {
           "id": "gqrx-20261123-014653-m259536-608240",
           "start_frame": 608240,
@@ -2177,11 +2765,25 @@
       "frames": 1693973,
       "clips": [
         {
+          "id": "gqrx-20261123-014653-m145215-1392984",
+          "start_frame": 1392984,
+          "end_frame": 1459904,
+          "pcm_sha256": "74700e9669dee447f67b05fad8d56b0a1ae2f28affbbd4631b22e223225b2e3d",
+          "text": "NQ6B NQ6B K"
+        },
+        {
           "id": "gqrx-20261123-014653-m145215-1623040",
           "start_frame": 1623040,
           "end_frame": 1657840,
           "pcm_sha256": "9659036194e108637f545db978522d538ff0ed8649335831a68fd8e25a58e9e3",
           "text": "CQ CQ"
+        },
+        {
+          "id": "gqrx-20261123-014653-m145215-1661648",
+          "start_frame": 1661648,
+          "end_frame": 1686728,
+          "pcm_sha256": "cf853982f68d6857b7d5dae1d6bbf3a84e9ed776f09506338f814914eb328126",
+          "text": "CQ DE"
         }
       ]
     },
@@ -2215,6 +2817,13 @@
       "sample_rate": 8000,
       "frames": 1693973,
       "clips": [
+        {
+          "id": "gqrx-20261123-014653-m35125-432376",
+          "start_frame": 432376,
+          "end_frame": 447768,
+          "pcm_sha256": "2263c2f04ed47249ff31b884202d4fe982157c243816e23ecad90294d0c0634b",
+          "text": "QR"
+        },
         {
           "id": "gqrx-20261123-014653-m35125-708880",
           "start_frame": 708880,
@@ -2269,6 +2878,13 @@
       "frames": 1693973,
       "clips": [
         {
+          "id": "gqrx-20261123-014653-p4857-459880",
+          "start_frame": 459880,
+          "end_frame": 521464,
+          "pcm_sha256": "2e88fab5440ae8ee44909dd5ba72c5cb896c6a898e98f3022d25d5da147604ec",
+          "text": "THOUGHT I"
+        },
+        {
           "id": "gqrx-20261123-014653-p4857-522800",
           "start_frame": 522800,
           "end_frame": 610720,
@@ -2276,11 +2892,25 @@
           "text": "WAS GOING TO"
         },
         {
+          "id": "gqrx-20261123-014653-p4857-646576",
+          "start_frame": 646576,
+          "end_frame": 693592,
+          "pcm_sha256": "8588f1f1f097aa64d1113a5f81ad16b7605d377ce42c4584217484fae1c5b413",
+          "text": "HAVE AL"
+        },
+        {
           "id": "gqrx-20261123-014653-p4857-715520",
           "start_frame": 715520,
           "end_frame": 773760,
           "pcm_sha256": "ab61d369184ff8d6fb36dfeb11ddbb8ea8b5906e058ad7a3c62f6f4451fee65e",
           "text": "OF POTA"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-786696",
+          "start_frame": 786696,
+          "end_frame": 816856,
+          "pcm_sha256": "0cb9f218f25fa2bc35a92bbc755f3756ded0b298473093387dfea4e6bf2c4068",
+          "text": "HUNTI"
         },
         {
           "id": "gqrx-20261123-014653-p4857-859440",
@@ -2316,6 +2946,13 @@
           "end_frame": 1580080,
           "pcm_sha256": "c997e8a6c9f585551b7e7d5197e4100f5ca28a69d7df22014ea7fd5f2167a596",
           "text": "3 CONTACTS <BT>"
+        },
+        {
+          "id": "gqrx-20261123-014653-p4857-1617864",
+          "start_frame": 1617864,
+          "end_frame": 1671256,
+          "pcm_sha256": "e76715d77b791d0555014b8ace6d4ff88bd11ff4722829041db2978703f27d3d",
+          "text": "NGRATULA"
         }
       ]
     },
