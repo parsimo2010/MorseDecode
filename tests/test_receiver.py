@@ -123,6 +123,29 @@ def test_invalid_passband_returns_a_clear_error():
         Receiver(RATE, cfg)
 
 
+def test_cli_flushes_pending_word_once_when_capture_is_interrupted(tmp_path, monkeypatch):
+    from morse_decode import cli
+
+    class InterruptedSource:
+        sample_rate = RATE
+
+        def stream(self):
+            samples = synth("CQ", 673)[:-RATE]
+            for start in range(0, len(samples), 400):
+                yield samples[start:start + 400]
+            raise KeyboardInterrupt
+
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    monkeypatch.setattr(cli, "create_source", lambda **options: InterruptedSource())
+    log = tmp_path / "interrupted.jsonl"
+    result = CliRunner().invoke(main, ["--channel-width", "600", "--log", str(log),
+                                       "--log-format", "jsonl"])
+    assert result.exit_code == 0, result.output
+    assert "CQ" in result.output
+    assert [json.loads(line)["text"] for line in log.read_text().splitlines()] == ["CQ"]
+
+
 @pytest.mark.parametrize(("options", "message"), [
     ({"minWpm": 8e-309}, "WPM range"),
     ({"hopMs": 0.1}, "hop"),

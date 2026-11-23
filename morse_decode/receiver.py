@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -27,9 +28,13 @@ class Receiver:
             for low in range(cfg.input.freq_min, cfg.input.freq_max, cfg.input.channel_width_hz)
         ]
         driver = Path(__file__).resolve().parent / "core" / "stdio.mjs"
+        # The CLI handles Ctrl-C and needs the worker alive to flush its copy.
+        process_group = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+                         if os.name == "nt" else {"start_new_session": True})
         self._process = subprocess.Popen(
             [node, str(driver)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             text=True, encoding="utf-8", bufsize=1,
+            **process_group,
         )
         try:
             overrides = {

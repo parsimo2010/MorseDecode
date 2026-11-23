@@ -19,6 +19,8 @@ from __future__ import annotations
 import datetime
 import json
 import os
+import signal
+import threading
 from contextlib import closing
 from pathlib import Path
 from typing import TextIO
@@ -138,18 +140,44 @@ def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
                     logger.log(row.freq_hz, delta, row.snr_db, row.speed_wpm)
             display.refresh()
 
-        with display, closing(source.stream()) as chunks:
+        reading = False
+        stopping = False
+
+        def interrupt(_signum, _frame):
+            nonlocal stopping
+            stopping = True
+            if reading:
+                raise KeyboardInterrupt
+
+        with display:
             display.print_status(
                 f"[cyan]MorseDecode[/cyan] | {len(rows)} channels | "
                 f"{cfg.input.freq_min}-{cfg.input.freq_max} Hz | "
                 f"SR {sample_rate} Hz | Ctrl-C to quit"
             )
+            previous_handler = None
+            if threading.current_thread() is threading.main_thread():
+                previous_handler = signal.signal(signal.SIGINT, interrupt)
             try:
-                for chunk in chunks:
-                    update(receiver.push(chunk))
-            except KeyboardInterrupt:
-                return
-            update(receiver.finish(), final=True)
+                try:
+                    with closing(source.stream()) as chunks:
+                        while not stopping:
+                            reading = True
+                            try:
+                                if stopping:
+                                    break
+                                chunk = next(chunks)
+                            except StopIteration:
+                                break
+                            finally:
+                                reading = False
+                            update(receiver.push(chunk))
+                except KeyboardInterrupt:
+                    pass
+                update(receiver.finish(), final=True)
+            finally:
+                if previous_handler is not None:
+                    signal.signal(signal.SIGINT, previous_handler)
 
 
 # ---------------------------------------------------------------------------
