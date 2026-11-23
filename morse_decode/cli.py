@@ -100,12 +100,16 @@ class ChannelLogger:
 # ---------------------------------------------------------------------------
 
 def run_decoder(cfg: Config, logger: ChannelLogger | None = None) -> None:
+    def report_audio_status(message: str) -> None:
+        display.print_status(message)
+
     source = create_source(
         device=cfg.input.device if cfg.input.device != "default" else None,
         file=cfg.input.file,
         stdin=cfg.input.stdin,
         sample_rate=cfg.audio.sample_rate,
         chunk_ms=50.0,
+        on_status=report_audio_status,
     )
     sample_rate = source.sample_rate
     with Receiver(sample_rate, cfg) as receiver:

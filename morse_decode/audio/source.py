@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import queue
 import sys
-from typing import Generator
+from typing import Callable, Generator
 
 import numpy as np
 
@@ -112,6 +112,7 @@ class DeviceSource(AudioSource):
         device: int | str | None = None,
         sample_rate: int = 0,
         chunk_ms: float = 50.0,
+        on_status: Callable[[str], None] | None = None,
     ) -> None:
         if not _HAS_SOUNDDEVICE:
             raise RuntimeError(
@@ -123,14 +124,23 @@ class DeviceSource(AudioSource):
         self.sample_rate = sample_rate
         self._device = device
         self._chunk_size = max(1, int(sample_rate * chunk_ms / 1000.0))
-        self._q: queue.Queue[np.ndarray] = queue.Queue(maxsize=64)
+        self._on_status = on_status
 
     def stream(self) -> Generator[np.ndarray, None, None]:
-        def _callback(indata: np.ndarray, _frames: int, _time, _status) -> None:
+        chunks: queue.Queue[np.ndarray] = queue.Queue(maxsize=64)
+        statuses: queue.Queue[tuple[object, bool]] = queue.Queue(maxsize=64)
+
+        def _callback(indata: np.ndarray, _frames: int, _time, status) -> None:
+            dropped = False
             try:
-                self._q.put_nowait(indata.copy())
+                chunks.put_nowait(indata.copy())
             except queue.Full:
-                pass  # drop chunk if consumer is too slow
+                dropped = True
+            if self._on_status is not None and (status or dropped):
+                try:
+                    statuses.put_nowait((status, dropped))
+                except queue.Full:
+                    pass  # The consumer already has notices to report.
 
         with sd.InputStream(
             device=self._device,
@@ -142,9 +152,22 @@ class DeviceSource(AudioSource):
         ):
             while True:
                 try:
-                    chunk = self._q.get(timeout=0.5)
+                    chunk = chunks.get(timeout=0.5)
                 except queue.Empty:
                     continue
+                notices = set()
+                while True:
+                    try:
+                        status, dropped = statuses.get_nowait()
+                    except queue.Empty:
+                        break
+                    if status:
+                        notices.add(f"PortAudio {status}. Check the input device and system audio load.")
+                    if dropped:
+                        notices.add("Audio queue full. Reduce the receiver bandwidth or system load.")
+                if self._on_status is not None:
+                    for notice in sorted(notices):
+                        self._on_status(notice)
                 yield _to_mono(chunk)
 
 
@@ -228,6 +251,7 @@ def create_source(
     chunk_ms: float = 50.0,
     stdin_dtype: str = "int16",
     stdin_channels: int = 1,
+    on_status: Callable[[str], None] | None = None,
 ) -> AudioSource:
     """
     Create and return the appropriate AudioSource based on arguments.
@@ -246,4 +270,4 @@ def create_source(
         )
     # Live device
     dev = None if (device is None or device == "default") else device
-    return DeviceSource(device=dev, sample_rate=sample_rate, chunk_ms=chunk_ms)
+    return DeviceSource(device=dev, sample_rate=sample_rate, chunk_ms=chunk_ms, on_status=on_status)
